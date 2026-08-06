@@ -1,0 +1,127 @@
+<h2 class="page-title">
+رزروهای من
+</h2>
+
+
+{% for reservation in reservations %}
+
+
+<div class="booking-card">
+
+
+    <div class="booking-top">
+
+
+        <div class="booking-title">
+
+            <h3>
+                {{ reservation.service.name }}
+            </h3>
+
+
+            <p>
+                {{ reservation.barber.user.full_name }}
+            </p>
+
+        </div>
+
+
+
+        {% if reservation.status == "cancel" %}
+
+        <div class="status waiting">
+            لغو شده
+        </div>
+
+
+        {% elif reservation.status == "done" %}
+
+        <div class="status success">
+            انجام شده
+        </div>
+
+
+        {% else %}
+
+        <div class="status waiting">
+            {{ reservation.get_status_display }}
+        </div>
+
+        {% endif %}
+
+
+
+    </div>
+
+
+
+
+    <div class="booking-info">
+
+
+        <div>
+            📅 {{ reservation.date }}
+        </div>
+
+
+        <div>
+            🕒 {{ reservation.time }}
+        </div>
+
+
+    </div>
+
+
+
+
+
+    <div class="booking-action">
+
+
+        <button
+        class="details-btn"
+        data-id="{{ reservation.id }}"
+        onclick="showReservationDetail(this.dataset.id)">
+
+            مشاهده جزئیات
+
+        </button>
+
+
+
+        {% if reservation.status == "pending" or reservation.status == "approved" %}
+
+
+        <a
+        href="{% url 'cancel_reservation' reservation.id %}"
+        class="details-btn cancel-btn">
+
+            لغو رزرو
+
+        </a>
+
+
+        {% endif %}
+
+
+
+    </div>
+
+
+
+</div>
+
+
+{% empty %}
+
+
+<div class="booking-card">
+
+    <h3>
+        رزروی ثبت نشده است
+    </h3>
+
+</div>
+
+
+{% endfor %}

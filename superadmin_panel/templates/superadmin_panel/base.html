@@ -1,0 +1,209 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>
+        {% block title %}پنل مدیریت{% endblock %}
+    </title>
+
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <h2>AD</h2>
+
+            <p>Ahmad Dastanpour Beauty Collection</p>
+
+        </div>
+
+        <ul>
+
+            <li>
+                <a href="{% url 'dashboard' %}">
+                    <i class="fa-solid fa-house"></i>
+                    داشبورد
+                </a>
+            </li>
+
+            {% if request.user.is_super_admin or request.user.admin_permission.users_access %}
+<li>
+    <a href="{% url 'superadmin_users' %}">
+        <i class="fa-solid fa-users"></i>
+        کاربران
+    </a>
+</li>
+{% endif %}
+
+{% if request.user.is_super_admin or request.user.admin_permission.barbers_access %}
+<li>
+    <a href="{% url 'superadmin_barbers' %}">
+        <i class="fa-solid fa-user-tie"></i>
+        آرایشگرها
+    </a>
+</li>
+{% endif %}
+
+{% if request.user.is_super_admin %}
+<li>
+    <a href="{% url 'superadmin_admins' %}">
+        <i class="fa-solid fa-user-shield"></i>
+        مدیران
+    </a>
+</li>
+{% endif %}
+
+{% if request.user.is_super_admin or request.user.admin_permission.reservations_access %}
+<li>
+    <a href="{% url 'superadmin_reservations' %}">
+        <i class="fa-solid fa-calendar-days"></i>
+        نوبت‌ها
+    </a>
+</li>
+{% endif %}
+
+{% if request.user.is_super_admin or request.user.admin_permission.services_access %}
+<li>
+    <a href="{% url 'superadmin_services' %}">
+        <i class="fa-solid fa-scissors"></i>
+        خدمات
+    </a>
+</li>
+{% endif %}
+
+{% if request.user.is_super_admin or request.user.admin_permission.courses_access %}
+<li>
+    <a href="{% url 'academy_courses' %}">
+        <i class="fa-solid fa-graduation-cap"></i>
+        مدیریت دوره‌ها
+    </a>
+</li>
+{% endif %}
+
+{% if request.user.is_super_admin or request.user.admin_permission.shop_access %}
+<li>
+    <a href="{% url 'products' %}">
+        
+        <i class="fa-solid fa-store"></i>
+        فروشگاه
+    </a>
+</li>
+{% endif %}
+
+{% if request.user.is_super_admin or request.user.admin_permission.orders_access %}
+<li>
+   <a href="{% url 'orders' %}">
+    <i class="fa-solid fa-cart-shopping"></i>
+    سفارشات
+</a>
+</li>
+{% endif %}
+{% if request.user.is_super_admin or request.user.admin_permission.comments_access %}
+<li>
+    <a href="{% url 'superadmin_comments' %}">
+        <i class="fa-solid fa-comments"></i>
+        نظرات
+    </a>
+</li>
+{% endif %}
+{% if request.user.is_super_admin or request.user.admin_permission.messages_access %}
+<li>
+    <a href="{% url 'contact_messages' %}">
+        <i class="fa-solid fa-envelope"></i>
+        پیام‌ها
+    </a>
+</li>
+{% endif %}
+{% if request.user.is_super_admin or request.user.admin_permission.reports_access %}
+<li>
+    <a href="{% url 'reports' %}">
+        <i class="fa-solid fa-chart-column"></i>
+        گزارشات
+    </a>
+</li>
+{% endif %}
+
+{% if request.user.is_super_admin or request.user.admin_permission.settings_access %}
+<li>
+    <a href="{% url 'superadmin_settings' %}">
+        <i class="fa-solid fa-gear"></i>
+        تنظیمات
+    </a>
+</li>
+{% endif %}
+
+{% if request.user.is_barber %}
+
+<li>
+    <a href="{% url 'superadmin_reservations' %}">
+        <i class="fa-solid fa-calendar-check"></i>
+        نوبت‌های من
+    </a>
+</li>
+
+<li>
+    <a href="{% url 'barber_blocked_times' %}">
+        <i class="fa-solid fa-clock"></i>
+        مدیریت ساعات کاری
+    </a>
+</li>
+
+{% endif %}
+            <li>
+                <a href="{% url 'logout' %}">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    خروج
+                </a>
+            </li>
+
+        </ul>
+
+    </aside>
+
+    <div class="content">
+<div class="topbar">
+
+    <h2>
+        سلام
+        {{ request.user.full_name }}
+    </h2>
+
+
+    <a href="/" class="site-home-btn">
+
+        <i class="fa-solid fa-globe"></i>
+HOME
+
+    </a>
+
+
+</div>
+
+        <div class="page-content">
+
+            {% block content %}
+            {% endblock %}
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

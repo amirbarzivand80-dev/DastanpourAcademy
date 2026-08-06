@@ -1,0 +1,394 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}
+جزئیات محصول
+{% endblock %}
+
+{% block content %}
+
+<section class="product-detail-page">
+
+    <div class="container">
+
+        <div class="product-title">
+
+            <h1>{{ product.name }}</h1>
+
+        </div>
+
+        <div class="product-detail-grid">
+
+            <!-- گالری تصاویر -->
+          <div class="product-gallery">
+
+    <div class="swiper productSwiper">
+
+        <div class="swiper-wrapper">
+
+            {% if product.image %}
+
+            <div class="swiper-slide">
+
+                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+
+            </div>
+
+            {% endif %}
+
+
+            {% for image in product.gallery.all %}
+
+            <div class="swiper-slide">
+
+                <img src="{{ image.image.url }}" alt="{{ product.name }}">
+
+            </div>
+
+            {% endfor %}
+
+
+        </div>
+
+
+        <div class="swiper-button-next"></div>
+
+        <div class="swiper-button-prev"></div>
+
+        <div class="swiper-pagination"></div>
+
+
+    </div>
+
+
+    <!-- تصاویر کوچک -->
+
+    <div class="product-thumbs">
+
+
+        {% if product.image %}
+
+        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+
+        {% endif %}
+
+
+
+        {% for image in product.gallery.all %}
+
+        <img src="{{ image.image.url }}" alt="{{ product.name }}">
+
+        {% endfor %}
+
+
+    </div>
+
+
+</div>
+            <!-- اطلاعات محصول -->
+            <div class="product-information">
+<span class="product-brand">
+
+برند :
+{% if product.brand %}
+{{ product.brand.name }}
+{% else %}
+بدون برند
+{% endif %}
+
+</span>
+<h2 class="product-name">
+
+{{ product.name }}
+
+</h2>
+<div class="product-price">
+
+{% if product.discount_price %}
+
+{{ product.discount_price }}
+
+{% else %}
+
+{{ product.price }}
+
+{% endif %}
+
+تومان
+
+</div>
+
+                <div class="product-stock">
+{% if product.stock > 0 %}
+
+<span class="available">
+✔ موجود در انبار
+</span>
+
+{% else %}
+
+<span class="unavailable">
+✖ ناموجود
+</span>
+
+{% endif %}
+                </div>
+
+                <p class="product-short-description">
+
+                  {{ product.description }}
+
+                </p>
+
+                <div class="product-specs">
+
+                    <h3>مشخصات محصول</h3>
+
+                    <ul>
+
+{% for spec in product.specifications.all %}
+
+<li>
+    {{ spec.title }} : {{ spec.value }}
+</li>
+
+{% empty %}
+
+<li>
+    مشخصاتی ثبت نشده است.
+</li>
+
+{% endfor %}
+
+</ul>
+                </div>
+<a href="{% url 'add_to_cart' product.id %}" class="add-cart-btn">
+    🛒 افزودن به سبد خرید
+</a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="product-description-section">
+
+    <div class="container">
+
+        <div class="description-box">
+
+            <h2>توضیحات کامل محصول</h2>
+
+            <div class="description-line"></div>
+
+          <p>
+
+{{ product.description }}
+
+</p>
+        </div>
+
+    </div>
+
+</section>
+<section class="product-features-section">
+
+    <div class="container">
+
+        <div class="features-box">
+
+            <h2>ویژگی‌های محصول</h2>
+
+            <div class="description-line"></div>
+<div class="features-grid">
+
+{% for feature in product.features.all %}
+
+<div class="feature-item">
+
+✔ {{ feature.title }}
+
+</div>
+
+{% empty %}
+
+<div class="feature-item">
+
+ویژگی‌ای ثبت نشده است.
+
+</div>
+
+{% endfor %}
+
+</div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="product-comments-section">
+
+    <div class="container">
+
+        <div class="comments-box">
+
+            <h2>نظرات کاربران</h2>
+
+            <div class="description-line"></div>
+
+
+            <div class="comments-summary">
+
+                <div class="rating">
+
+                    ⭐⭐⭐⭐⭐
+
+                    <span>
+                        نظرات کاربران
+                    </span>
+
+                </div>
+
+
+                <p>
+                    {{ comments.count }} نظر ثبت شده
+                </p>
+
+            </div>
+
+
+
+            {% for comment in comments %}
+
+
+            <div class="comment-card">
+
+
+                <div class="comment-header">
+
+
+                    <div class="comment-avatar">
+                        👤
+                    </div>
+
+
+                    <div>
+
+                        <h4>
+                            {{ comment.user.full_name }}
+                        </h4>
+
+
+                        <small>
+                            {{ comment.created_at|date:"Y/m/d" }}
+                        </small>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+                <div class="comment-stars">
+
+
+                    {% if comment.rating == 5 %}
+
+                        ⭐⭐⭐⭐⭐
+
+                    {% elif comment.rating == 4 %}
+
+                        ⭐⭐⭐⭐☆
+
+                    {% elif comment.rating == 3 %}
+
+                        ⭐⭐⭐☆☆
+
+                    {% elif comment.rating == 2 %}
+
+                        ⭐⭐☆☆☆
+
+                    {% else %}
+
+                        ⭐☆☆☆☆
+
+                    {% endif %}
+
+
+                </div>
+
+
+
+
+                <p>
+
+                    {{ comment.text }}
+
+                </p>
+
+
+            </div>
+
+
+            {% empty %}
+
+
+            <div class="comment-card">
+
+                <p>
+                    هنوز نظری برای این محصول ثبت نشده است.
+                </p>
+
+            </div>
+
+
+            {% endfor %}
+
+{% if request.user.is_authenticated %}
+
+<a href="{% url 'add_comment' product.id %}" class="comment-btn">
+
+    ثبت نظر
+
+</a>
+
+{% else %}
+
+<a href="{% url 'login' %}" class="comment-btn">
+
+    برای ثبت نظر وارد شوید
+
+</a>
+
+{% endif %}
+
+
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+<link rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+<link rel="stylesheet" href="{% static 'css/product_detail.css' %}">
+
+
+
+<script src="{% static 'js/product_detail.js' %}"></script>
+
+{% endblock %}

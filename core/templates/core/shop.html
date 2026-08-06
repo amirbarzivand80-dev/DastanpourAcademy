@@ -1,0 +1,187 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}
+فروشگاه | آکادمی احمد داستانپور
+{% endblock %}
+
+{% block content %}
+
+<section class="shop-page">
+
+    <div class="container">
+
+        <div class="shop-header">
+
+            <h1>فروشگاه </h1>
+
+            <div class="title-line"></div>
+
+            <p>
+                محصولات تخصصی آرایشگری با تضمین اصالت و کیفیت
+            </p>
+
+        </div>
+<div class="shop-top">
+
+    <div class="shop-search">
+
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="جستجوی محصول..."
+        >
+
+    </div>
+
+    <div class="shop-sort">
+
+        <select id="sortProducts">
+
+            <option value="default">مرتب‌سازی</option>
+
+            <option value="cheap">ارزان‌ترین</option>
+
+            <option value="expensive">گران‌ترین</option>
+
+            <option value="name">نام محصول</option>
+
+            <option value="available">فقط موجودها</option>
+
+        </select>
+
+    </div>
+
+</div>
+
+       <div class="shop-filter">
+
+    <button class="active" data-filter="all">
+        همه
+    </button>
+
+
+    {% for category in categories %}
+
+    <button data-filter="{{ category.slug }}">
+        {{ category.name }}
+    </button>
+
+    {% endfor %}
+
+
+</div>
+
+      <div class="products-grid">
+
+
+{% for product in products %}
+
+
+<a href="{% url 'product_detail' product.slug %}" class="product-link">
+
+
+<div class="product-card"
+
+data-id="{{ product.id }}"
+
+data-price="{{ product.price }}"
+
+data-name="{{ product.name }}"
+
+data-category="{{ product.category.slug }}">
+
+
+
+<div class="product-image">
+<button 
+class="favorite-btn"
+data-id="{{ product.id }}">
+
+<i class="fa-regular fa-heart"></i>
+
+</button>
+
+
+{% if product.image %}
+
+<img src="{{ product.image.url }}" alt="{{ product.name }}">
+
+{% endif %}
+
+
+</div>
+
+
+
+<div class="product-info">
+
+
+<h3>
+{{ product.name }}
+</h3>
+
+
+
+{% if product.discount_price %}
+
+<span class="price">
+{{ product.discount_price }} تومان
+</span>
+
+
+<del>
+{{ product.price }} تومان
+</del>
+
+
+{% else %}
+
+<span class="price">
+{{ product.price }} تومان
+</span>
+
+{% endif %}
+
+
+
+{% if product.stock > 0 %}
+
+<span class="stock available">
+موجود
+</span>
+
+{% else %}
+
+<span class="stock unavailable">
+ناموجود
+</span>
+
+{% endif %}
+
+
+
+</div>
+
+
+</div>
+
+
+</a>
+
+
+{% empty %}
+
+
+<p>
+هنوز محصولی ثبت نشده است.
+</p>
+
+
+{% endfor %}
+
+
+</div>
+</section>
+<script src="{% static 'js/shop.js' %}"></script>
+{% endblock %}

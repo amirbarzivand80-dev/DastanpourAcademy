@@ -1,0 +1,127 @@
+{% extends "superadmin_panel/base.html" %}
+
+
+{% block content %}
+
+
+<h2 class="page-title">
+    پیام‌های کاربران
+</h2>
+
+
+<div class="details-card">
+
+
+{% if messages %}
+
+
+<table class="admin-table">
+
+    <thead>
+
+        <tr>
+
+            <th>نام</th>
+
+            <th>شماره تماس</th>
+
+            <th>پیام</th>
+
+            <th>تاریخ</th>
+
+            <th>وضعیت</th>
+
+            <th>عملیات</th>
+
+        </tr>
+
+    </thead>
+
+
+    <tbody>
+
+
+    {% for message in messages %}
+
+
+        <tr>
+
+            <td>
+                {{ message.full_name }}
+            </td>
+
+
+            <td>
+                {{ message.phone }}
+            </td>
+
+
+            <td>
+                {{ message.message|truncatechars:50 }}
+            </td>
+
+
+            <td>
+                {{ message.created_at|date:"Y/m/d" }}
+            </td>
+
+
+            <td>
+
+                {% if message.is_read %}
+
+                    <span>
+                        خوانده شده
+                    </span>
+
+                {% else %}
+
+                    <span>
+                        جدید
+                    </span>
+
+                {% endif %}
+
+            </td>
+
+
+            <td>
+
+                <a 
+                href="{% url 'contact_message_detail' message.id %}"
+                class="details-btn">
+
+                    مشاهده
+
+                </a>
+
+            </td>
+
+
+        </tr>
+
+
+    {% endfor %}
+
+
+    </tbody>
+
+
+</table>
+
+
+{% else %}
+
+
+<p>
+    هیچ پیامی وجود ندارد.
+</p>
+
+
+{% endif %}
+
+
+</div>
+
+
+{% endblock %}

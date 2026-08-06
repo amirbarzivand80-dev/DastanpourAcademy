@@ -1,0 +1,134 @@
+{% extends 'superadmin_panel/base.html' %}
+
+{% block content %}
+
+<div class="page-content">
+
+
+    <div class="page-header">
+
+        <h2>
+            سفارش‌ها
+        </h2>
+
+    </div>
+
+
+    <div class="table-box">
+
+
+        <table>
+
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        شماره سفارش
+                    </th>
+
+
+                    <th>
+                        مشتری
+                    </th>
+
+
+                    <th>
+                        مبلغ
+                    </th>
+
+
+                    <th>
+                        وضعیت
+                    </th>
+
+
+                    <th>
+                        عملیات
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+
+            <tbody>
+
+
+            {% for order in orders %}
+
+
+                <tr>
+
+
+                    <td>
+                        #{{ order.id }}
+                    </td>
+
+
+                    <td>
+                        {{ order.user.full_name }}
+                    </td>
+
+
+                    <td>
+                        {{ order.total_price }}
+                        تومان
+                    </td>
+
+
+                    <td>
+
+                        <span class="status active">
+
+                            {{ order.get_status_display }}
+
+                        </span>
+
+                    </td>
+
+
+                    <td>
+<a href="{% url 'order_detail' order.id %}" class="btn-edit">
+    مشاهده
+</a>
+                    </td>
+
+
+                </tr>
+
+
+
+            {% empty %}
+
+
+                <tr>
+
+                    <td colspan="5">
+
+                        سفارشی وجود ندارد
+
+                    </td>
+
+                </tr>
+
+
+            {% endfor %}
+
+
+
+            </tbody>
+
+
+        </table>
+
+
+    </div>
+
+
+</div>
+
+
+{% endblock %}

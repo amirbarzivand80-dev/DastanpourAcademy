@@ -1,0 +1,230 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>{% block title %}آکادمی احمد داستانپور{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'css/variables.css' %}">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/components.css' %}">
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
+    <link rel="stylesheet" href="{% static 'css/services.css' %}">
+    
+    <link rel="stylesheet" href="{% static 'css/service_detail.css' %}">
+    <link rel="stylesheet" href="{% static 'css/course_detail.css' %}">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+          <link rel="stylesheet" href="{% static 'css/shop.css' %}">
+<link
+rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+
+
+</head>
+
+<body>
+
+<header class="header">
+
+    <div class="container header-content">
+
+     <div class="logo">
+    <span>DASTANPOUR Beauty Collection</span>
+    <a href="/">مجموعه زیبایی احمدداستانپور</a>
+</div>
+
+        <nav class="navbar">
+            <ul>
+               <li><a href="/">صفحه اصلی</a></li>
+
+<li><a href="{% url 'services' %}">خدمات</a></li>
+
+<li><a href="{% url 'education' %}">آموزش‌ها</a></li>
+
+<li><a href="{% url 'shop' %}">فروشگاه</a></li>
+
+<li><a href="{% url 'about' %}">درباره ما</a></li>
+
+<li><a href="{% url 'contact' %}">تماس با ما</a></li>
+            </ul>
+        </nav>
+<div class="auth-buttons">
+
+{% if user.is_authenticated %}
+<a href="{% url 'profile_redirect' %}" class="header-btn user-name">
+    <span class="avatar">
+        {{ user.full_name|first }}
+    </span>
+
+    {{ user.full_name }}
+
+</a>
+
+{% else %}
+
+<a href="{% url 'login' %}" class="header-btn">
+    ورود
+</a>
+
+{% endif %}
+
+</div>
+<div class="header-actions">
+
+    <a href="{% url 'favorites' %}" class="header-favorite">
+
+        <i class="fa-solid fa-heart"></i>
+
+    </a>
+
+    <a href="{% url 'cart' %}" class="header-cart">
+
+        🛒
+
+        <span class="cart-count">1</span>
+
+    </a>
+
+</div>
+    </div>
+
+</header>
+
+{% if messages %}
+<div class="messages-container">
+
+    {% for message in messages %}
+
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+
+    </div>
+
+    {% endfor %}
+
+</div>
+{% endif %}
+
+{% block content %}
+{% endblock %}
+<footer class="footer">
+
+    <div class="footer-glass">
+
+        <div class="footer-info">
+
+            <div class="info-card">
+
+                <i class="fa-solid fa-location-dot"></i>
+
+                <h4>آدرس</h4>
+
+                <p>اصفهان - هشت بهشت شرقی - خیابان میثم تمار</p>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <i class="fa-solid fa-phone"></i>
+
+                <h4>تماس</h4>
+
+                <p>3661 327 0913</p>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <i class="fa-solid fa-envelope"></i>
+
+                <h4>ایمیل</h4>
+
+                <p></p>
+
+            </div>
+
+        </div>
+
+
+
+
+        <div class="footer-social">
+
+            <a href="#" class="instagram">
+                <i class="fa-brands fa-instagram"></i>
+            </a>
+
+            <a href="#" class="telegram">
+                <i class="fa-brands fa-telegram"></i>
+            </a>
+
+            <a href="#" class="whatsapp">
+                <i class="fa-brands fa-whatsapp"></i>
+            </a>
+
+        </div>
+
+<div class="footer-enamad">
+
+    <a href="#" class="enamad-box">
+        اینماد
+    </a>
+
+    <a href="#" class="enamad-box">
+        ساماندهی
+    </a>
+
+    <a href="{% url 'rules' %}" class="enamad-box footer-rules">
+
+        <i class="fa-solid fa-scale-balanced"></i>
+
+        <span>قوانین و مقررات</span>
+
+    </a>
+
+    <a href="{% url 'privacy' %}" class="enamad-box footer-rules">
+
+    <i class="fa-solid fa-user-shield"></i>
+
+    <span>
+        حریم خصوصی
+    </span>
+
+</a>
+</div>
+
+        <div class="footer-bottom">
+
+            <p>
+                ©️ 2026 Ahmad Dastanpour Beauty Collection
+            </p>
+
+            <small>
+                Website Designed & Developed by
+                <span>AMIR BARZIVAND</span>
+            </small>
+
+        </div>
+
+    </div>
+
+</footer>
+<script src="{% static 'js/main.js' %}"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+<script src="{% static 'js/cart.js' %}"></script>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<link rel="stylesheet" href="{% static 'css/rules.css' %}">
+</body>
+
+</html>

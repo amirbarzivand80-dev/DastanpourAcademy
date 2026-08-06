@@ -1,0 +1,27 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+حذف تصویر
+{% endblock %}
+
+{% block content %}
+
+<h2>حذف تصویر</h2>
+
+<p>آیا از حذف این تصویر مطمئن هستید؟</p>
+
+<img src="{{ image.image.url }}" width="250">
+
+<form method="post">
+
+    {% csrf_token %}
+
+    <button type="submit">
+
+        بله، حذف شود
+
+    </button>
+
+</form>
+
+{% endblock %}

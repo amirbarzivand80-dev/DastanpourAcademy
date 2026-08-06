@@ -1,0 +1,241 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+داشبورد
+{% endblock %}
+
+{% block content %}
+
+<!-- =======================
+        کارت های آماری
+======================== -->
+
+<div class="cards">
+
+    <div class="card">
+        <h3>کاربران</h3>
+        <h1>{{ users_count }}</h1>
+    </div>
+
+    <div class="card">
+        <h3>نوبت‌ها</h3>
+        <h1>{{ reservation_count }}</h1>
+    </div>
+
+    <div class="card">
+        <h3>آرایشگرها</h3>
+        <h1>{{ barbers_count }}</h1>
+    </div>
+
+    <div class="card">
+        <h3>خدمات</h3>
+        <h1>{{ services_count }}</h1>
+    </div>
+
+    <div class="card">
+        <h3>محصولات</h3>
+        <h1>{{ products_count }}</h1>
+    </div>
+
+    <div class="card">
+        <h3>سفارشات</h3>
+        <h1>{{ orders_count }}</h1>
+    </div>
+
+</div>
+
+
+<!-- =======================
+        نمودار درآمد
+======================== -->
+
+<div class="dashboard-row">
+
+    <div class="dashboard-box chart-box">
+
+        <h2>نمودار درآمد</h2>
+
+        <canvas id="incomeChart"></canvas>
+
+    </div>
+
+</div>
+
+
+<!-- =======================
+     رزروها و سفارشات
+======================== -->
+
+<div class="dashboard-row">
+
+    <!-- آخرین رزروها -->
+
+    <div class="dashboard-box">
+
+        <h2>آخرین رزروها</h2>
+
+        <table>
+
+            <thead>
+
+            <tr>
+
+                <th>مشتری</th>
+                <th>خدمت</th>
+                <th>آرایشگر</th>
+                <th>تاریخ</th>
+                <th>ساعت</th>
+                <th>وضعیت</th>
+
+            </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for r in last_reservations %}
+
+            <tr>
+
+                <td>{{ r.user.full_name }}</td>
+                <td>{{ r.service.name }}</td>
+                <td>{{ r.barber.user.full_name }}</td>
+                <td>{{ r.date }}</td>
+                <td>{{ r.time }}</td>
+                <td>{{ r.get_status_display }}</td>
+
+            </tr>
+
+            {% empty %}
+
+            <tr>
+
+                <td colspan="6">
+
+                    هنوز رزروی ثبت نشده است.
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+
+    <!-- آخرین سفارشات -->
+
+    <div class="dashboard-box small-box">
+
+        <h2>آخرین سفارشات</h2>
+
+        <div class="dashboard-list">
+
+            {% for order in last_orders %}
+
+            <div class="dashboard-item">
+
+                <strong>{{ order.user.full_name }}</strong>
+
+                <span>{{ order.total_price }} تومان</span>
+
+            </div>
+
+            {% empty %}
+
+            <div class="dashboard-item">
+
+                <strong>فعلاً سفارشی وجود ندارد.</strong>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =======================
+      پیام ها و نظرات
+======================== -->
+
+<div class="dashboard-row">
+
+    <!-- پیام های جدید -->
+
+    <div class="dashboard-box small-box">
+
+        <h2>پیام‌های جدید</h2>
+
+        <div class="dashboard-list">
+
+            {% for message in last_messages %}
+
+            <div class="dashboard-item">
+
+                <strong>{{ message.full_name }}</strong>
+
+                <span>{{ message.phone }}</span>
+
+            </div>
+
+            {% empty %}
+
+            <div class="dashboard-item">
+
+                <strong>فعلاً پیامی وجود ندارد.</strong>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+
+
+    <!-- نظرات در انتظار تایید -->
+
+    <div class="dashboard-box small-box">
+
+        <h2>نظرات در انتظار تایید</h2>
+
+        <div class="dashboard-list">
+
+            {% for comment in pending_comments %}
+
+            <div class="dashboard-item">
+
+                <strong>{{ comment.user.full_name }}</strong>
+
+                <span>{{ comment.product.name }}</span>
+
+            </div>
+
+            {% empty %}
+
+            <div class="dashboard-item">
+
+                <strong>همه نظرات تایید شده‌اند.</strong>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

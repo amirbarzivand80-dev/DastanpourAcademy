@@ -1,0 +1,69 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}مشخصات محصول{% endblock %}
+
+{% block content %}
+
+<h2>مشخصات {{ product.name }}</h2>
+
+<hr>
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit" class="btn-add">
+        افزودن مشخصه
+    </button>
+
+</form>
+
+<hr>
+
+<table class="dashboard-table">
+
+    <thead>
+
+        <tr>
+
+            <th>عنوان</th>
+
+            <th>مقدار</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+    {% for spec in specs %}
+
+        <tr>
+
+            <td>{{ spec.title }}</td>
+
+            <td>{{ spec.value }}</td>
+
+        </tr>
+
+    {% empty %}
+
+        <tr>
+
+            <td colspan="2">
+
+                هنوز مشخصه‌ای ثبت نشده است.
+
+            </td>
+
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}

@@ -1,0 +1,139 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}جزئیات دوره{% endblock %}
+
+{% block content %}
+
+<section class="course-detail">
+
+   <div class="gallery">
+
+    {% if course.image %}
+        <img src="{{ course.image.url }}" alt="{{ course.title }}">
+    {% endif %}
+
+    {% for image in course.gallery.all %}
+
+        <img src="{{ image.image.url }}" alt="{{ course.title }}">
+
+    {% endfor %}
+
+</div>
+
+    <div class="course-info">
+<span class="course-type">
+
+{% if course.course_type == "offline" %}
+دوره حضوری
+{% elif course.course_type == "online" %}
+دوره آنلاین
+{% else %}
+آموزش رایگان
+{% endif %}
+
+</span>
+
+       <h1>{{ course.title }}</h1>
+       <p>{{ course.description }}</p>
+
+        <div class="course-topics">
+
+    <h2>سرفصل‌های دوره</h2>
+
+    <ul>
+
+        {% for topic in course.topics.all %}
+
+            <li>{{ topic.title }}</li>
+
+        {% empty %}
+
+            <li>هنوز سرفصلی ثبت نشده است.</li>
+
+        {% endfor %}
+
+    </ul>
+
+</div>
+<div class="course-sessions">
+
+    <h2>جلسات دوره</h2>
+
+    <ul>
+
+        {% for session in course.sessions.all %}
+
+            <li>{{ session.order }} - {{ session.title }}</li>
+
+        {% empty %}
+
+            <li>هنوز جلسه‌ای ثبت نشده است.</li>
+
+        {% endfor %}
+
+    </ul>
+
+</div>
+<div class="course-features">
+
+    {% for feature in course.features.all %}
+
+        <div class="feature-box">
+
+            <i class="{{ feature.icon }} feature-icon"></i>
+
+            <h3>{{ feature.title }}</h3>
+
+            <p>{{ feature.description }}</p>
+
+        </div>
+
+    {% empty %}
+
+        <p>ویژگی‌ای ثبت نشده است.</p>
+
+    {% endfor %}
+
+</div>
+        <div class="course-meta">
+
+            <div>
+                👨‍🏫 مدرس :
+              <strong>{{ course.teacher }}</strong>
+            </div>
+
+            <div>
+                📅 شروع دوره :
+               <strong>{{ course.start_date }}</strong>
+            </div>
+
+            <div>
+                🕒 ساعت :
+                <strong>{{ course.start_time }} تا {{ course.end_time }}</strong>
+            </div>
+
+            <div>
+                📍 مکان :
+                <strong>{{ course.location }}</strong>
+            </div>
+
+            <div>
+                💰 شهریه :
+                {% if course.course_type == "free" %}
+<strong>رایگان</strong>
+{% else %}
+<strong>{{ course.price }} تومان</strong>
+{% endif %}
+            </div>
+
+        </div>
+<a href="{% url 'course_register' course.slug %}" class="course-btn">
+    ثبت نام در دوره
+</a>
+
+    </div>
+
+</section>
+
+{% endblock %}

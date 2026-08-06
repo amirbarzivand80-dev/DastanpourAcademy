@@ -1,0 +1,50 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+افزودن ویژگی
+{% endblock %}
+
+{% block content %}
+
+<h2>افزودن ویژگی</h2>
+
+<form method="post">
+
+{% csrf_token %}
+
+<label>عنوان</label>
+
+<input
+type="text"
+name="title"
+required>
+
+<br><br>
+
+<label>توضیح</label>
+
+<textarea
+name="description"
+required></textarea>
+
+<br><br>
+
+<label>آیکون FontAwesome</label>
+
+<input
+type="text"
+name="icon"
+placeholder="fa-solid fa-star"
+required>
+
+<br><br>
+
+<button type="submit">
+
+ذخیره
+
+</button>
+
+</form>
+
+{% endblock %}

@@ -1,0 +1,223 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<section class="education-page">
+
+    <div class="container">
+
+        <div class="education-header">
+
+            <h1>آموزش‌ها</h1>
+
+            <div class="title-line"></div>
+
+        </div>
+
+
+        <div class="education-tabs">
+
+            <button class="tab-btn active" data-tab="offline">
+                دوره‌های حضوری
+            </button>
+
+            <button class="tab-btn" data-tab="online">
+                دوره‌های آنلاین
+            </button>
+
+            <button class="tab-btn" data-tab="free">
+                آموزش‌های رایگان
+            </button>
+
+        </div>
+
+
+        <div class="education-content">
+
+
+            {% for type, title in course_types %}
+
+
+            <div class="tab-content {% if forloop.first %}active{% endif %}" id="{{ type }}">
+
+
+                <h2 class="section-title">
+                    {{ title }}
+                </h2>
+
+
+                {% for course in courses %}
+
+
+                    {% if course.course_type == type %}
+
+
+                    <div class="course-row"
+                         data-id="{{ course.id }}"
+                         data-name="{{ course.title }}"
+                         data-price="{{ course.price }}">
+
+
+
+                        <div class="course-image">
+
+
+                            <button 
+                            class="favorite-btn"
+                            data-id="{{ course.id }}">
+
+                                <i class="fa-regular fa-heart"></i>
+
+                            </button>
+
+
+
+                            {% if course.image %}
+
+                                <img src="{{ course.image.url }}" alt="{{ course.title }}">
+
+                            {% endif %}
+
+
+                        </div>
+
+
+
+
+                        <div class="course-info">
+
+
+                            <h3>
+                                {{ course.title }}
+                            </h3>
+
+
+                            <p>
+                                {{ course.description }}
+                            </p>
+
+
+
+                            <div class="course-meta">
+
+
+                                <span>
+                                    👨‍🏫 مدرس: احمد داستانپور
+                                </span>
+
+
+
+                                {% if course.course_type == "offline" %}
+
+                                    <span>
+                                        🏫 حضوری
+                                    </span>
+
+
+                                {% elif course.course_type == "online" %}
+
+                                    <span>
+                                        💻 آنلاین
+                                    </span>
+
+
+                                {% else %}
+
+                                    <span>
+                                        🎁 رایگان
+                                    </span>
+
+
+                                {% endif %}
+
+
+
+                            </div>
+
+
+                        </div>
+
+
+
+
+                        <div class="course-price">
+
+
+                            {% if course.course_type == "free" %}
+
+
+                                <h3>
+                                    رایگان
+                                </h3>
+
+
+                                <a href="{% url 'course_detail' course.slug %}">
+                                    مشاهده آموزش
+                                </a>
+
+
+
+                            {% else %}
+
+
+
+                                <h3>
+                                    {{ course.price }} تومان
+                                </h3>
+
+
+                                <a href="{% url 'course_detail' course.slug %}">
+                                    ثبت‌نام
+                                </a>
+
+
+
+                            {% endif %}
+
+
+                        </div>
+
+
+
+                    </div>
+
+
+                    {% endif %}
+
+
+                {% empty %}
+
+
+                    <p>
+                        هنوز دوره‌ای ثبت نشده است.
+                    </p>
+
+
+                {% endfor %}
+
+
+
+            </div>
+
+
+            {% endfor %}
+
+
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+
+<link rel="stylesheet" href="{% static 'css/education.css' %}">
+
+<script src="{% static 'js/education.js' %}"></script>
+
+
+{% endblock %}

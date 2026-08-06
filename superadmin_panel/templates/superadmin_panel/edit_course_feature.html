@@ -1,0 +1,53 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+
+ویرایش ویژگی
+
+{% endblock %}
+
+{% block content %}
+
+<h2>ویرایش ویژگی</h2>
+
+<form method="post">
+
+{% csrf_token %}
+
+<label>عنوان</label>
+
+<input
+type="text"
+name="title"
+value="{{ feature.title }}"
+required>
+
+<br><br>
+
+<label>توضیح</label>
+
+<textarea
+name="description"
+required>{{ feature.description }}</textarea>
+
+<br><br>
+
+<label>آیکون</label>
+
+<input
+type="text"
+name="icon"
+value="{{ feature.icon }}"
+required>
+
+<br><br>
+
+<button type="submit">
+
+ذخیره
+
+</button>
+
+</form>
+
+{% endblock %}

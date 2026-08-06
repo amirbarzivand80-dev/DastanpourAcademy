@@ -1,0 +1,102 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}
+خدمات | آکادمی احمد داستانپور
+{% endblock %}
+
+{% block content %}
+
+<section class="services-page">
+
+    <div class="container">
+
+        <div class="services-header">
+
+            <h1>خدمات مجموعه </h1>
+
+            <div class="title-line"></div>
+
+        </div>
+<div class="services-search">
+
+    <input
+        type="text"
+        id="serviceSearch"
+        placeholder="جستجوی خدمات...">
+
+</div>
+       <div class="services-filter">
+
+    <button class="active" data-filter="all">
+        همه
+    </button>
+
+    {% for category in categories %}
+
+        <button data-filter="{{ category.id }}">
+            {{ category.name }}
+        </button>
+
+    {% endfor %}
+
+</div>
+
+        <div class="services-grid">
+
+        {% for service in services %}
+
+            <a href="{% url 'service_detail' service.id %}" class="service-link">
+
+                <div class="service-card"
+                     data-category="{{ service.category.id }}">
+
+                    <div class="service-image">
+
+                        {% if service.image %}
+                            <img src="{{ service.image.url }}" alt="{{ service.name }}">
+                        {% else %}
+                            <img src="{% static 'images/default-service.jpg' %}" alt="">
+                        {% endif %}
+
+                        <div class="service-icon">
+                            ✂️
+                        </div>
+
+                    </div>
+
+                    <div class="service-content">
+
+                        <h3>{{ service.name }}</h3>
+
+                        <p>
+                            {{ service.description }}
+                        </p>
+
+                        <div class="service-price">
+                            {{ service.price }} تومان
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </a>
+
+        {% empty %}
+
+            <h3 style="color:white;text-align:center;">
+                هنوز سرویسی ثبت نشده است.
+            </h3>
+
+        {% endfor %}
+
+        </div>
+
+    </div>
+
+</section>
+
+<script src="{% static 'js/services.js' %}"></script>
+
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+ورود | ثبت نام
+{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+
+<div class="auth-page">
+
+    <div class="auth-card">
+
+        <div class="logo-area">
+
+            <h1>Beauty Collection</h1>
+            <h2>Ahmed Dastanpour</h2>
+
+        </div>
+
+        <div class="auth-tabs">
+
+            <button id="loginTab" class="active">
+                ورود
+            </button>
+
+            <button id="registerTab">
+                ثبت نام
+            </button>
+
+        </div>
+
+        <!-- فرم ورود -->
+
+        <form id="loginForm"
+      method="POST"
+      action="{% url 'login' %}">
+
+    {% csrf_token %}
+
+    <input
+        type="text"
+        name="phone"
+        placeholder="شماره موبایل"
+        required>
+
+    <input
+        type="password"
+        name="password"
+        placeholder="رمز عبور"
+        required>
+
+    <button type="submit">
+        ورود
+    </button>
+
+</form>
+
+        <!-- فرم ثبت نام -->
+<form id="registerForm"
+      method="POST"
+      action="{% url 'register' %}">
+
+    {% csrf_token %}
+
+    <input
+        type="text"
+        name="full_name"
+        placeholder="نام و نام خانوادگی"
+        required
+    >
+
+    <input
+        type="text"
+        name="phone"
+        placeholder="شماره موبایل"
+        required
+    >
+
+    <input
+        type="password"
+        name="password"
+        placeholder="رمز عبور"
+        required
+    >
+
+    <input
+        type="password"
+        name="confirm_password"
+        placeholder="تکرار رمز عبور"
+        required
+    >
+
+    <button type="submit">
+        ثبت نام
+    </button>
+
+</form>
+    </div>
+
+</div>
+
+<script src="{% static 'js/auth.js' %}"></script>
+
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+مدیریت ساعات کاری
+{% endblock %}
+
+{% block content %}
+
+<h2 class="page-title">
+مدیریت ساعات کاری
+</h2>
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button class="btn-edit">
+        ثبت
+    </button>
+
+</form>
+
+<hr>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>تاریخ</th>
+<th>شروع</th>
+<th>پایان</th>
+<th>دلیل</th>
+<th>عملیات</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for item in blocked_times %}
+
+<tr>
+
+<td>{{ item.date }}</td>
+<td>{{ item.start_time }}</td>
+<td>{{ item.end_time }}</td>
+<td>{{ item.reason }}</td>
+
+<td>
+
+<a href="{% url 'edit_blocked_time' item.id %}"
+   class="btn-edit">
+ویرایش
+</a>
+
+<a href="{% url 'delete_blocked_time' item.id %}"
+   class="btn-delete"
+   onclick="return confirm('حذف شود؟');">
+حذف
+</a>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+{% endblock %}

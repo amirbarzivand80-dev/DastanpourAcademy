@@ -1,0 +1,133 @@
+<h2 class="page-title">
+    جزئیات سفارش #{{ order.id }}
+</h2>
+
+
+<div class="booking-card">
+
+
+    <div class="booking-top">
+
+        <div class="booking-title">
+
+            <h3>
+                محصولات سفارش
+            </h3>
+
+            <p>
+                تاریخ:
+                {{ order.created_at|date:"Y/m/d" }}
+            </p>
+
+        </div>
+
+
+        <div class="status waiting">
+
+            {{ order.get_status_display }}
+
+        </div>
+
+
+    </div>
+
+
+
+    {% for item in order.items.all %}
+
+
+    <div class="booking-info">
+
+
+        <div>
+            🛍 {{ item.product.name }}
+        </div>
+
+
+        <div>
+            تعداد:
+            {{ item.quantity }}
+        </div>
+
+
+        <div>
+            💰
+            {{ item.price }}
+            تومان
+        </div>
+
+
+    </div>
+
+
+    {% endfor %}
+
+
+
+</div>
+
+
+
+
+
+<div class="details-card">
+
+
+    <div class="detail-row">
+
+        <span>
+            💰 مبلغ نهایی
+        </span>
+
+
+        <strong>
+            {{ order.total_price }}
+            تومان
+        </strong>
+
+    </div>
+
+
+
+    <div class="detail-row">
+
+        <span>
+            📌 وضعیت سفارش
+        </span>
+
+
+        <strong class="status waiting">
+
+            {{ order.get_status_display }}
+
+        </strong>
+
+    </div>
+
+
+
+    <div class="detail-row">
+
+        <span>
+            📍 آدرس ارسال
+        </span>
+
+
+        <strong>
+            {{ order.address }}
+        </strong>
+
+    </div>
+
+
+
+    <button 
+    class="back-btn"
+    onclick="loadOrders()">
+
+        ← بازگشت به سفارش‌ها
+
+    </button>
+
+
+</div>

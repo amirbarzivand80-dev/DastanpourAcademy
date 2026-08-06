@@ -1,0 +1,38 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+مدیریت فروشگاه
+{% endblock %}
+
+
+{% block content %}
+
+<div class="page-header">
+    <h2>مدیریت فروشگاه</h2>
+</div>
+
+
+<div class="management-grid">
+
+
+    <a href="{% url 'categories' %}" class="manage-card">
+
+        <span>📂</span>
+        <h3>دسته‌بندی‌ها</h3>
+
+    </a>
+
+
+
+    <a href="{% url 'brands' %}" class="manage-card">
+
+        <span>🏷</span>
+        <h3>برندها</h3>
+
+    </a>
+
+
+</div>
+
+
+{% endblock %}

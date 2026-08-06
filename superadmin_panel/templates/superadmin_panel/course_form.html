@@ -1,0 +1,47 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <h2>{{ title }}</h2>
+</div>
+
+<form method="post" enctype="multipart/form-data" class="card-form">
+
+    {% csrf_token %}
+
+    {% for field in form %}
+
+        <div class="mb-3">
+
+            <label>
+                {{ field.label }}
+            </label>
+
+            {{ field }}
+
+            {% if field.errors %}
+                <div class="text-danger">
+                    {{ field.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+    {% endfor %}
+
+    <div class="form-buttons">
+
+        <button type="submit" class="btn-add">
+            ذخیره دوره
+        </button>
+
+        <a href="{% url 'academy_courses' %}" class="btn-delete">
+            بازگشت
+        </a>
+
+    </div>
+
+</form>
+
+{% endblock %}

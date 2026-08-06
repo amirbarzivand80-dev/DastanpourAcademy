@@ -1,0 +1,33 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block content %}
+
+<h2 class="page-title">
+    {{ title }}
+</h2>
+
+<form method="POST" enctype="multipart/form-data" class="form-box">
+
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit" class="btn-edit">
+
+        ذخیره
+
+    </button>
+
+    <a href="{% url 'superadmin_services' %}" class="btn-delete">
+
+        انصراف
+
+    </a>
+
+</form>
+
+{% endblock %}

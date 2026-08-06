@@ -1,0 +1,184 @@
+{% extends 'superadmin_panel/base.html' %}
+
+
+{% block content %}
+
+
+<div class="page-content">
+
+
+    <div class="page-header">
+
+        <h2>
+            جزئیات سفارش #{{ order.id }}
+        </h2>
+
+    </div>
+
+
+
+    <div class="table-box">
+<h2>
+    اطلاعات مشتری
+</h2>
+
+
+<p>
+    نام:
+    {{ order.full_name }}
+</p>
+
+
+<p>
+    شماره تماس:
+    {{ order.phone }}
+</p>
+
+
+<p>
+    آدرس:
+    {{ order.address }}
+</p>
+
+    </div>
+
+
+
+
+    <div class="table-box">
+
+
+        <h2>
+            محصولات سفارش
+        </h2>
+
+
+        <table>
+
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        محصول
+                    </th>
+
+
+                    <th>
+                        تعداد
+                    </th>
+
+
+                    <th>
+                        قیمت
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+
+            <tbody>
+
+
+            {% for item in order.items.all %}
+
+
+                <tr>
+
+
+                    <td>
+                        {{ item.product.name }}
+                    </td>
+
+
+                    <td>
+                        {{ item.quantity }}
+                    </td>
+
+
+                    <td>
+                        {{ item.price }}
+                        تومان
+                    </td>
+
+
+                </tr>
+
+
+            {% endfor %}
+
+
+
+            </tbody>
+
+
+        </table>
+
+
+    </div>
+
+
+
+
+
+    <div class="table-box">
+
+
+        <h2>
+            وضعیت سفارش
+        </h2>
+
+<form method="POST" action="{% url 'update_order_status' order.id %}">
+
+{% csrf_token %}
+
+
+<select name="status">
+
+    {% for key,value in order.STATUS_CHOICES %}
+
+        <option 
+        value="{{ key }}"
+        {% if order.status == key %}
+        selected
+        {% endif %}
+        >
+
+        {{ value }}
+
+        </option>
+
+    {% endfor %}
+
+
+</select>
+
+
+<button type="submit">
+    ذخیره وضعیت
+</button>
+
+
+</form>
+
+
+        <h3 style="color:#d4b06a">
+
+            مبلغ نهایی:
+            {{ order.total_price }}
+            تومان
+
+        </h3>
+
+
+    </div>
+
+
+
+</div>
+
+
+{% endblock %}

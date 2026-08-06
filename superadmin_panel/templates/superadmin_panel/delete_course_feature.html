@@ -1,0 +1,33 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+حذف ویژگی
+{% endblock %}
+
+{% block content %}
+
+<h2>حذف ویژگی</h2>
+
+<p>
+
+آیا از حذف
+
+<strong>{{ feature.title }}</strong>
+
+اطمینان دارید؟
+
+</p>
+
+<form method="post">
+
+{% csrf_token %}
+
+<button type="submit">
+
+بله، حذف شود
+
+</button>
+
+</form>
+
+{% endblock %}

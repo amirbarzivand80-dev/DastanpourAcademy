@@ -1,0 +1,117 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}مدیریت محصولات{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h2>مدیریت فروشگاه </h2>
+
+</div>
+
+<div class="header-buttons">
+
+    <a href="{% url 'add_product' %}" class="btn-add">
+        + افزودن محصول
+    </a>
+<a href="{% url 'shop_management' %}" class="btn-edit">
+    ⚙ مدیریت فروشگاه
+</a>
+
+</div>
+
+<br>
+
+<table class="dashboard-table">
+
+    <thead>
+        <tr>
+            <th>تصویر</th>
+            <th>نام محصول</th>
+            <th>دسته بندی</th>
+            <th>برند</th>
+            <th>قیمت</th>
+            <th>موجودی</th>
+            <th>وضعیت</th>
+            <th>عملیات</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        {% for product in products %}
+
+        <tr>
+
+            <td>
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" width="70">
+                {% endif %}
+            </td>
+
+            <td>{{ product.name }}</td>
+
+            <td>{{ product.category.name }}</td>
+
+            <td>
+                {% if product.brand %}
+                    {{ product.brand.name }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+
+            <td>{{ product.price }}</td>
+
+            <td>{{ product.stock }}</td>
+
+            <td>
+                {% if product.is_active %}
+                    فعال
+                {% else %}
+                    غیرفعال
+                {% endif %}
+            </td>
+
+            <td>
+
+                <a href="{% url 'edit_product' product.id %}" class="btn-edit">
+                    ویرایش
+                </a>
+
+                <a href="{% url 'product_gallery' product.id %}" class="btn-edit">
+                    گالری
+                </a>
+<a href="{% url 'product_specifications' product.id %}" class="btn-edit">
+    مشخصات
+</a>
+
+<a href="{% url 'product_features' product.id %}" class="btn-edit">
+    ویژگی‌ها
+</a>
+                <a href="#" class="btn-delete">
+                    حذف
+                </a>
+
+            </td>
+
+        </tr>
+
+        {% empty %}
+
+        <tr>
+
+            <td colspan="8">
+                هنوز محصولی ثبت نشده است.
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}دسته بندی ها{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h2>مدیریت دسته بندی ها</h2>
+
+    <a href="{% url 'add_category' %}" class="btn-add">
+        + افزودن دسته بندی
+    </a>
+
+</div>
+
+<table class="dashboard-table">
+
+    <thead>
+
+        <tr>
+
+            <th>نام</th>
+
+            <th>اسلاگ</th>
+
+            <th>عملیات</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+        {% for category in categories %}
+
+        <tr>
+
+            <td>{{ category.name }}</td>
+
+            <td>{{ category.slug }}</td>
+
+            <td>
+
+                <a href="#" class="btn-edit">
+                    ویرایش
+                </a>
+
+                <a href="#" class="btn-delete">
+                    حذف
+                </a>
+
+            </td>
+
+        </tr>
+
+        {% empty %}
+
+        <tr>
+
+            <td colspan="3">
+                هنوز دسته بندی ثبت نشده است.
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}

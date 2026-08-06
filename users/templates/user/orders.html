@@ -1,0 +1,73 @@
+<h2 class="page-title">
+    سفارش‌های من
+</h2>
+
+
+{% for order in orders %}
+
+<div class="booking-card">
+
+
+    <div class="booking-top">
+
+        <div class="booking-title">
+
+            <h3>
+                سفارش #{{ order.id }}
+            </h3>
+
+            <p>
+                {{ order.created_at|date:"Y/m/d" }}
+            </p>
+
+        </div>
+
+
+        <div class="status waiting">
+
+            {{ order.get_status_display }}
+
+        </div>
+
+    </div>
+
+
+
+    <div class="booking-info">
+
+
+        <div>
+            💰 {{ order.total_price }} تومان
+        </div>
+
+
+        <div>
+            🛍 {{ order.items.count }} محصول
+        </div>
+
+
+    </div>
+
+
+    <button 
+class="details-btn"
+data-id="{{ order.id }}"
+onclick="showOrderDetail(this.dataset.id)">
+
+مشاهده جزئیات
+
+</button>
+
+
+</div>
+
+
+{% empty %}
+
+
+<p>
+هنوز سفارشی ندارید.
+</p>
+
+
+{% endfor %}

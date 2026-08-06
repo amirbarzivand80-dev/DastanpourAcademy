@@ -1,0 +1,261 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+
+
+<section class="hero">
+
+    <div class="hero-overlay"></div>
+
+    <div class="container hero-content">
+
+        <h1>
+            زیبایی، <span>هنر</span> است<br>
+            و <span>هنر</span> از اینجا آغاز می‌شود
+        </h1>
+
+        <p>
+            آموزش تخصصی آرایشگری مردانه، خدمات VIP و فروش محصولات حرفه‌ای
+        </p>
+
+        <div class="hero-buttons">
+
+          <a href="{% url 'reservation' %}">
+    رزرو نوبت
+</a>
+
+           <a href="{% url 'education' %}">
+    دوره‌های آموزشی
+</a>
+
+        </div>
+
+    </div>
+
+</section>
+<section class="cards-section">
+
+    <div class="container">
+
+        <div class="cards">
+
+            <!-- خدمات -->
+
+            <div class="card">
+
+                <div class="card-image">
+
+                    <img src="{% static 'images/service.jpg' %}" alt="خدمات">
+
+                </div>
+
+                <div class="card-icon">
+
+                    💈
+
+                </div>
+
+                <div class="card-body">
+
+                    <h3>خدمات</h3>
+
+                    <p>
+                        انواع خدمات اصلاح، گریم، فیشیال و پیرایش
+                        با جدیدترین متدهای روز دنیا
+                    </p>
+
+                    <a href="{% url 'services' %}" class="card-btn">
+    مشاهده خدمات
+    <span>→</span>
+</a>
+
+                </div>
+
+            </div>
+
+            <!-- آموزش -->
+
+            <div class="card">
+
+                <div class="card-image">
+
+                    <img src="{% static 'images/academy.jpg' %}" alt="آموزش">
+
+                </div>
+
+                <div class="card-icon">
+
+                    🎓
+
+                </div>
+
+                <div class="card-body">
+
+                    <h3>آموزش</h3>
+
+                    <p>
+                        آموزش تخصصی آرایشگری مردانه
+                        از مبتدی تا فوق حرفه‌ای
+                    </p>
+
+                    <a href="{% url 'education' %}" class="card-btn">
+    مشاهده دوره‌ها
+    <span>→</span>
+</a>
+
+                </div>
+
+            </div>
+
+            <!-- فروشگاه -->
+
+            <div class="card">
+
+                <div class="card-image">
+
+                    <img src="{% static 'images/shop.jpg' %}" alt="فروشگاه">
+
+                </div>
+
+                <div class="card-icon">
+
+                    🛍
+
+                </div>
+
+                <div class="card-body">
+
+                    <h3>فروشگاه</h3>
+
+                    <p>
+                        محصولات اورجینال آرایشگری
+                        با تضمین کیفیت و اصالت
+                    </p>
+<a href="{% url 'shop' %}" class="card-btn">
+    مشاهده محصولات
+    <span>→</span>
+</a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="about-section">
+
+    <div class="container about-container">
+
+        <div class="about-image">
+
+           <img src="{% static 'images/ahmad.jpg' %}" alt="احمد داستانپور">
+
+        </div>
+
+        <div class="about-content">
+
+            <span class="about-subtitle">
+                Dastanpour Beauty collection
+            </span>
+
+            <h2>
+                مجموعه زیبایی تخصصی احمد داستانپور
+            </h2>
+
+           <p>مجموعه احمد داستانپور با بیش از <strong>۲۵ سال</strong> سابقه در زمینه آموزش و پیرایش مردانه، محیطی حرفه‌ای و استاندارد برای علاقه‌مندان این هنر فراهم کرده است. هدف ما تعلیم آرایشگران متخصص با بهره‌گیری از جدیدترین متدهای آموزشی و انتقال تجربه سال‌ها فعالیت حرفه‌ای است.
+</p>
+            <ul>
+<ul class="about-list">
+
+    <li>
+        <i class="fa-solid fa-scissors"></i>
+        بیش از ۲۵ سال سابقه در آموزش و پیرایش مردانه
+    </li>
+
+    <li>
+        <i class="fa-solid fa-award"></i>
+        عضو کمیسیون آموزش اتحادیه آرایشگران
+    </li>
+
+    <li>
+        <i class="fa-solid fa-trophy"></i>
+        داور مسابقات کشوری آرایشگری
+    </li>
+
+    <li>
+        <i class="fa-solid fa-graduation-cap"></i>
+        مربی رسمی سازمان فنی و حرفه‌ای کشور
+    </li>
+
+</ul>
+            </ul>
+
+               
+          <a href="{% url 'about' %}" class="about-btn">
+    درباره آکادمی
+</a>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="stats-section">
+
+    <div class="container">
+
+        <div class="stats-grid">
+
+            <div class="stat-box">
+
+                <h2 class="counter" data-target="25">
+    <span>0</span>
+</h2>
+
+                <span>سال تجربه</span>
+
+            </div>
+
+            <div class="stat-box">
+
+               <h2 class="counter" data-target="5000">
+    <span>0</span>
+</h2>
+
+                <span>هنرجوی آموزش دیده</span>
+
+            </div>
+
+            <div class="stat-box">
+
+                <h2 class="counter" data-target="12000">
+    <span>0</span>
+</h2>
+
+                <span>خدمات انجام شده</span>
+
+            </div>
+
+            <div class="stat-box">
+
+               <h2 class="counter" data-target="15">
+    <span>0</span>
+</h2>
+                <span>افتخار و گواهینامه</span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+{% endblock %}

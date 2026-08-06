@@ -1,0 +1,103 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+مدیریت برندها
+{% endblock %}
+
+
+{% block content %}
+
+<div class="page-header">
+
+    <h2>مدیریت برندها</h2>
+
+</div>
+
+
+<div class="header-buttons">
+{% if edit %}
+    <h2>ویرایش برند</h2>
+{% else %}
+    <h2>افزودن برند جدید</h2>
+{% endif %}
+</div>
+
+
+<br>
+
+
+<table class="dashboard-table">
+
+    <thead>
+
+        <tr>
+            <th>لوگو</th>
+            <th>نام برند</th>
+            <th>اسلاگ</th>
+            <th>عملیات</th>
+        </tr>
+
+    </thead>
+
+
+    <tbody>
+
+    {% for brand in brands %}
+
+        <tr>
+
+            <td>
+
+                {% if brand.logo %}
+                    <img src="{{ brand.logo.url }}" width="70">
+                {% endif %}
+
+            </td>
+
+
+            <td>
+                {{ brand.name }}
+            </td>
+
+
+            <td>
+                {{ brand.slug }}
+            </td>
+
+
+            <td>
+<a href="{% url 'edit_brand' brand.id %}" class="btn-edit">
+    ویرایش
+</a>
+
+<a href="{% url 'delete_brand' brand.id %}" class="btn-delete">
+    حذف
+</a>
+
+            </td>
+
+
+        </tr>
+
+
+    {% empty %}
+
+        <tr>
+
+            <td colspan="4">
+                هنوز برندی ثبت نشده است.
+            </td>
+
+        </tr>
+
+
+    {% endfor %}
+
+
+    </tbody>
+
+
+</table>
+
+
+{% endblock %}

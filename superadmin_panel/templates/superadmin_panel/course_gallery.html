@@ -1,0 +1,73 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}گالری تصاویر{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h2>گالری {{ course.title }}</h2>
+
+    <a href="{% url 'academy_add_course_gallery' course.id %}" class="btn-add">
+        ➕ افزودن تصویر
+    </a>
+
+</div>
+
+<table>
+
+    <thead>
+
+        <tr>
+
+            <th>تصویر</th>
+
+            <th>عملیات</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+    {% for image in images %}
+
+        <tr>
+
+            <td>
+
+                <img src="{{ image.image.url }}" width="140">
+
+            </td>
+
+            <td>
+
+                <a href="{% url 'academy_delete_course_gallery' image.id %}">
+
+                    حذف
+
+                </a>
+
+            </td>
+
+        </tr>
+
+    {% empty %}
+
+        <tr>
+
+            <td colspan="2">
+
+                هنوز تصویری ثبت نشده است.
+
+            </td>
+
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}

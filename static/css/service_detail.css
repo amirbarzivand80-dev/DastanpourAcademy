@@ -1,0 +1,185 @@
+.service-detail{
+
+    width:90%;
+    max-width:1000px;
+    margin:140px auto 80px;
+
+}
+
+/* ---------- Slider ---------- */
+
+.slider-container{
+
+    position:relative;
+    width:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin-bottom:20px;
+
+}
+
+.slider{
+
+    width:450px;
+    height:300px;
+
+    position:relative;
+
+    overflow:hidden;
+
+    border-radius:20px;
+
+    box-shadow:0 15px 35px rgba(0,0,0,.18);
+
+}
+
+.slide{
+
+    position:absolute;
+    top:0;
+    left:0;
+
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+    opacity:0;
+
+    transition:.4s;
+
+}
+
+.slide.active{
+
+    opacity:1;
+
+}
+
+.slider-btn{
+
+    width:45px;
+    height:45px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:#111;
+
+    color:#fff;
+
+    cursor:pointer;
+
+    font-size:22px;
+
+    margin:0 20px;
+
+    transition:.3s;
+
+}
+
+.slider-btn:hover{
+
+    background:#d4af37;
+    color:#111;
+
+}
+
+/* ---------- Dots ---------- */
+
+.dots{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:10px;
+
+    margin-bottom:40px;
+
+}
+
+.dot{
+
+    width:10px;
+
+    height:10px;
+
+    border-radius:50%;
+
+    background:#bbb;
+
+}
+
+.dot.active{
+
+    background:#d4af37;
+
+}
+
+/* ---------- Text ---------- */
+
+.service-info{
+
+    max-width:800px;
+
+    margin:auto;
+
+    text-align:center;
+
+}
+
+.service-info h1{
+
+    font-size:38px;
+
+    margin-bottom:20px;
+
+}
+
+.service-info p{
+
+    line-height:2.2;
+
+    color:#666;
+
+    margin-bottom:40px;
+
+}
+
+/* ---------- Button ---------- */
+
+.reserve-btn{
+
+    display:inline-block;
+
+    padding:14px 45px;
+
+    background:#111;
+
+    color:#fff;
+
+    text-decoration:none;
+
+    border-radius:40px;
+
+    transition:.3s;
+
+}
+
+.reserve-btn:hover{
+
+    background:#d4af37;
+
+    color:#111;
+
+}
+
+.service-price{
+    font-size:24px;
+    font-weight:bold;
+    color:#c9a96e;
+    margin:15px 0;
+}

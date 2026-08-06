@@ -1,0 +1,91 @@
+{% extends "superadmin_panel/base.html" %}
+
+
+{% block content %}
+
+
+<h2 class="page-title">
+    جزئیات پیام
+</h2>
+
+
+<div class="details-card">
+
+
+<div class="detail-row">
+
+<span>👤 نام</span>
+
+<strong>
+{{ message.full_name }}
+</strong>
+
+</div>
+
+
+
+<div class="detail-row">
+
+<span>📱 شماره تماس</span>
+
+<strong>
+{{ message.phone }}
+</strong>
+
+</div>
+
+
+
+<div class="detail-row">
+
+<span>📧 ایمیل</span>
+
+<strong>
+{{ message.email|default:"ندارد" }}
+</strong>
+
+</div>
+
+
+
+<div class="detail-row">
+
+<span>📅 تاریخ ارسال</span>
+
+<strong>
+{{ message.created_at|date:"Y/m/d H:i" }}
+</strong>
+
+</div>
+
+
+
+<div class="detail-row">
+
+<span>💬 متن پیام</span>
+
+<p>
+{{ message.message }}
+</p>
+
+</div>
+
+
+<a 
+href="{% url 'contact_message_delete' message.id %}"
+class="delete-btn">
+
+حذف پیام
+
+</a>
+<a href="{% url 'contact_messages' %}" class="details-btn">
+
+← بازگشت
+
+</a>
+
+
+</div>
+
+
+{% endblock %}

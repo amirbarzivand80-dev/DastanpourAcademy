@@ -1,0 +1,153 @@
+<h2 class="page-title">
+    علاقه‌مندی‌های من
+</h2>
+
+
+{% for favorite in favorites %}
+
+<div class="booking-card">
+
+
+    <div class="booking-top">
+
+        <div class="booking-title">
+
+            <h3>
+                {{ favorite.product.name }}
+            </h3>
+
+            <p>
+                محصول فروشگاه
+            </p>
+
+        </div>
+
+
+        {% if favorite.product.stock > 0 %}
+
+        <div class="status success">
+            موجود
+        </div>
+
+        {% else %}
+
+        <div class="status waiting">
+            ناموجود
+        </div>
+
+        {% endif %}
+
+
+    </div>
+
+
+    <div class="booking-info">
+
+        <div>
+            💰 {{ favorite.product.price }} تومان
+        </div>
+
+    </div>
+
+
+    <a 
+    href="{% url 'product_detail' favorite.product.slug %}"
+    class="details-btn">
+
+        مشاهده محصول
+
+    </a>
+
+
+</div>
+
+
+{% empty %}
+
+
+<div class="booking-card">
+
+    <h3>
+        هنوز محصولی به علاقه‌مندی‌ها اضافه نکرده‌اید.
+    </h3>
+
+</div>
+
+
+{% endfor %}
+
+
+
+
+
+<h2 class="page-title">
+    دوره‌های مورد علاقه
+</h2>
+
+
+
+{% for favorite in course_favorites %}
+
+
+<div class="booking-card">
+
+
+    <div class="booking-top">
+
+        <div class="booking-title">
+
+            <h3>
+                {{ favorite.course.title }}
+            </h3>
+
+            <p>
+                دوره آموزشی
+            </p>
+
+        </div>
+
+
+        <div class="status success">
+            مورد علاقه
+        </div>
+
+
+    </div>
+
+
+
+    <div class="booking-info">
+
+        <div>
+            🎓 {{ favorite.course.price }} تومان
+        </div>
+
+    </div>
+
+
+
+    <a 
+    href="{% url 'course_detail' favorite.course.slug %}"
+    class="details-btn">
+
+        مشاهده دوره
+
+    </a>
+
+
+</div>
+
+
+{% empty %}
+
+
+<div class="booking-card">
+
+    <h3>
+        هنوز دوره‌ای به علاقه‌مندی‌ها اضافه نکرده‌اید.
+    </h3>
+
+</div>
+
+
+{% endfor %}

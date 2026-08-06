@@ -1,0 +1,35 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block content %}
+
+<h2>
+
+ثبت آرایشگر
+
+</h2>
+
+<p>
+
+{{ user_obj.full_name }}
+
+<br>
+
+{{ user_obj.phone }}
+
+</p>
+
+<form method="POST">
+
+{% csrf_token %}
+
+{{ form.as_p }}
+
+<button type="submit" class="btn-edit">
+
+ثبت
+
+</button>
+
+</form>
+
+{% endblock %}

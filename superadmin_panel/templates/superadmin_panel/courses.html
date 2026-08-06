@@ -1,0 +1,117 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h2>مدیریت دوره‌ها</h2>
+
+    <div>
+
+        <a href="{% url 'academy_all_students' %}" class="btn-edit">
+            👥 همه هنرجویان
+        </a>
+
+        <a href="{% url 'academy_course_add' %}" class="btn-add">
+            + افزودن دوره
+        </a>
+
+    </div>
+
+</div>
+
+<table class="table">
+
+    <thead>
+
+        <tr>
+
+            <th>تصویر</th>
+
+            <th>عنوان</th>
+
+            <th>نوع</th>
+
+            <th>مدرس</th>
+
+            <th>شهریه</th>
+
+            <th>وضعیت</th>
+
+            <th>عملیات</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+    {% for course in courses %}
+
+        <tr>
+
+            <td>
+
+                {% if course.image %}
+                    <img src="{{ course.image.url }}" width="80">
+                {% endif %}
+
+            </td>
+
+            <td>{{ course.title }}</td>
+
+            <td>{{ course.get_course_type_display }}</td>
+
+            <td>{{ course.teacher }}</td>
+
+            <td>{{ course.price }}</td>
+
+            <td>
+
+                {% if course.is_active %}
+                    فعال
+                {% else %}
+                    غیرفعال
+                {% endif %}
+
+            </td>
+
+          <td>
+
+    <a href="{% url 'academy_course_edit' course.id %}"
+       class="btn-edit">
+        ویرایش
+    </a>
+
+    <a href="{% url 'academy_course_delete' course.id %}"
+       class="btn-delete"
+       onclick="return confirm('حذف شود؟');">
+        حذف
+    </a>
+<a href="{% url 'academy_course_manage' course.id %}" class="btn-edit">
+    ⚙️ مدیریت
+</a>
+
+</td>
+
+        </tr>
+
+    {% empty %}
+
+        <tr>
+
+            <td colspan="7">
+
+                هیچ دوره‌ای ثبت نشده است.
+
+            </td>
+
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}

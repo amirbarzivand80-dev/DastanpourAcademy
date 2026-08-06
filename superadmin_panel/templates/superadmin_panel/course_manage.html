@@ -1,0 +1,74 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}مدیریت دوره{% endblock %}
+
+{% block content %}
+
+<div class="manage-header">
+
+    <h2>{{ course.title }}</h2>
+
+    <div class="course-info">
+
+        <span>👨‍🏫 {{ course.teacher }}</span>
+
+        <span>
+            💰
+            {% if course.course_type == "free" %}
+                رایگان
+            {% else %}
+                {{ course.price }} تومان
+            {% endif %}
+        </span>
+
+        <span>📅 {{ course.start_date }}</span>
+
+    </div>
+
+</div>
+
+<div class="manage-grid">
+
+    <a href="{% url 'academy_course_topics' course.id %}" class="manage-card">
+
+        <div class="manage-icon">📚</div>
+
+        <h3>سرفصل‌ها</h3>
+
+    </a>
+
+    <a href="{% url 'academy_course_sessions' course.id %}" class="manage-card">
+
+        <div class="manage-icon">🎥</div>
+
+        <h3>جلسات</h3>
+
+    </a>
+
+    <a href="{% url 'academy_course_features' course.id %}" class="manage-card">
+
+        <div class="manage-icon">⭐</div>
+
+        <h3>ویژگی‌ها</h3>
+
+    </a>
+
+    <a href="{% url 'academy_course_gallery' course.id %}" class="manage-card">
+
+        <div class="manage-icon">🖼</div>
+
+        <h3>گالری تصاویر</h3>
+
+    </a>
+
+    <a href="{% url 'academy_course_students' course.id %}" class="manage-card">
+
+        <div class="manage-icon">👨‍🎓</div>
+
+        <h3>هنرجویان</h3>
+
+    </a>
+
+</div>
+
+{% endblock %}

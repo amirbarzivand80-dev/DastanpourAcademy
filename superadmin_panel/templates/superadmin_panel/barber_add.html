@@ -1,0 +1,68 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+افزودن آرایشگر
+{% endblock %}
+
+{% block content %}
+
+<h2 class="page-title">
+افزودن آرایشگر
+</h2>
+
+<input
+        type="text"
+        id="searchUser"
+        placeholder="جستجوی نام یا شماره موبایل..."
+        autocomplete="off"
+>
+
+<br><br>
+
+<div id="usersList"></div>
+
+<script>
+
+const input = document.getElementById("searchUser");
+const list = document.getElementById("usersList");
+
+input.addEventListener("keyup", function(){
+
+    fetch(`/superadmin/search-users/?q=${input.value}`)
+
+    .then(res=>res.json())
+
+    .then(data=>{
+
+        list.innerHTML="";
+
+        data.forEach(user=>{
+
+            list.innerHTML += `
+
+            <div class="card" style="margin-bottom:10px;padding:15px;">
+
+                <h3>${user.full_name}</h3>
+
+                <p>${user.phone}</p>
+
+                <a
+                href="/superadmin/barbers/add/${user.id}/"
+                class="btn-edit"
+                >
+                انتخاب
+                </a>
+
+            </div>
+
+            `;
+
+        });
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,142 @@
+<h2 class="page-title">
+    {{ session.title }}
+</h2>
+
+<div class="booking-details">
+
+<div class="booking-card">
+
+    <div class="details-card">
+
+        <div class="detail-row">
+
+            <span>🎬 عنوان جلسه</span>
+
+            <strong>{{ session.title }}</strong>
+
+        </div>
+
+        <div class="detail-row">
+
+            <span>🔢 شماره جلسه</span>
+
+            <strong>{{ session.order }}</strong>
+
+        </div>
+
+        <div class="detail-row">
+
+            <span>📝 توضیحات</span>
+
+            <strong>{{ session.description }}</strong>
+
+        </div>
+
+    </div>
+
+
+    {% if session.video %}
+
+    <div class="details-card">
+
+        <video
+            width="100%"
+            controls>
+
+            <source
+                src="{{ session.video.url }}"
+                type="video/mp4">
+
+        </video>
+
+    </div>
+
+    {% else %}
+
+    <div class="details-card">
+
+        <div class="detail-row">
+
+            <span>
+                هنوز ویدیویی برای این جلسه ثبت نشده است.
+            </span>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+    {% if session.pdf %}
+
+    <div class="details-card">
+
+        <a
+        href="{{ session.pdf.url }}"
+        target="_blank"
+        class="details-btn">
+
+            📄 دانلود PDF
+
+        </a>
+
+    </div>
+
+    {% endif %}
+
+
+    {% if session.attachment %}
+
+    <div class="details-card">
+
+        <a
+        href="{{ session.attachment.url }}"
+        target="_blank"
+        class="details-btn">
+
+            📎 دانلود فایل ضمیمه
+
+        </a>
+
+    </div>
+
+    {% endif %}
+
+    <div class="navigation-buttons">
+
+    {% if previous_session %}
+
+    <button
+        class="details-btn"
+        onclick="showSessionDetail('{{ previous_session.id }}')">
+
+        ⬅ جلسه قبلی
+
+    </button>
+
+    {% endif %}
+
+
+    {% if next_session %}
+
+    <button
+        class="details-btn"
+        onclick="showSessionDetail('{{ next_session.id }}')">
+
+        جلسه بعدی ➡
+
+    </button>
+
+    {% endif %}
+
+</div>
+<button
+    class="back-btn"
+    onclick="loadCourseDetail('{{ course.id }}')">
+    ← بازگشت
+</button>
+
+</div>
+
+</div>

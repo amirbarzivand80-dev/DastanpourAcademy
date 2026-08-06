@@ -1,0 +1,135 @@
+<h2 class="page-title">
+    جزئیات رزرو
+</h2>
+
+
+<div class="booking-card">
+
+
+    <div class="booking-top">
+
+        <div class="booking-title">
+
+            <h3>
+                {{ reservation.service.name }}
+            </h3>
+
+            <p>
+                آرایشگر:
+                {{ reservation.barber.user.full_name }}
+            </p>
+
+        </div>
+
+
+        <div class="status waiting">
+
+            {{ reservation.get_status_display }}
+
+        </div>
+
+
+    </div>
+
+
+
+    <div class="booking-info">
+
+        <div>
+            📅 {{ reservation.date }}
+        </div>
+
+
+        <div>
+            🕒 {{ reservation.time }}
+        </div>
+
+    </div>
+
+
+
+    <div class="details-card">
+
+
+        <div class="detail-row">
+
+            <span>
+                💈 سرویس
+            </span>
+
+            <strong>
+                {{ reservation.service.name }}
+            </strong>
+
+        </div>
+
+
+
+        <div class="detail-row">
+
+            <span>
+                👤 آرایشگر
+            </span>
+
+            <strong>
+                {{ reservation.barber.user.full_name }}
+            </strong>
+
+        </div>
+
+
+
+        <div class="detail-row">
+
+            <span>
+                📅 تاریخ رزرو
+            </span>
+
+            <strong>
+                {{ reservation.date }}
+            </strong>
+
+        </div>
+
+
+
+        <div class="detail-row">
+
+            <span>
+                🕒 ساعت
+            </span>
+
+            <strong>
+                {{ reservation.time }}
+            </strong>
+
+        </div>
+
+
+
+        <div class="detail-row">
+
+            <span>
+                📌 وضعیت
+            </span>
+
+            <strong>
+                {{ reservation.get_status_display }}
+            </strong>
+
+        </div>
+
+
+    </div>
+
+
+    <button 
+    class="back-btn"
+    onclick="loadBookings()">
+
+        ← بازگشت
+
+    </button>
+
+
+</div>

@@ -1,0 +1,96 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+دسترسی مدیر
+{% endblock %}
+
+{% block content %}
+
+<h2 class="page-title">
+
+دسترسی‌های {{ user_obj.full_name }}
+
+</h2>
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    <div class="table-box">
+
+        <table>
+
+            <tbody>
+
+                <tr>
+                    <td>مدیریت کاربران</td>
+                    <td>{{ form.users_access }}</td>
+                </tr>
+
+                <tr>
+                    <td>مدیریت آرایشگرها</td>
+                    <td>{{ form.barbers_access }}</td>
+                </tr>
+
+                <tr>
+                    <td>مدیریت خدمات</td>
+                    <td>{{ form.services_access }}</td>
+                </tr>
+
+                <tr>
+                    <td>مدیریت نوبت‌ها</td>
+                    <td>{{ form.reservations_access }}</td>
+                </tr>
+
+                <tr>
+                    <td>مدیریت آموزش‌ها</td>
+                    <td>{{ form.courses_access }}</td>
+                </tr>
+
+                <tr>
+                    <td>مدیریت فروشگاه</td>
+                    <td>{{ form.shop_access }}</td>
+                </tr>
+
+                <tr>
+                    <td>مدیریت سفارشات</td>
+                    <td>{{ form.orders_access }}</td>
+                </tr>
+
+                <tr>
+                    <td>مدیریت نظرات</td>
+                    <td>{{ form.comments_access }}</td>
+                </tr>
+
+                <tr>
+                    <td>مدیریت پیام‌ها</td>
+                    <td>{{ form.messages_access }}</td>
+                </tr>
+
+                <tr>
+                    <td>گزارشات</td>
+                    <td>{{ form.reports_access }}</td>
+                </tr>
+
+                <tr>
+                    <td>تنظیمات</td>
+                    <td>{{ form.settings_access }}</td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <br>
+
+    <button class="btn-edit" type="submit">
+
+        ذخیره دسترسی‌ها
+
+    </button>
+
+</form>
+
+{% endblock %}

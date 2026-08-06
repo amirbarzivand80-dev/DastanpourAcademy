@@ -1,0 +1,218 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+گزارشات
+{% endblock %}
+
+{% block content %}
+
+<h2 class="page-title">
+
+    گزارشات مدیریتی
+
+</h2>
+
+
+
+<!-- فیلتر تاریخ -->
+
+<div class="report-filter">
+
+    <button class="filter-btn active">
+        امروز
+    </button>
+
+    <button class="filter-btn">
+        هفته
+    </button>
+
+    <button class="filter-btn">
+        ماه
+    </button>
+
+    <button class="filter-btn">
+        سال
+    </button>
+
+    <button class="filter-btn">
+        بازه دلخواه
+    </button>
+
+</div>
+
+
+
+<!-- کارت های آماری -->
+
+<div class="cards">
+
+    <div class="card">
+
+        <h3>درآمد امروز</h3>
+<h1>{{ today_income }}</h1>
+
+    </div>
+
+    <div class="card">
+
+        <h3>درآمد ماه</h3>
+
+       <h1>{{ month_income }}</h1>
+
+    </div>
+
+    <div class="card">
+
+        <h3>رزرو امروز</h3>
+
+        <h1>{{ today_reservations }}</h1>
+
+    </div>
+
+    <div class="card">
+
+        <h3>سفارشات</h3>
+
+       <h1>{{ total_orders }}</h1>
+
+    </div>
+
+    <div class="card">
+
+        <h3>کاربران جدید</h3>
+<h1>{{ new_users }}</h1>
+
+    </div>
+
+    <div class="card">
+
+        <h3>پیام های جدید</h3>
+
+       <h1>{{ new_messages }}</h1>
+
+    </div>
+
+</div>
+
+
+
+<!-- نمودارها -->
+
+<div class="dashboard-row">
+
+    <div class="dashboard-box chart-box">
+
+        <h2>نمودار درآمد</h2>
+
+        <canvas id="incomeChart"></canvas>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+<!-- آخرین فعالیت -->
+
+<div class="dashboard-box">
+
+    <h2>
+
+        آخرین فعالیت ها
+
+    </h2>
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>زمان</th>
+
+                <th>کاربر</th>
+
+                <th>فعالیت</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+{% for activity in activities %}
+
+<tr>
+
+<td>
+{{ activity.created_at|date:"Y/m/d H:i" }}
+</td>
+
+<td>
+{% if activity.user %}
+{{ activity.user.full_name }}
+{% else %}
+سیستم
+{% endif %}
+</td>
+
+<td>
+{{ activity.action }}
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+
+<td colspan="3">
+فعلاً فعالیتی ثبت نشده است.
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+    </table>
+
+</div>
+
+
+
+<!-- خروجی -->
+
+<div class="report-actions">
+
+    <button class="save-btn">
+
+        خروجی PDF
+
+    </button>
+
+    <button class="save-btn">
+
+        خروجی Excel
+
+    </button>
+
+</div>
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+{{ months|json_script:"months-data" }}
+{{ totals|json_script:"totals-data" }}
+
+<script src="{% static 'js/reports.js' %}"></script>
+
+{% endblock %}

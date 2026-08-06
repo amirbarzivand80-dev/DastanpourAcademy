@@ -1,0 +1,135 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+مدیران
+{% endblock %}
+
+{% block content %}
+
+<h2 class="page-title">
+مدیران
+</h2>
+
+<a href="{% url 'superadmin_admin_search' %}" class="btn-edit">
+    افزودن مدیر
+</a>
+
+<br><br>
+
+<div class="table-box">
+
+<table>
+
+<thead>
+
+<tr>
+    <th>نام</th>
+    <th>شماره</th>
+    <th>دسترسی‌ها</th>
+    <th>عملیات</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for admin in admins %}
+
+<tr>
+
+    <td>{{ admin.full_name }}</td>
+
+    <td>{{ admin.phone }}</td>
+
+    <td>
+
+        {% if admin.admin_permission.users_access %}
+            کاربران<br>
+        {% endif %}
+
+        {% if admin.admin_permission.barbers_access %}
+            آرایشگرها<br>
+        {% endif %}
+
+        {% if admin.admin_permission.services_access %}
+            خدمات<br>
+        {% endif %}
+
+        {% if admin.admin_permission.reservations_access %}
+            نوبت‌ها<br>
+        {% endif %}
+
+        {% if admin.admin_permission.courses_access %}
+            آموزش<br>
+        {% endif %}
+
+        {% if admin.admin_permission.shop_access %}
+            فروشگاه<br>
+        {% endif %}
+
+        {% if admin.admin_permission.orders_access %}
+            سفارشات<br>
+        {% endif %}
+
+        {% if admin.admin_permission.comments_access %}
+            نظرات<br>
+        {% endif %}
+
+        {% if admin.admin_permission.messages_access %}
+            پیام‌ها<br>
+        {% endif %}
+
+        {% if admin.admin_permission.reports_access %}
+            گزارشات<br>
+        {% endif %}
+
+        {% if admin.admin_permission.settings_access %}
+            تنظیمات
+        {% endif %}
+
+    </td>
+
+    <td>
+
+        <a
+            href="{% url 'superadmin_admin_permission' admin.id %}"
+            class="btn-edit">
+
+            دسترسی
+
+        </a>
+
+        <a
+            href="{% url 'superadmin_admin_remove' admin.id %}"
+            class="btn-delete"
+            onclick="return confirm('آیا از حذف مدیر مطمئن هستید؟');">
+
+            حذف مدیر
+
+        </a>
+
+    </td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+
+    <td colspan="4">
+
+        مدیری ثبت نشده است.
+
+    </td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+{% endblock %}

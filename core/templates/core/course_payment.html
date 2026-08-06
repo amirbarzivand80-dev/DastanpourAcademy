@@ -1,0 +1,77 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+
+{% block title %}
+پرداخت دوره
+{% endblock %}
+
+
+{% block content %}
+
+
+<section class="course-payment-page">
+
+    <div class="payment-card">
+
+
+        <h1>
+            پرداخت دوره
+        </h1>
+
+
+        <div class="course-payment-info">
+
+            {% if course.image %}
+            <img 
+                src="{{ course.image.url }}" 
+                alt="{{ course.title }}"
+            >
+            {% endif %}
+
+
+            <h2>
+                {{ course.title }}
+            </h2>
+
+
+            <p>
+                مبلغ دوره:
+            </p>
+
+
+            <span>
+                {{ course.price }} تومان
+            </span>
+
+
+        </div>
+
+
+
+        <div class="payment-warning">
+
+            این صفحه پرداخت آزمایشی است.
+            بعد از اتصال درگاه، پرداخت واقعی انجام خواهد شد.
+
+        </div>
+
+
+
+        <a 
+        href="{% url 'course_payment_success' course.id %}"
+        class="payment-btn"
+        >
+            پرداخت موفق
+        </a>
+
+
+    </div>
+
+
+</section>
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/course_payment.css' %}">
+
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}ویرایش جلسه{% endblock %}
+
+{% block content %}
+
+<h2>ویرایش جلسه</h2>
+
+<form method="post">
+
+    {% csrf_token %}
+
+    <label>عنوان جلسه</label>
+
+    <input
+        type="text"
+        name="title"
+        value="{{ session.title }}"
+        required
+    >
+
+    <br><br>
+
+    <label>ترتیب</label>
+
+    <input
+        type="number"
+        name="order"
+        value="{{ session.order }}"
+        required
+    >
+
+    <br><br>
+
+    <button type="submit">
+        ذخیره تغییرات
+    </button>
+
+</form>
+
+{% endblock %}

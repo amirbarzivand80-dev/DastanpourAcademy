@@ -1,0 +1,81 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}
+ثبت نظر
+{% endblock %}
+
+
+{% block content %}
+
+
+<section class="product-comments-section">
+
+    <div class="container">
+
+        <div class="comments-box">
+
+
+            <h2>
+                ثبت نظر برای {{ product.name }}
+            </h2>
+
+
+            <div class="description-line"></div>
+
+
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+
+                <div class="form-group">
+
+                    <label>
+                        امتیاز شما
+                    </label>
+
+                    {{ form.rating }}
+
+                </div>
+
+
+
+                <div class="form-group">
+
+                    <label>
+                        متن نظر
+                    </label>
+
+                    {{ form.text }}
+
+                </div>
+
+
+
+                <button 
+                type="submit"
+                class="comment-btn">
+
+                    ارسال نظر
+
+                </button>
+
+
+            </form>
+
+
+
+        </div>
+
+    </div>
+
+
+</section>
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/product_detail.css' %}">
+
+
+{% endblock %}

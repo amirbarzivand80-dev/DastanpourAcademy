@@ -1,0 +1,223 @@
+.contact-page{
+
+    padding:140px 0 70px;
+
+}
+
+.contact-header{
+
+    text-align:center;
+
+    margin-bottom:60px;
+
+}
+
+.contact-header h1{
+
+    font-size:42px;
+
+    color:#111;
+
+    margin-bottom:12px;
+
+}
+
+.contact-header p{
+
+    color:#444;
+
+    font-size:18px;
+
+}
+
+.contact-content{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:40px;
+
+    margin-bottom:70px;
+
+}
+
+.contact-info,
+.contact-form{
+
+    background:#1b1b1b;
+
+    padding:35px;
+
+    border-radius:20px;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.15);
+
+}
+
+.contact-info h2,
+.contact-form h2{
+
+    color:#d4b06a;
+
+    margin-bottom:30px;
+
+}
+
+.contact-item{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+    margin-bottom:28px;
+
+}
+
+.contact-item i{
+
+    font-size:26px;
+
+    color:#d4b06a;
+
+    width:35px;
+
+    text-align:center;
+
+}
+
+.contact-item h3{
+
+    color:#fff;
+
+    margin-bottom:5px;
+
+    font-size:17px;
+
+}
+
+.contact-item span{
+
+    color:#ccc;
+
+    font-size:15px;
+
+}
+
+.form-group{
+
+    margin-bottom:18px;
+
+}
+
+.form-group input,
+.form-group textarea{
+
+    width:100%;
+
+    padding:15px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#2b2b2b;
+
+    color:#fff;
+
+    font-family:inherit;
+
+    font-size:15px;
+
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder{
+
+    color:#999;
+
+}
+
+.form-group input:focus,
+.form-group textarea:focus{
+
+    outline:none;
+
+    border:1px solid #d4b06a;
+
+}
+
+.send-btn{
+
+    width:100%;
+
+    padding:15px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#d4b06a;
+
+    color:#111;
+
+    font-size:16px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.send-btn:hover{
+
+    background:#c39a48;
+
+}
+
+.contact-map h2{
+
+    text-align:center;
+
+    color:#111;
+
+    margin-bottom:25px;
+
+}
+
+.contact-map iframe{
+
+    box-shadow:0 10px 25px rgba(0,0,0,.15);
+
+}
+
+@media(max-width:992px){
+
+.contact-content{
+
+grid-template-columns:1fr;
+
+}
+
+}
+
+@media(max-width:600px){
+
+.contact-header h1{
+
+font-size:32px;
+
+}
+
+.contact-info,
+.contact-form{
+
+padding:25px;
+
+}
+
+}

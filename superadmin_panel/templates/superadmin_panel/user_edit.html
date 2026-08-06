@@ -1,0 +1,69 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+ویرایش کاربر
+{% endblock %}
+
+{% block content %}
+
+<h2 class="page-title">
+ویرایش کاربر
+</h2>
+
+<form method="POST" enctype="multipart/form-data" class="edit-form">
+
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <label>نقش کاربر</label>
+
+    <select name="role">
+
+        <option value="user"
+        {% if not user_obj.is_super_admin and not user_obj.is_admin and not user_obj.is_barber %}
+        selected
+        {% endif %}
+        >
+            کاربر عادی
+        </option>
+
+        <option value="Barber"
+        {% if user_obj.is_barber %}
+        selected
+        {% endif %}
+        >
+            آرایشگر
+        </option>
+
+        <option value="Admin"
+        {% if user_obj.is_admin %}
+        selected
+        {% endif %}
+        >
+            ادمین
+        </option>
+
+        <option value="SuperAdmin"
+        {% if user_obj.is_super_admin %}
+        selected
+        {% endif %}
+        >
+            سوپر ادمین
+        </option>
+
+    </select>
+
+    <br><br>
+
+    <button type="submit" class="btn-edit">
+        ذخیره تغییرات
+    </button>
+
+    <a href="{% url 'superadmin_users' %}" class="btn-delete">
+        انصراف
+    </a>
+
+</form>
+
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+مدیریت آرایشگرها
+{% endblock %}
+
+{% block content %}
+
+<h2 class="page-title">
+    مدیریت آرایشگرها
+</h2>
+<div style="margin-bottom:20px;">
+
+    <a href="{% url 'superadmin_barber_search' %}" class="btn-edit">
+    + افزودن آرایشگر
+</a>
+</div>
+<table>
+
+    <thead>
+        <tr>
+            <th>نام</th>
+            <th>شماره</th>
+            <th>شروع کار</th>
+            <th>پایان کار</th>
+            <th>مدت نوبت</th>
+            <th>وضعیت</th>
+            <th>عملیات</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        {% for barber in barbers %}
+
+        <tr>
+
+            <td>{{ barber.user.full_name }}</td>
+
+            <td>{{ barber.user.phone }}</td>
+
+            <td>{{ barber.work_start }}</td>
+
+            <td>{{ barber.work_end }}</td>
+
+            <td>{{ barber.appointment_duration }} دقیقه</td>
+
+            <td>
+
+                {% if barber.is_active %}
+
+                    <span class="status active">
+                        فعال
+                    </span>
+
+                {% else %}
+
+                    <span class="status inactive">
+                        غیرفعال
+                    </span>
+
+                {% endif %}
+
+            </td>
+
+            <td>
+
+                <button class="btn-edit">
+                    ویرایش
+                </button>
+
+                <button class="btn-delete">
+                    حذف
+                </button>
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}

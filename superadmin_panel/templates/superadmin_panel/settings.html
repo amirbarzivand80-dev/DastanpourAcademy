@@ -1,0 +1,143 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h2>
+        تنظیمات حساب
+    </h2>
+
+</div>
+
+
+<div class="form-container">
+
+<form
+method="POST"
+action="{% url 'update_profile' %}">
+
+{% csrf_token %}
+
+
+<div class="form-group">
+
+<label>
+👤 نام و نام خانوادگی
+</label>
+
+<input
+type="text"
+name="full_name"
+value="{{ request.user.full_name }}">
+
+</div>
+
+
+
+<div class="form-group">
+
+<label>
+📱 شماره موبایل
+</label>
+
+<input
+type="text"
+name="phone"
+value="{{ request.user.phone }}">
+
+</div>
+
+
+
+<div class="form-group">
+
+<label>
+📍 آدرس
+</label>
+
+<input
+type="text"
+name="address"
+value="{{ request.user.address|default:'' }}">
+
+</div>
+
+
+
+<div class="form-group">
+
+<label>
+🎂 تاریخ تولد
+</label>
+
+<input
+type="date"
+name="birth_date"
+value="{{ request.user.birth_date|date:'Y-m-d' }}">
+
+</div>
+
+
+
+<div class="form-group">
+
+<label>
+💍 تاریخ ازدواج
+</label>
+
+<input
+type="date"
+name="marriage_date"
+value="{{ request.user.marriage_date|date:'Y-m-d' }}">
+
+</div>
+
+
+
+<div class="form-group">
+
+<label>
+👶 تاریخ تولد فرزند
+</label>
+
+<input
+type="date"
+name="child_birth"
+value="{{ request.user.child_birth|date:'Y-m-d' }}">
+
+</div>
+
+
+
+<div class="form-actions">
+
+<button
+type="submit"
+class="save-btn">
+
+ذخیره تغییرات
+
+</button>
+
+</div>
+
+</form>
+
+<hr>
+
+<div class="form-actions">
+
+<a
+href="{% url 'superadmin_change_password' %}"
+class="save-btn">
+
+🔒 تغییر رمز عبور
+
+</a>
+
+</div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+مدیریت جلسات
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h2>
+        جلسات دوره {{ course.title }}
+    </h2>
+
+</div>
+<a href="{% url 'academy_add_course_session' course.id %}"
+   class="btn-add">
+
+    ➕ افزودن جلسه
+
+</a>
+
+<div class="table-container">
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>ترتیب</th>
+                <th>عنوان جلسه</th>
+                <th>ویدئو</th>
+                <th>عملیات</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for session in sessions %}
+
+            <tr>
+
+                <td>{{ session.order }}</td>
+
+                <td>{{ session.title }}</td>
+
+                <td>
+
+                    {% if session.video %}
+                        ✅
+                    {% else %}
+                        ❌
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                  <a href="{% url 'academy_edit_course_session' session.id %}">
+    ویرایش
+</a>
+
+                    |
+
+                    <a href="{% url 'academy_delete_course_session' session.id %}">
+    حذف
+</a>
+
+                </td>
+
+            </tr>
+
+            {% empty %}
+
+            <tr>
+
+                <td colspan="4">
+
+                    هنوز جلسه‌ای ثبت نشده است.
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

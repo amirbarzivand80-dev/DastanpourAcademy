@@ -1,0 +1,109 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}افزودن محصول{% endblock %}
+
+{% block content %}
+
+<div class="form-card">
+
+    <div class="page-header">
+
+      {% if product %}
+
+<h2>ویرایش محصول</h2>
+
+{% else %}
+
+<h2>افزودن محصول جدید</h2>
+
+{% endif %}
+
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+
+        {% csrf_token %}
+
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label>نام محصول</label>
+                {{ form.name }}
+            </div>
+
+            <div class="form-group">
+                <label>اسلاگ</label>
+                {{ form.slug }}
+            </div>
+
+            <div class="form-group">
+                <label>دسته بندی</label>
+                {{ form.category }}
+            </div>
+
+            <div class="form-group">
+                <label>برند</label>
+                {{ form.brand }}
+            </div>
+
+            <div class="form-group">
+                <label>قیمت</label>
+                {{ form.price }}
+            </div>
+
+            <div class="form-group">
+                <label>قیمت با تخفیف</label>
+                {{ form.discount_price }}
+            </div>
+
+            <div class="form-group">
+                <label>موجودی</label>
+                {{ form.stock }}
+            </div>
+
+            <div class="form-group">
+                <label>تصویر اصلی</label>
+                {{ form.image }}
+            </div>
+
+        </div>
+<div class="form-group">
+
+    <label>محصولات پیشنهادی</label>
+
+    {{ form.related_products }}
+
+</div>
+        <div class="form-group">
+
+            <label>توضیحات محصول</label>
+
+            {{ form.description }}
+
+        </div>
+<div class="checkbox-group">
+
+    {{ form.is_active }}
+
+    <label>محصول فعال باشد</label>
+
+</div>
+
+<div class="checkbox-group">
+
+    {{ form.is_featured }}
+
+    <label>محصول پیشنهادی باشد</label>
+
+</div>
+        <button class="btn-save">
+
+            ذخیره محصول
+
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

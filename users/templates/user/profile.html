@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>پنل کاربری</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
+    <link rel="stylesheet" href="{% static 'user/css/profile.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+
+<body>
+    <a href="/" class="home-float-btn">
+
+    <i class="fa-solid fa-house"></i>
+
+    <span>
+      HOME
+    </span>
+
+</a>
+<button id="menu-toggle" class="menu-toggle">
+    ☰
+</button>
+<div class="dashboard">
+
+    <aside class="sidebar" id="sidebar">
+<div class="sidebar-header">
+    <div class="avatar">
+
+{% if user.profile_image %}
+
+<img src="{{ user.profile_image.url }}" class="avatar-img">
+
+{% else %}
+
+{{ user.full_name|first }}
+
+{% endif %}
+
+</div>
+    <h3>{{ user.full_name }}</h3>
+
+    <p>{{ user.phone }}</p>
+</div>
+<ul class="sidebar-menu">
+
+<li id="dashboard-btn" class="active">
+    <span class="icon"><i class="fa-solid fa-house"></i></span>
+    <span class="text">داشبورد</span>
+</li>
+
+<li id="bookings-btn">
+    <span class="icon"><i class="fa-solid fa-calendar-check"></i></span>
+    <span class="text">رزروهای من</span>
+</li>
+
+<li id="orders-btn">
+    <span class="icon"><i class="fa-solid fa-bag-shopping"></i></span>
+    <span class="text">سفارش‌های من</span>
+</li>
+
+<li id="courses-btn">
+    <span class="icon"><i class="fa-solid fa-graduation-cap"></i></span>
+    <span class="text">دوره‌های من</span>
+</li>
+
+<li id="favorites-btn">
+    <span class="icon"><i class="fa-solid fa-heart"></i></span>
+    <span class="text">علاقه‌مندی‌ها</span>
+</li>
+
+<li id="settings-btn">
+    <span class="icon"><i class="fa-solid fa-gear"></i></span>
+    <span class="text">تنظیمات</span>
+</li>
+<li id="logout-btn">
+    <a href="{% url 'logout' %}">
+        <span class="icon">
+            <i class="fa-solid fa-right-from-bracket"></i>
+        </span>
+
+        <span class="text">
+            خروج
+        </span>
+    </a>
+</li>
+</ul>
+    </aside>
+
+    <main class="content">
+<div class="dashboard-header">
+
+    <div class="header-right">
+
+       <div class="profile-avatar">
+
+{% if user.profile_image %}
+
+<img src="{{ user.profile_image.url }}" class="avatar-img">
+
+{% else %}
+
+{{ user.full_name|first }}
+
+{% endif %}
+
+</div>
+
+       <div class="profile-info">
+
+    <h2>{{ user.full_name }}</h2>
+
+    <p id="profile_phone">{{ user.phone }}</p>
+
+    {% if user.address %}
+    <p id="profile_address">📍 {{ user.address }}</p>
+    {% else %}
+    <p id="profile_address"></p>
+    {% endif %}
+
+    {% if user.birth_date %}
+    <p id="profile_birth">🎂 {{ user.birth_date }}</p>
+    {% else %}
+    <p id="profile_birth"></p>
+    {% endif %}
+
+    {% if user.marriage_date %}
+    <p id="profile_marriage">💍 {{ user.marriage_date }}</p>
+    {% else %}
+    <p id="profile_marriage"></p>
+    {% endif %}
+
+    {% if user.child_birth %}
+    <p id="profile_child">👶 {{ user.child_birth }}</p>
+    {% else %}
+    <p id="profile_child"></p>
+    {% endif %}
+
+</div>
+    </div>
+
+    <div class="header-left">
+
+        <h3>سلام {{ user.full_name }} 👋</h3>
+
+        <span>خوش آمدید </span>
+
+       <form action="{% url 'upload_profile_image' %}"
+      method="POST"
+      enctype="multipart/form-data">
+
+    {% csrf_token %}
+
+    <input
+        type="file"
+        name="profile_image"
+        id="profile_image"
+        accept="image/*"
+        hidden
+        onchange="this.form.submit()"
+    >
+
+    <button
+        type="button"
+        class="edit-btn"
+        onclick="document.getElementById('profile_image').click()">
+
+        تغییر عکس پروفایل
+
+    </button>
+
+</form>
+
+    </div>
+
+</div>
+
+<div class="content-area" id="content-area">
+
+    <!-- اینجا محتوای پنل نمایش داده میشه -->
+
+</div>
+    </main>
+
+</div>
+
+
+
+<script>
+const userStats = {
+    reservations: Number("{{ reservation_count|default:0 }}"),
+    orders: Number("{{ order_count|default:0 }}"),
+    courses: Number("{{ course_count|default:0 }}"),
+    favorites: Number("{{ favorite_count|default:0 }}")
+};
+
+
+const latestData = {
+
+    reservation: {
+        service: "{{ last_reservation.service.name|default:'ندارد' }}",
+        barber: "{{ last_reservation.barber.user.full_name|default:'' }}",
+        date: "{{ last_reservation.date|default:'' }}",
+        time: "{{ last_reservation.time|default:'' }}"
+    },
+
+
+    order: {
+        id: "{{ last_order.id|default:'' }}",
+        price: "{{ last_order.total_price|default:'0' }}",
+        date: "{{ last_order.created_at|date:'Y/m/d'|default:'' }}"
+    }
+
+};
+
+</script>
+
+<script src="{% static 'user/js/profile.js' %}"></script>
+
+
+</body>
+</html>

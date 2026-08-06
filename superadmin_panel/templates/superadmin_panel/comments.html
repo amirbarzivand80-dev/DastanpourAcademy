@@ -1,0 +1,144 @@
+{% extends "superadmin_panel/base.html" %}
+
+
+{% block content %}
+
+
+<h2 class="page-title">
+    نظرات کاربران
+</h2>
+
+
+<div class="details-card">
+
+
+{% if comments %}
+
+
+<table class="admin-table">
+
+<thead>
+
+<tr>
+    <th>کاربر</th>
+    <th>محصول</th>
+    <th>امتیاز</th>
+    <th>نظر</th>
+    <th>وضعیت</th>
+    <th>عملیات</th>
+</tr>
+
+</thead>
+
+
+<tbody>
+
+
+{% for comment in comments %}
+
+<tr>
+
+
+<td>
+{{ comment.user.full_name }}
+</td>
+
+
+<td>
+{{ comment.product.name }}
+</td>
+
+
+<td>
+{{ comment.rating }} ⭐
+</td>
+
+
+<td>
+{{ comment.text|truncatechars:50 }}
+</td>
+
+
+<td>
+
+{% if comment.is_active %}
+
+<span style="color:#43e97b;">
+تایید شده
+</span>
+
+{% else %}
+
+<span style="color:#ffcf5a;">
+در انتظار تایید
+</span>
+
+{% endif %}
+
+</td>
+
+
+<td>
+
+
+{% if comment.is_active %}
+
+<a href="{% url 'deactivate_comment' comment.id %}"
+class="btn danger">
+
+لغو تایید
+
+</a>
+
+
+{% else %}
+
+<a href="{% url 'activate_comment' comment.id %}"
+class="btn success">
+
+تایید
+
+</a>
+
+
+{% endif %}
+
+
+
+<a href="{% url 'delete_comment' comment.id %}"
+class="btn danger"
+onclick="return confirm('آیا از حذف این نظر مطمئن هستید؟')">
+
+حذف
+
+</a>
+
+
+</td>
+
+
+</tr>
+
+
+{% endfor %}
+
+
+</tbody>
+
+
+</table>
+
+
+{% else %}
+
+<p>
+هنوز نظری ثبت نشده است.
+</p>
+
+{% endif %}
+
+
+</div>
+
+
+{% endblock %}

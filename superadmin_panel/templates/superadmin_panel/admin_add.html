@@ -1,0 +1,55 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+افزودن مدیر
+{% endblock %}
+
+{% block content %}
+
+<h2 class="page-title">
+
+افزودن مدیر جدید
+
+</h2>
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    <label>
+
+        انتخاب کاربر
+
+    </label>
+
+    <select name="user" required>
+
+        <option value="">
+
+            -----------
+
+        </option>
+
+        {% for user in users %}
+
+        <option value="{{ user.id }}">
+
+            {{ user.full_name }} - {{ user.phone }}
+
+        </option>
+
+        {% endfor %}
+
+    </select>
+
+    <br><br>
+
+    <button type="submit" class="btn-edit">
+
+        افزودن مدیر
+
+    </button>
+
+</form>
+
+{% endblock %}

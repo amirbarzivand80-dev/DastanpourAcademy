@@ -1,0 +1,168 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+مدیریت نوبت‌ها
+{% endblock %}
+
+{% block content %}
+
+<h2 class="page-title">
+    مدیریت نوبت‌ها
+</h2>
+
+<form method="GET" style="margin-bottom:20px;display:flex;gap:10px;flex-wrap:wrap;">
+
+    <input
+        type="text"
+        name="search"
+        placeholder="جستجوی مشتری..."
+        value="{{ request.GET.search }}">
+
+    <select name="barber">
+
+        <option value="">همه آرایشگرها</option>
+
+        {% for barber in barbers %}
+
+        <option
+            value="{{ barber.id }}"
+            {% if request.GET.barber == barber.id|stringformat:"s" %}selected{% endif %}>
+
+            {{ barber.user.full_name }}
+
+        </option>
+
+        {% endfor %}
+
+    </select>
+
+    <input
+        type="date"
+        name="date"
+        value="{{ request.GET.date }}">
+
+    <button type="submit" class="btn-edit">
+        جستجو
+    </button>
+
+</form>
+<li>
+    <a href="{% url 'barber_walkin_reservation' %}" class="btn-add">
+        ثبت نوبت حضوری
+    </a>
+</li>
+
+<div class="table-box">
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>مشتری</th>
+                <th>خدمت</th>
+                <th>آرایشگر</th>
+                <th>تاریخ</th>
+                <th>ساعت</th>
+                <th>وضعیت</th>
+                <th>عملیات</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for reservation in reservations %}
+
+            <tr>
+
+                <td>{{ reservation.user.full_name }}</td>
+
+                <td>{{ reservation.service.name }}</td>
+
+                <td>{{ reservation.barber.user.full_name }}</td>
+
+                <td>{{ reservation.date }}</td>
+
+                <td>{{ reservation.time }}</td>
+
+                <td>
+
+                    <form
+                        method="POST"
+                        action="{% url 'superadmin_reservation_status' reservation.id %}">
+
+                        {% csrf_token %}
+
+                        <select name="status">
+
+                            <option value="pending"
+                            {% if reservation.status == "pending" %}selected{% endif %}>
+                                در انتظار
+                            </option>
+
+                            <option value="approved"
+                            {% if reservation.status == "approved" %}selected{% endif %}>
+                                تایید شده
+                            </option>
+
+                            <option value="done"
+                            {% if reservation.status == "done" %}selected{% endif %}>
+                                انجام شده
+                            </option>
+
+                            <option value="cancel"
+                            {% if reservation.status == "cancel" %}selected{% endif %}>
+                                لغو شده
+                            </option>
+
+                        </select>
+
+                        <button
+                            type="submit"
+                            class="btn-edit">
+
+                            ذخیره
+
+                        </button>
+
+                    </form>
+
+                </td>
+
+                <td>
+
+                    <a
+                        href="{% url 'superadmin_reservation_delete' reservation.id %}"
+                        class="btn-delete"
+                        onclick="return confirm('از حذف این نوبت مطمئن هستید؟')">
+
+                        حذف
+
+                    </a>
+
+                </td>
+
+            </tr>
+
+        {% empty %}
+
+            <tr>
+
+                <td colspan="7">
+                    هنوز هیچ نوبتی ثبت نشده است.
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

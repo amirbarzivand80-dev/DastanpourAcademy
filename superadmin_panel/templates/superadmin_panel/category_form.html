@@ -1,0 +1,43 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+افزودن دسته بندی
+{% endblock %}
+
+{% block content %}
+
+<div class="form-card">
+
+    <h2>افزودن دسته بندی</h2>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <div class="form-group">
+
+            <label>نام دسته بندی</label>
+
+            {{ form.name }}
+
+        </div>
+
+        <div class="form-group">
+
+            <label>اسلاگ</label>
+
+            {{ form.slug }}
+
+        </div>
+
+        <button class="btn-save">
+
+            ذخیره
+
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

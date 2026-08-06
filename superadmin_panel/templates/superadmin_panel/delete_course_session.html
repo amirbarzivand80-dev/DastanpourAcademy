@@ -1,0 +1,31 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}حذف جلسه{% endblock %}
+
+{% block content %}
+
+<h2>حذف جلسه</h2>
+
+<p>
+
+آیا از حذف جلسه
+
+<strong>{{ session.title }}</strong>
+
+مطمئن هستید؟
+
+</p>
+
+<form method="post">
+
+    {% csrf_token %}
+
+    <button type="submit">
+
+        بله، حذف شود
+
+    </button>
+
+</form>
+
+{% endblock %}

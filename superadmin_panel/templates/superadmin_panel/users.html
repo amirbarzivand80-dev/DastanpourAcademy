@@ -1,0 +1,123 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+مدیریت کاربران
+{% endblock %}
+
+{% block content %}
+
+<h2 class="page-title">
+    مدیریت کاربران
+</h2>
+
+<div class="table-box">
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>شناسه</th>
+
+                <th>نام</th>
+
+                <th>شماره</th>
+
+                <th>نقش</th>
+
+                <th>وضعیت</th>
+
+                <th>عملیات</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for user in users %}
+
+            <tr>
+
+                <td>{{ user.id }}</td>
+
+                <td>{{ user.full_name }}</td>
+
+                <td>{{ user.phone }}</td>
+
+                <td>
+
+                    {% if user.is_super_admin %}
+
+                        سوپر ادمین
+
+                    {% elif user.is_admin %}
+
+                        ادمین
+
+                    {% elif user.is_barber %}
+
+                        آرایشگر
+
+                    {% else %}
+
+                        کاربر
+
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    {% if user.is_active %}
+
+                        <span class="status active">
+                            فعال
+                        </span>
+
+                    {% else %}
+
+                        <span class="status inactive">
+                            غیرفعال
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+    <a href="{% url 'superadmin_user_edit' user.id %}" class="btn-edit">
+
+        ویرایش
+
+    </a>
+
+   <form method="POST" action="{% url 'superadmin_user_delete' user.id %}" style="display:inline;">
+    
+    {% csrf_token %}
+
+    <button 
+        type="submit" 
+        class="btn-delete"
+        onclick="return confirm('آیا از حذف این کاربر مطمئن هستید؟')"
+    >
+        حذف
+    </button>
+
+</form>
+
+</td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

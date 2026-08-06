@@ -1,0 +1,95 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+گالری تصاویر
+{% endblock %}
+
+
+{% block content %}
+
+<h2 class="page-title">
+    گالری {{ product.name }}
+</h2>
+
+
+<hr>
+
+<form method="POST" enctype="multipart/form-data">
+
+    {% csrf_token %}
+
+    <label>
+        افزودن تصاویر جدید
+    </label>
+
+    <br><br>
+
+    <input 
+        type="file"
+        name="images"
+        multiple
+        accept="image/*"
+    >
+
+    <br><br>
+
+    <button class="btn-edit" type="submit">
+        افزودن تصاویر
+    </button>
+
+</form>
+
+
+<hr>
+
+
+<h3>
+تصاویر محصول
+</h3>
+
+
+<div>
+{% for image in images %}
+
+<div style="display:inline-block;text-align:center;margin:10px;">
+
+    <img
+        src="{{ image.image.url }}"
+        width="180"
+        style="
+        border-radius:10px;
+        display:block;
+        margin-bottom:10px;
+        "
+    >
+
+
+    <form method="POST" action="{% url 'delete_product_image' image.id %}">
+
+        {% csrf_token %}
+
+        <button 
+            type="submit"
+            class="btn-delete"
+            onclick="return confirm('حذف این تصویر؟')"
+        >
+            حذف
+        </button>
+
+    </form>
+
+
+</div>
+
+{% empty %}
+
+<p>
+هنوز تصویری ثبت نشده است.
+</p>
+
+{% endfor %}
+
+</div>
+
+
+{% endblock %}

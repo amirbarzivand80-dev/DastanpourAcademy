@@ -1,0 +1,76 @@
+.favorites-page{
+
+    width:90%;
+    margin:140px auto 100px;
+
+}
+
+.favorite-tabs{
+
+    display:flex;
+    justify-content:center;
+    gap:15px;
+    margin:35px 0 45px;
+
+}
+
+.favorite-tabs button{
+
+    padding:12px 28px;
+    border:none;
+    border-radius:30px;
+    background:#f2f2f2;
+    color:#333;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:600;
+    transition:.3s;
+
+}
+
+.favorite-tabs button:hover{
+
+    background:#d4af37;
+    color:#111;
+
+}
+
+.favorite-tabs button.active{
+
+    background:#d4af37;
+    color:#111;
+
+}
+
+.remove-favorite{
+
+    position:absolute;
+
+    top:12px;
+
+    left:12px;
+
+    background:none;
+
+    border:none;
+
+    cursor:pointer;
+
+    z-index:10;
+
+}
+
+.remove-favorite i{
+
+    font-size:24px;
+
+    color:#e53935;
+
+}
+.cart-title{
+
+    margin-top:100px;
+
+    text-align:center;
+
+}

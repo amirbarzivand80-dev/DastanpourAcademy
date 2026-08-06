@@ -1,0 +1,167 @@
+<h2 class="page-title">
+    جزئیات دوره
+</h2>
+
+
+<div class="booking-details">
+
+
+<div class="booking-card">
+
+
+    <div class="booking-top">
+
+
+        <div class="booking-title">
+
+            <h3>
+                {{ course.title }}
+            </h3>
+
+
+            <p>
+                مدرس:
+                {{ course.teacher }}
+            </p>
+
+
+        </div>
+
+
+
+        <div class="status success">
+
+            فعال
+
+        </div>
+
+
+    </div>
+
+
+
+
+    <div class="details-card">
+
+
+        <div class="detail-row">
+
+            <span>
+                📚 توضیحات
+            </span>
+
+
+            <strong>
+                {{ course.description }}
+            </strong>
+
+        </div>
+
+
+
+
+        <div class="detail-row">
+
+            <span>
+                ⏱ مدت دوره
+            </span>
+
+
+            <strong>
+                {{ course.duration }}
+            </strong>
+
+        </div>
+
+
+
+
+       <div class="detail-row">
+
+    <span>
+        📈 پیشرفت دوره
+    </span>
+
+<div class="progress-bar">
+
+    <div class="progress-fill"
+         data-progress="{{ progress }}">
+    </div>
+<p>
+پیشرفت فعلی: {{ progress }}%
+</p>
+</div>
+    <strong>
+        {{ progress }}%
+    </strong>
+
+</div>
+
+
+
+
+
+        <div class="detail-row">
+
+            <span>
+                👨‍🏫 مدرس
+            </span>
+
+
+            <strong>
+                {{ course.teacher }}
+            </strong>
+
+        </div>
+
+
+
+    </div>
+
+<div class="details-card">
+
+    <h3 style="margin-bottom:20px;">
+        جلسات دوره
+    </h3>
+{% for session in sessions %}
+
+<div class="detail-row">
+
+    <span>
+        🎥 جلسه {{ session.order }} - {{ session.title }}
+    </span>
+
+    <button
+        class="details-btn"
+        onclick="showSessionDetail('{{ session.id }}')">
+
+        مشاهده
+
+    </button>
+
+</div>
+
+{% empty %}
+
+<div class="detail-row">
+
+    <span>
+        هنوز جلسه‌ای برای این دوره ثبت نشده است.
+    </span>
+
+</div>
+
+{% endfor %}
+    <button 
+    class="back-btn"
+    onclick="loadCourses()">
+
+        ← بازگشت
+
+    </button>
+
+
+</div>
+
+
+</div>

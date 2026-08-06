@@ -1,0 +1,149 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}
+سبد خرید
+{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cart.css' %}">
+{% endblock %}
+{% block content %}
+<section class="cart-page">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="/">خانه</a>
+            <span>›</span>
+            <a href="{% url 'shop' %}">فروشگاه</a>
+            <span>›</span>
+            <span>سبد خرید</span>
+        </div>
+        <div class="cart-title">
+            <h1>سبد خرید</h1>
+           <p>{{ items|length }} محصول در سبد خرید شما</p>
+        </div>
+        <div class="cart-layout">
+           <div class="cart-products">
+
+    {% for item in items %}
+
+    <div class="cart-item">
+<a
+    href="{% url 'remove_from_cart' item.id %}"
+    class="cart-remove"
+>
+    ✕
+</a>
+<div class="cart-price">
+
+    <span 
+        class="item-price"
+        data-price="{{ item.total_price }}"
+    >
+
+        {{ item.total_price }}
+
+    </span>
+
+    <small>تومان</small>
+
+</div>
+
+        <div class="cart-quantity">
+<button 
+class="minus"
+data-id="{{ item.id }}">
+-
+</button>
+
+
+<span class="quantity">
+{{ item.quantity }}
+</span>
+
+
+<button 
+class="plus"
+data-id="{{ item.id }}">
++
+</button>
+
+        </div>
+
+        <div class="cart-details">
+
+            <h3>{{ item.product.name }}</h3>
+
+            <p>
+
+                برند :
+
+                {% if item.product.brand %}
+                    {{ item.product.brand.name }}
+                {% else %}
+                    بدون برند
+                {% endif %}
+
+            </p>
+
+        </div>
+
+        <div class="cart-image">
+
+            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+
+        </div>
+
+    </div>
+
+    {% empty %}
+
+    <p>سبد خرید شما خالی است.</p>
+
+    {% endfor %}
+
+</div>
+
+           <div class="cart-summary">
+    <h2>خلاصه سفارش</h2>
+    <div class="summary-row">
+        <span>جمع کالاها</span>
+       <span>
+    {{ total_price|default:"0" }} تومان
+</span>
+    </div>
+    <div class="summary-row">
+        <span>هزینه ارسال</span>
+        <span>رایگان</span>
+    </div>
+   <div class="summary-row">
+    <span>قیمت نهایی</span>
+    <span class="subtotal-price">
+
+    {{ total_price }} تومان
+
+</span>
+</div>
+    <div class="discount-box">
+        <input type="text" placeholder="کد تخفیف">
+    </div>
+   <a href="{% url 'checkout' %}" class="checkout-btn">
+    ادامه فرایند خرید
+</a>
+    <a href="{% url 'shop' %}" class="back-shop">
+        ← بازگشت به فروشگاه
+    </a>
+</div>
+        </div>
+    </div>
+</section>
+<div class="empty-cart hidden">
+    <img src="{% static 'images/empty-cart.png' %}" alt="">
+    <h2>سبد خرید شما خالی است</h2>
+    <p>
+        هنوز محصولی به سبد خرید اضافه نکرده‌اید.
+    </p>
+    <a href="{% url 'shop' %}" class="empty-btn">
+        رفتن به فروشگاه
+    </a>
+</div>
+<link rel="stylesheet" href="{% static 'css/cart.css' %}">
+{% endblock %}

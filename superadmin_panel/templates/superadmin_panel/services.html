@@ -1,0 +1,128 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+مدیریت خدمات
+{% endblock %}
+
+{% block content %}
+
+<h2 class="page-title">
+
+    مدیریت خدمات
+
+</h2>
+
+<div style="margin-bottom:20px;">
+
+    <a href="{% url 'superadmin_service_add' %}"
+       class="btn-edit">
+
+        + افزودن خدمت
+
+    </a>
+
+</div>
+
+<div class="table-box">
+
+<table>
+
+<thead>
+
+<tr>
+
+    <th>عکس</th>
+    <th>نام</th>
+    <th>دسته بندی</th>
+    <th>قیمت</th>
+    <th>ترتیب</th>
+    <th>وضعیت</th>
+    <th>عملیات</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for service in services %}
+
+<tr>
+
+    <td>
+
+        {% if service.image %}
+
+            <img src="{{ service.image.url }}"
+                 width="70">
+
+        {% endif %}
+
+    </td>
+
+    <td>{{ service.name }}</td>
+
+    <td>{{ service.category }}</td>
+
+    <td>{{ service.price }}</td>
+
+    <td>{{ service.order }}</td>
+
+    <td>
+
+        {% if service.is_active %}
+
+            فعال
+
+        {% else %}
+
+            غیرفعال
+
+        {% endif %}
+
+    </td>
+
+    <td>
+
+        <a
+            href="{% url 'superadmin_service_edit' service.id %}"
+            class="btn-edit">
+
+            ویرایش
+
+        </a>
+
+        <a
+            href="{% url 'superadmin_service_delete' service.id %}"
+            class="btn-delete"
+            onclick="return confirm('حذف شود؟')">
+
+            حذف
+
+        </a>
+
+    </td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+
+<td colspan="7">
+
+هیچ خدمتی ثبت نشده است.
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+{% endblock %}

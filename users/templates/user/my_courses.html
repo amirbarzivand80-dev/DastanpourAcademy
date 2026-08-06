@@ -1,0 +1,86 @@
+<h2 class="page-title">
+    دوره‌های من
+</h2>
+
+
+{% for item in courses %}
+
+
+<div class="booking-card">
+
+
+    <div class="booking-top">
+
+
+        <div class="booking-title">
+
+            <h3>
+                {{ item.course.title }}
+            </h3>
+
+
+            <p>
+                مدرس:
+                {{ item.course.teacher }}
+            </p>
+
+        </div>
+
+
+        <div class="status success">
+
+            {% if item.is_paid %}
+                فعال
+            {% else %}
+                در انتظار پرداخت
+            {% endif %}
+
+        </div>
+
+
+    </div>
+
+
+
+    <div class="booking-info">
+
+
+        <div>
+            📚 {{ item.course.duration }}
+        </div>
+
+
+        <div>
+            🎓 {{ item.course.get_course_type_display }}
+        </div>
+
+
+    </div>
+
+<div style="text-align:left; margin-top:20px;">
+<button 
+class="details-btn"
+onclick="showCourseDetail('{{ item.course.id }}')">
+
+ادامه آموزش
+
+</button>
+
+</div>
+
+</div>
+
+
+{% empty %}
+
+
+<div class="booking-card">
+
+<h3>
+هنوز دوره‌ای خریداری نکرده‌اید
+</h3>
+
+</div>
+
+
+{% endfor %}

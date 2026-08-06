@@ -1,0 +1,67 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}ویژگی‌های محصول{% endblock %}
+
+{% block content %}
+
+<h2>ویژگی‌های {{ product.name }}</h2>
+
+<hr>
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit" class="btn-add">
+
+        افزودن ویژگی
+
+    </button>
+
+</form>
+
+<hr>
+
+<table class="dashboard-table">
+
+    <thead>
+
+        <tr>
+
+            <th>ویژگی</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+    {% for feature in features %}
+
+        <tr>
+
+            <td>{{ feature.title }}</td>
+
+        </tr>
+
+    {% empty %}
+
+        <tr>
+
+            <td>
+
+                هنوز ویژگی‌ای ثبت نشده است.
+
+            </td>
+
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}

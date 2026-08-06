@@ -1,0 +1,64 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+افزودن مدیر
+{% endblock %}
+
+{% block content %}
+
+<h2 class="page-title">
+جستجوی کاربر برای مدیر شدن
+</h2>
+
+<input
+    type="text"
+    id="searchBox"
+    placeholder="نام یا شماره موبایل..."
+    class="form-control">
+
+<br>
+
+<div id="resultBox"></div>
+
+<script>
+
+const box = document.getElementById("searchBox");
+
+box.addEventListener("keyup", function(){
+    fetch("/superadmin/search-admin-users/?q="+box.value)
+
+    .then(r=>r.json())
+
+    .then(data=>{
+
+        let html="";
+
+        data.forEach(user=>{
+
+            html += `
+                <div style="padding:10px;border-bottom:1px solid #ddd;">
+                    <b>${user.full_name}</b><br>
+                    ${user.phone}
+                    <br><br>
+
+                    <a
+                        class="btn-edit"
+                        href="/superadmin/admins/add/${user.id}/">
+
+                        انتخاب
+
+                    </a>
+                </div>
+            `;
+
+        });
+
+        document.getElementById("resultBox").innerHTML = html;
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

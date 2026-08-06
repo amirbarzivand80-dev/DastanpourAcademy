@@ -1,0 +1,70 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block content %}
+
+<h2>
+سرفصل‌های دوره
+{{ course.title }}
+</h2>
+
+<a class="btn-add" href="#">
++ افزودن سرفصل
+</a>
+
+<table class="table">
+
+<thead>
+
+<tr>
+
+<th>ترتیب</th>
+
+<th>عنوان</th>
+
+<th>عملیات</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for topic in topics %}
+
+<tr>
+
+<td>{{ topic.order }}</td>
+
+<td>{{ topic.title }}</td>
+
+<td>
+
+<a href="#" class="btn-edit">
+ویرایش
+</a>
+
+<a href="#" class="btn-delete">
+حذف
+</a>
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+
+<td colspan="3">
+سرفصلی ثبت نشده است.
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+{% endblock %}

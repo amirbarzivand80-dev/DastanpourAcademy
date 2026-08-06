@@ -1,0 +1,53 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+علاقه‌مندی‌ها
+{% endblock %}
+
+{% block content %}
+
+<section class="cart-page">
+
+    <div class="container">
+
+        
+
+        <div class="cart-title">
+
+            <h1>علاقه‌مندی‌ها</h1>
+
+            <p>2 مورد در علاقه‌مندی‌های شما</p>
+
+        </div>
+        <div class="favorite-tabs">
+
+    <button class="active" id="products-tab">محصولات</button>
+
+    <button id="courses-tab">دوره‌ها</button>
+
+</div>
+
+      <div id="products-section">
+
+    <div class="products-grid" id="favorites-products">
+
+    </div>
+
+</div>
+
+<div id="courses-section" style="display:none;">
+
+    <div class="products-grid" id="favorites-courses">
+
+    </div>
+
+</div>
+    </div>
+
+</section>
+
+<link rel="stylesheet" href="{% static 'css/favorites.css' %}">
+
+<script src="{% static 'js/favorites.js' %}"></script>
+{% endblock %}
