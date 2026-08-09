@@ -71,12 +71,9 @@
 
     </p>
 
-    <a href="{% url 'reservation' %}" class="reserve-btn">
-
-        رزرو نوبت
-
-    </a>
-
+   <a href="{% url 'reservation' %}?service={{ service.id }}" class="reserve-btn">
+    رزرو نوبت
+</a>
 </div>
 
 </section>

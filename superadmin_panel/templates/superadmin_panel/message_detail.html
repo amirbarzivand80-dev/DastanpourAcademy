@@ -2,7 +2,7 @@
 
 
 {% block content %}
-
+{% load jalali %}
 
 <h2 class="page-title">
     جزئیات پیام
@@ -53,7 +53,7 @@
 <span>📅 تاریخ ارسال</span>
 
 <strong>
-{{ message.created_at|date:"Y/m/d H:i" }}
+{{ message.created_at|to_jalali}}
 </strong>
 
 </div>

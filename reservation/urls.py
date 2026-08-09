@@ -2,6 +2,7 @@ from django.urls import path
 
 from . import views
 
+
 urlpatterns = [
 
     path(
@@ -15,10 +16,23 @@ urlpatterns = [
         views.blocked_times_api,
         name="blocked_times_api",
     ),
+
     path(
-    "cancel/<int:id>/",
-    views.cancel_reservation,
-    name="cancel_reservation",
-),
+        "cancel/<int:id>/",
+        views.cancel_reservation,
+        name="cancel_reservation",
+    ),
+
+    path(
+        "working-hours/",
+        views.barber_working_hours,
+        name="barber_working_hours",
+    ),
+
+    path(
+        "payment/<int:reservation_id>/",
+        views.reservation_payment,
+        name="reservation_payment",
+    ),
 
 ]

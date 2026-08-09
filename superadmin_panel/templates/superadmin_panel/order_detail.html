@@ -1,184 +1,283 @@
 {% extends 'superadmin_panel/base.html' %}
 
-
 {% block content %}
 
-
-<div class="page-content">
-
-
-    <div class="page-header">
-
-        <h2>
-            جزئیات سفارش #{{ order.id }}
-        </h2>
-
-    </div>
+<div class="page-header">
 
 
-
-    <div class="table-box">
 <h2>
-    اطلاعات مشتری
+    جزئیات سفارش #{{ order.id }}
 </h2>
-
-
-<p>
-    نام:
-    {{ order.full_name }}
-</p>
-
-
-<p>
-    شماره تماس:
-    {{ order.phone }}
-</p>
-
-
-<p>
-    آدرس:
-    {{ order.address }}
-</p>
-
-    </div>
-
-
-
-
-    <div class="table-box">
-
-
-        <h2>
-            محصولات سفارش
-        </h2>
-
-
-        <table>
-
-
-            <thead>
-
-                <tr>
-
-                    <th>
-                        محصول
-                    </th>
-
-
-                    <th>
-                        تعداد
-                    </th>
-
-
-                    <th>
-                        قیمت
-                    </th>
-
-                </tr>
-
-            </thead>
-
-
-
-            <tbody>
-
-
-            {% for item in order.items.all %}
-
-
-                <tr>
-
-
-                    <td>
-                        {{ item.product.name }}
-                    </td>
-
-
-                    <td>
-                        {{ item.quantity }}
-                    </td>
-
-
-                    <td>
-                        {{ item.price }}
-                        تومان
-                    </td>
-
-
-                </tr>
-
-
-            {% endfor %}
-
-
-
-            </tbody>
-
-
-        </table>
-
-
-    </div>
-
-
-
-
-
-    <div class="table-box">
-
-
-        <h2>
-            وضعیت سفارش
-        </h2>
-
-<form method="POST" action="{% url 'update_order_status' order.id %}">
-
-{% csrf_token %}
-
-
-<select name="status">
-
-    {% for key,value in order.STATUS_CHOICES %}
-
-        <option 
-        value="{{ key }}"
-        {% if order.status == key %}
-        selected
-        {% endif %}
-        >
-
-        {{ value }}
-
-        </option>
-
-    {% endfor %}
-
-
-</select>
-
-
-<button type="submit">
-    ذخیره وضعیت
-</button>
-
-
-</form>
-
-
-        <h3 style="color:#d4b06a">
-
-            مبلغ نهایی:
-            {{ order.total_price }}
-            تومان
-
-        </h3>
-
-
-    </div>
-
 
 
 </div>
 
+<!-- =========================
+     اطلاعات سفارش
+========================= -->
+
+<div class="table-box">
+
+<h2>
+    اطلاعات سفارش
+</h2>
+
+
+<table class="order-info-table">
+
+    <tbody>
+
+        <tr>
+            <th>
+                نام و نام خانوادگی
+            </th>
+
+            <td>
+                {{ order.full_name }}
+            </td>
+        </tr>
+
+
+        <tr>
+            <th>
+                شماره تلفن
+            </th>
+
+            <td>
+                {{ order.phone }}
+            </td>
+        </tr>
+
+
+        <tr>
+            <th>
+                کد پستی
+            </th>
+
+            <td>
+                {{ order.postal_code }}
+            </td>
+        </tr>
+
+
+        <tr>
+            <th>
+                آدرس
+            </th>
+
+            <td>
+                {{ order.address }}
+            </td>
+        </tr>
+
+
+        <tr>
+            <th>
+                نحوه تحویل
+            </th>
+
+            <td>
+
+                {% if order.delivery_type == "self" %}
+
+                    خود مشتری تحویل می‌گیرد
+
+                {% else %}
+
+                    شخص دیگری تحویل می‌گیرد
+
+                {% endif %}
+
+            </td>
+        </tr>
+
+
+        {% if order.delivery_type == "other" %}
+
+        <tr>
+            <th>
+                نام تحویل‌گیرنده
+            </th>
+
+            <td>
+                {{ order.receiver_name }}
+            </td>
+        </tr>
+
+
+        <tr>
+            <th>
+                شماره تحویل‌گیرنده
+            </th>
+
+            <td>
+                {{ order.receiver_phone }}
+            </td>
+        </tr>
+
+        {% endif %}
+
+    </tbody>
+
+</table>
+
+
+</div>
+
+<!-- =========================
+     محصولات سفارش
+========================= -->
+
+<div class="table-box">
+
+<h2>
+    محصولات سفارش
+</h2>
+
+
+<table class="admin-table">
+
+    <thead>
+
+        <tr>
+
+            <th>
+                محصول
+            </th>
+
+            <th>
+                تعداد
+            </th>
+
+            <th>
+                قیمت واحد
+            </th>
+
+            <th>
+                مبلغ
+            </th>
+
+        </tr>
+
+    </thead>
+
+
+    <tbody>
+
+        {% for item in order.items.all %}
+
+        <tr>
+
+            <td>
+                {{ item.product.name }}
+            </td>
+
+            <td>
+                {{ item.quantity }}
+            </td>
+
+            <td>
+                {{ item.price }}
+                تومان
+            </td>
+
+            <td>
+                {{ item.total_price }}
+                تومان
+            </td>
+
+        </tr>
+
+        {% empty %}
+
+        <tr>
+
+            <td colspan="4">
+                محصولی برای این سفارش ثبت نشده است.
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+</div>
+
+<!-- =========================
+     وضعیت سفارش
+========================= -->
+
+<div class="table-box">
+
+
+<h2>
+    وضعیت سفارش
+</h2>
+
+
+<form
+    method="POST"
+    action="{% url 'update_order_status' order.id %}"
+>
+
+    {% csrf_token %}
+
+
+    <div class="form-group">
+
+        <label>
+            وضعیت سفارش
+        </label>
+
+
+        <select name="status">
+
+            {% for key,value in order.STATUS_CHOICES %}
+
+            <option
+                value="{{ key }}"
+                {% if order.status == key %}
+                    selected
+                {% endif %}
+            >
+
+                {{ value }}
+
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+    </div>
+
+
+    <button
+        type="submit"
+        class="btn-edit"
+    >
+
+        ذخیره وضعیت
+
+    </button>
+
+</form>
+
+
+<h3 style="color:#d4b06a; margin-top:25px;">
+
+    مبلغ نهایی:
+
+    {{ order.total_price }}
+
+    تومان
+
+</h3>
+
+
+</div>
 
 {% endblock %}

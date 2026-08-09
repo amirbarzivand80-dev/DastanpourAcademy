@@ -14,6 +14,7 @@ from .permissions import (
     is_admin,
     is_barber,
 )
+import jdatetime
 
 @login_required(login_url="/login/")
 def profile_view(request):
@@ -32,6 +33,15 @@ def profile_view(request):
     last_order = Order.objects.filter(
         user=request.user
     ).order_by("-created_at").first()
+    if last_reservation:
+             last_reservation.jalali_date = jdatetime.date.fromgregorian(
+        date=last_reservation.date
+    ).strftime("%Y/%m/%d")
+
+    if last_order:
+        last_order.jalali_date = jdatetime.datetime.fromgregorian(
+        datetime=last_order.created_at
+    ).strftime("%Y/%m/%d")
 
 
 
@@ -214,7 +224,6 @@ def dashboard(request):
     return redirect("profile")
 
 from shop.models import Order
-
 @login_required(login_url="/login/")
 def my_orders(request):
 
@@ -222,6 +231,10 @@ def my_orders(request):
         user=request.user
     ).order_by("-created_at")
 
+    for order in orders:
+        order.jalali_date = jdatetime.datetime.fromgregorian(
+            datetime=order.created_at
+        ).strftime("%Y/%m/%d")
 
     return render(
         request,
@@ -255,7 +268,6 @@ def order_detail(request, id):
 from reservation.models import Reservation
 from django.contrib.auth.decorators import login_required
 
-
 @login_required(login_url="/login/")
 def my_bookings(request):
 
@@ -263,6 +275,10 @@ def my_bookings(request):
         user=request.user
     ).order_by("-created_at")
 
+    for reservation in reservations:
+        reservation.jalali_date = jdatetime.date.fromgregorian(
+            date=reservation.date
+        ).strftime("%Y/%m/%d")
 
     return render(
         request,

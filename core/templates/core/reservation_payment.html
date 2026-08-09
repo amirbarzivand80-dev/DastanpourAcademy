@@ -1,0 +1,209 @@
+{% load static %}
+{% load jalali %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>پرداخت بیعانه</title>
+
+    <link rel="stylesheet"
+          href="{% static 'css/fonts.css' %}">
+
+    <style>
+
+        body {
+            margin: 0;
+            background: #0f0f0f;
+            color: #fff;
+            font-family: "Estedad", sans-serif;
+        }
+
+        .payment-container {
+            width: 90%;
+            max-width: 600px;
+            margin: 80px auto;
+            background: #1b1b1b;
+            border: 1px solid #2f2f2f;
+            border-radius: 20px;
+            padding: 35px;
+            box-sizing: border-box;
+        }
+
+        .payment-title {
+            text-align: center;
+            color: #d4b06a;
+            margin-bottom: 30px;
+        }
+
+        .reservation-info {
+            background: #242424;
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #aaa;
+        }
+
+        .info-value {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .deposit-box {
+            text-align: center;
+            background: rgba(212, 176, 106, .1);
+            border: 1px solid #d4b06a;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .deposit-label {
+            color: #bbb;
+            margin-bottom: 10px;
+        }
+
+        .deposit-price {
+            font-size: 32px;
+            font-weight: 800;
+            color: #d4b06a;
+        }
+
+        .pay-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(
+                135deg,
+                #fff1a8,
+                #c9a227
+            );
+            color: #111;
+            font-family: inherit;
+            font-size: 17px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .pay-btn:hover {
+            transform: translateY(-2px);
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="payment-container">
+
+    <h2 class="payment-title">
+        پرداخت بیعانه نوبت
+    </h2>
+
+    <div class="reservation-info">
+
+        <div class="info-row">
+
+            <span class="info-label">
+                خدمت
+            </span>
+
+            <span class="info-value">
+                {{ reservation.service.name }}
+            </span>
+
+        </div>
+
+        <div class="info-row">
+
+            <span class="info-label">
+                آرایشگر
+            </span>
+
+            <span class="info-value">
+                {{ reservation.barber.user.full_name }}
+            </span>
+
+        </div>
+
+        <div class="info-row">
+
+            <span class="info-label">
+                تاریخ
+            </span>
+
+            <span class="info-value">
+              {{ reservation.date|to_jalali }}
+            </span>
+
+        </div>
+
+        <div class="info-row">
+
+            <span class="info-label">
+                ساعت
+            </span>
+
+            <span class="info-value">
+                 {{ reservation.time }}
+            </span>
+
+        </div>
+
+        <div class="info-row">
+
+            <span class="info-label">
+                مبلغ خدمت
+            </span>
+
+            <span class="info-value">
+                {{ reservation.service_price }} تومان
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="deposit-box">
+
+        <div class="deposit-label">
+            مبلغ قابل پرداخت برای رزرو
+        </div>
+
+        <div class="deposit-price">
+            {{ reservation.deposit_amount }} تومان
+        </div>
+
+    </div>
+
+
+    <button class="pay-btn" type="button">
+
+        پرداخت بیعانه
+
+    </button>
+
+</div>
+
+</body>
+
+</html>

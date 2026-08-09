@@ -65,13 +65,30 @@
 
             <td>
 
-                <button class="btn-edit">
-                    ویرایش
-                </button>
+                <a
+    href="{% url 'superadmin_barber_edit' barber.id %}"
+    class="btn-edit">
 
-                <button class="btn-delete">
-                    حذف
-                </button>
+    ویرایش
+
+</a>
+<form
+    method="POST"
+    action="{% url 'superadmin_barber_delete' barber.id %}"
+    style="display:inline;"
+    onsubmit="return confirm('آیا از غیرفعال کردن این آرایشگر مطمئن هستید؟');">
+
+    {% csrf_token %}
+
+    <button
+        type="submit"
+        class="btn-delete">
+
+        حذف
+
+    </button>
+
+</form>
 
             </td>
 

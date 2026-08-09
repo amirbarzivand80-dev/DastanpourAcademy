@@ -2,7 +2,7 @@
 
 
 {% block content %}
-
+{% load jalali %}
 
 <h2 class="page-title">
     پیام‌های کاربران
@@ -62,7 +62,7 @@
 
 
             <td>
-                {{ message.created_at|date:"Y/m/d" }}
+                {{ message.created_at|to_jalali}}
             </td>
 
 

@@ -1,104 +1,259 @@
-.checkout-page{
-    padding:120px 0 70px;
-    background:#f8f8f8;
-    min-height:100vh;
+.checkout-page {
+padding: 120px 20px 70px;
+background: #f8f8f8;
+min-height: 100vh;
+direction: rtl;
 }
 
-.checkout-page h1{
-    text-align:center;
-    margin-bottom:40px;
-    font-size:34px;
-    font-weight:700;
-    color:#222;
+.checkout-container {
+width: 100%;
+max-width: 1100px;
+margin: 0 auto;
 }
 
-.checkout-layout{
-    display:grid;
-    grid-template-columns:2fr 1fr;
-    gap:30px;
+.checkout-container > h1 {
+text-align: center;
+margin-bottom: 40px;
+font-size: 34px;
+font-weight: 700;
+color: #222;
 }
 
-.checkout-info,
-.checkout-summary{
-    background:#fff;
-    border-radius:18px;
-    padding:30px;
-    box-shadow:0 10px 30px rgba(0,0,0,.08);
+/* =========================
+چیدمان اصلی
+========================= */
+
+.checkout-layout {
+display: grid;
+grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
+gap: 30px;
+align-items: start;
 }
 
-.checkout-info h2,
-.checkout-summary h2{
-    margin-bottom:25px;
-    font-size:24px;
+/* ستون اطلاعات */
+
+.checkout-main {
+min-width: 0;
 }
 
-.checkout-info label{
-    display:block;
-    margin-bottom:8px;
-    font-weight:600;
-    color:#444;
+/* ستون خلاصه سفارش */
+
+.checkout-summary-box {
+min-width: 0;
+position: sticky;
+top: 100px;
 }
 
-.checkout-info input,
-.checkout-info textarea{
-    width:100%;
-    padding:14px;
-    border:1px solid #ddd;
-    border-radius:12px;
-    margin-bottom:20px;
-    font-family:inherit;
-    font-size:15px;
-    transition:.3s;
+/* =========================
+باکس‌ها
+========================= */
+
+.checkout-box {
+background: #fff;
+border-radius: 18px;
+padding: 30px;
+margin-bottom: 25px;
+box-shadow: 0 10px 30px rgba(0, 0, 0, .08);
 }
 
-.checkout-info textarea{
-    min-height:120px;
-    resize:vertical;
+.checkout-box h2 {
+margin: 0 0 25px;
+font-size: 24px;
+font-weight: 700;
+color: #222;
 }
 
-.checkout-info input:focus,
-.checkout-info textarea:focus{
-    border-color:#111;
-    outline:none;
+/* =========================
+فرم
+========================= */
+
+.form-group {
+margin-bottom: 20px;
 }
 
-.checkout-info button{
-    width:100%;
-    padding:15px;
-    border:none;
-    border-radius:12px;
-    background:#111;
-    color:#fff;
-    font-size:17px;
-    cursor:pointer;
-    transition:.3s;
+.form-group label {
+display: block;
+margin-bottom: 8px;
+font-weight: 600;
+color: #444;
 }
 
-.checkout-info button:hover{
-    background:#333;
+.form-group input,
+.form-group textarea {
+width: 100%;
+box-sizing: border-box;
+padding: 14px;
+border: 1px solid #ddd;
+border-radius: 12px;
+background: #fff;
+color: #222;
+font-family: inherit;
+font-size: 15px;
+transition: .3s;
 }
 
-.checkout-summary div{
-    display:flex;
-    justify-content:space-between;
-    margin-bottom:15px;
-    font-size:16px;
+.form-group textarea {
+min-height: 120px;
+resize: vertical;
 }
 
-.checkout-summary hr{
-    margin:20px 0;
+.form-group input:focus,
+.form-group textarea:focus {
+border-color: #111;
+outline: none;
+box-shadow: 0 0 0 3px rgba(0, 0, 0, .04);
 }
 
-.checkout-summary h3{
-    text-align:center;
-    color:#0b7b2d;
-    font-size:24px;
+/* =========================
+نوع تحویل
+========================= */
+
+.delivery-options {
+display: flex;
+gap: 15px;
+margin-bottom: 20px;
 }
 
-@media(max-width:900px){
+.delivery-option {
+flex: 1;
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 17px;
+border: 1px solid #ddd;
+border-radius: 12px;
+cursor: pointer;
+transition: .3s;
+color: #333;
+}
 
-    .checkout-layout{
-        grid-template-columns:1fr;
-    }
+.delivery-option:hover {
+border-color: #111;
+background: #fafafa;
+}
+
+.delivery-option input {
+width: auto;
+margin: 0;
+accent-color: #111;
+}
+
+/* =========================
+اطلاعات تحویل گیرنده
+========================= */
+
+.receiver-box {
+margin-top: 20px;
+padding: 20px;
+background: #f8f8f8;
+border-radius: 14px;
+border: 1px solid #e5e5e5;
+}
+
+.receiver-box[hidden] {
+display: none;
+}
+
+/* =========================
+خلاصه سفارش
+========================= */
+
+.checkout-summary-box .checkout-box {
+margin-bottom: 0;
+}
+
+.order-item {
+display: flex;
+justify-content: space-between;
+align-items: center;
+gap: 20px;
+padding: 15px 0;
+border-bottom: 1px solid #eee;
+color: #444;
+font-size: 15px;
+}
+
+.total-price {
+display: flex;
+justify-content: space-between;
+align-items: center;
+gap: 15px;
+margin-top: 20px;
+padding-top: 20px;
+border-top: 2px solid #eee;
+font-size: 20px;
+font-weight: 800;
+color: #111;
+}
+
+/* =========================
+دکمه
+========================= */
+
+.submit-btn {
+width: 100%;
+padding: 16px;
+margin-top: 5px;
+border: none;
+border-radius: 12px;
+background: #111;
+color: #fff;
+font-family: inherit;
+font-size: 17px;
+font-weight: 700;
+cursor: pointer;
+transition: .3s;
+}
+
+.submit-btn:hover {
+background: #333;
+transform: translateY(-2px);
+}
+
+/* =========================
+موبایل
+========================= */
+
+@media (max-width: 900px) {
+
+
+.checkout-page {
+    padding: 90px 15px 50px;
+}
+
+.checkout-container > h1 {
+    font-size: 28px;
+    margin-bottom: 25px;
+}
+
+.checkout-layout {
+    grid-template-columns: 1fr;
+}
+
+.checkout-summary-box {
+    position: static;
+}
+
+.checkout-box {
+    padding: 20px;
+}
+
+.delivery-options {
+    flex-direction: column;
+}
+
+.delivery-option {
+    flex: none;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.order-item {
+    font-size: 14px;
+}
+
+.total-price {
+    font-size: 18px;
+}
 
 }

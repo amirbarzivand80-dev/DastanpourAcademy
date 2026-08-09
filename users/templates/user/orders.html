@@ -1,3 +1,4 @@
+{% load jalali %}
 <h2 class="page-title">
     سفارش‌های من
 </h2>
@@ -17,7 +18,7 @@
             </h3>
 
             <p>
-                {{ order.created_at|date:"Y/m/d" }}
+                {{ order.created_at|to_jalali }}
             </p>
 
         </div>

@@ -53,7 +53,31 @@ class BarberForm(forms.ModelForm):
         }
 
         
+class BarberEditForm(forms.ModelForm):
 
+    class Meta:
+        model = Barber
+
+        fields = [
+            "work_start",
+            "work_end",
+            "appointment_duration",
+            "is_active",
+        ]
+
+        widgets = {
+            "work_start": forms.TimeInput(
+                attrs={"type": "time"}
+            ),
+
+            "work_end": forms.TimeInput(
+                attrs={"type": "time"}
+            ),
+
+            "appointment_duration": forms.NumberInput(
+                attrs={"min": 15}
+            ),
+        }
 class AdminPermissionForm(forms.ModelForm):
 
     class Meta:

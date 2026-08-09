@@ -1,92 +1,249 @@
+```html
 {% extends "superadmin_panel/base.html" %}
 
 {% block title %}
 ثبت نوبت حضوری
 {% endblock %}
-
+{% load static %}
 {% block content %}
+{% load jalali %}
+<div class="walkin-container">
 
-<h2 class="page-title">
-ثبت نوبت حضوری
-</h2>
+    <h2>ثبت نوبت حضوری</h2>
 
-<form method="POST">
+    <form method="POST">
 
-    {% csrf_token %}
+        {% csrf_token %}
 
-    {{ form.as_p }}
+        <!-- نام مشتری -->
+        <div class="form-group">
 
-    <button type="submit" class="btn-edit">
-        ثبت نوبت
-    </button>
+            {{ form.customer_name.label_tag }}
 
-</form>
+            {{ form.customer_name }}
 
-<hr>
+        </div>
 
-<h3>
-لیست نوبت‌های ثبت شده
-</h3>
 
-<table>
+        <!-- شماره موبایل -->
+        <div class="form-group">
 
-    <thead>
+            {{ form.customer_phone.label_tag }}
 
-        <tr>
+            {{ form.customer_phone }}
 
-            <th>مشتری</th>
-            <th>خدمت</th>
-            <th>تاریخ</th>
-            <th>ساعت</th>
-            <th>وضعیت</th>
+        </div>
 
-        </tr>
 
-    </thead>
+        <!-- خدمت -->
+        <div class="form-group">
 
-    <tbody>
+            {{ form.service.label_tag }}
 
-        {% for item in reservations %}
+            {{ form.service }}
 
-        <tr>
-<td>
+        </div>
 
-    {% if item.user %}
 
-        {{ item.user.full_name }}
+        <!-- تاریخ شمسی -->
+        <div class="form-group">
 
-    {% else %}
+            <label>
+                تاریخ
+            </label>
 
-        {{ item.customer_name }}
+            <div id="openCalendar" class="date-input">
 
-    {% endif %}
+                <span id="selectedDate">
+                    برای انتخاب تاریخ کلیک کنید
+                </span>
 
-</td>
+                <i class="fa-solid fa-calendar-days"></i>
 
-            <td>{{ item.service.name }}</td>
+            </div>
 
-            <td>{{ item.date }}</td>
+            <input
+                type="hidden"
+                name="date"
+                id="hiddenDate"
+            >
 
-            <td>{{ item.time }}</td>
+        </div>
 
-            <td>{{ item.get_status_display }}</td>
 
-        </tr>
+        <!-- ساعت -->
+        <div class="form-group">
 
-        {% empty %}
+    <label>
+        ساعت
+    </label>
 
-        <tr>
+    <div id="timeGrid" class="time-grid">
 
-            <td colspan="5">
-                نوبتی ثبت نشده است.
-            </td>
+        <!-- ساعت‌ها توسط JavaScript ساخته می‌شوند -->
 
-        </tr>
+    </div>
 
-        {% endfor %}
+    <input
+        type="hidden"
+        name="time"
+        id="hiddenTime"
+    >
 
-    </tbody>
+</div>
 
-</table>
 
+        <button type="submit" class="btn-edit">
+            ثبت نوبت
+        </button>
+
+    </form>
+
+
+    <!-- ========================= -->
+    <!-- تقویم -->
+    <!-- ========================= -->
+
+    <div id="calendarModal" class="calendar-modal">
+
+        <div class="calendar-content">
+
+            <div class="calendar-header">
+
+                <button
+                    type="button"
+                    id="prevMonth"
+                >
+                    ماه قبل
+                </button>
+
+
+                <h3 id="calendarTitle"></h3>
+
+
+                <button
+                    type="button"
+                    id="nextMonth"
+                >
+                    ماه بعد
+                </button>
+
+            </div>
+
+
+            <div class="week-days">
+
+                <span>ش</span>
+                <span>ی</span>
+                <span>د</span>
+                <span>س</span>
+                <span>چ</span>
+                <span>پ</span>
+                <span>ج</span>
+
+            </div>
+
+
+            <div
+                id="calendar-days"
+                class="calendar-days"
+            ></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- لیست نوبت‌ها -->
+    <!-- ========================= -->
+
+    <h2>
+        نوبت‌های ثبت‌شده
+    </h2>
+
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>مشتری</th>
+
+                <th>خدمت</th>
+
+                <th>تاریخ</th>
+
+                <th>ساعت</th>
+
+                <th>وضعیت</th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            {% for item in reservations %}
+
+            <tr>
+
+                <td>
+
+                    {% if item.user %}
+
+                        {{ item.user.full_name }}
+
+                    {% else %}
+
+                        {{ item.customer_name }}
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+                    {{ item.service.name }}
+                </td>
+
+
+                <td>
+                    {{ item.date|to_jalali }}
+                </td>
+
+                <td>
+                    {{ item.time }}
+                </td>
+
+
+                <td>
+                    {{ item.get_status_display }}
+                </td>
+
+            </tr>
+
+
+            {% empty %}
+
+            <tr>
+
+                <td colspan="5">
+                    نوبتی ثبت نشده است.
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/jalaali-js/dist/jalaali.min.js"></script>
+<script src="{% static 'js/barber_walkin.js' %}"></script>
 {% endblock %}
+```

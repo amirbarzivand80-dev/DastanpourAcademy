@@ -27,6 +27,30 @@ urlpatterns = [
         name="superadmin_user_edit"
     ),
     path(
+    "users/<int:user_id>/gallery/add/",
+    views.customer_gallery_add,
+    name="customer_gallery_add"
+),
+
+path(
+    "users/gallery/<int:image_id>/delete/",
+    views.customer_gallery_delete,
+    name="customer_gallery_delete"
+),
+
+path(
+    "users/<int:user_id>/gallery/add/",
+    views.customer_gallery_add,
+    name="customer_gallery_add",
+),
+
+path(
+    "users/gallery/delete/<int:image_id>/",
+    views.customer_gallery_delete,
+    name="customer_gallery_delete",
+),
+
+    path(
     "users/delete/<int:id>/",
     views.superadmin_user_delete,
     name="superadmin_user_delete"
@@ -43,7 +67,16 @@ urlpatterns = [
         views.barber_search,
         name="superadmin_barber_search"
     ),
-
+path(
+    "barbers/<int:id>/edit/",
+    views.barber_edit,
+    name="superadmin_barber_edit"
+),
+path(
+    "barbers/<int:id>/delete/",
+    views.barber_delete,
+    name="superadmin_barber_delete"
+),
     # جستجوی Ajax کاربران
     path(
         "search-users/",
@@ -153,6 +186,11 @@ path(
     "barber/walkin/",
     views.barber_walkin_reservation,
     name="barber_walkin_reservation",
+),
+path(
+    "barber-walkin/busy-times/",
+    views.barber_walkin_busy_times,
+    name="barber_walkin_busy_times"
 ),
 
 # ---------------- Academy ----------------

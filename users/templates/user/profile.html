@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>پنل کاربری</title>
-
+    {% load jalali %}
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
     <link rel="stylesheet" href="{% static 'user/css/profile.css' %}">
@@ -122,19 +122,19 @@
     {% endif %}
 
     {% if user.birth_date %}
-    <p id="profile_birth">🎂 {{ user.birth_date }}</p>
+   <p id="profile_birth">🎂 {{ user.birth_date|to_jalali }}</p>
     {% else %}
     <p id="profile_birth"></p>
     {% endif %}
 
     {% if user.marriage_date %}
-    <p id="profile_marriage">💍 {{ user.marriage_date }}</p>
+   <p id="profile_marriage">💍 {{ user.marriage_date|to_jalali }}</p>
     {% else %}
     <p id="profile_marriage"></p>
     {% endif %}
 
     {% if user.child_birth %}
-    <p id="profile_child">👶 {{ user.child_birth }}</p>
+   <p id="profile_child">👶 {{ user.child_birth|to_jalali}}</p>
     {% else %}
     <p id="profile_child"></p>
     {% endif %}
@@ -197,13 +197,12 @@ const userStats = {
     favorites: Number("{{ favorite_count|default:0 }}")
 };
 
-
 const latestData = {
 
     reservation: {
         service: "{{ last_reservation.service.name|default:'ندارد' }}",
         barber: "{{ last_reservation.barber.user.full_name|default:'' }}",
-        date: "{{ last_reservation.date|default:'' }}",
+        date: "{{ last_reservation.date|to_jalali|default:'' }}",
         time: "{{ last_reservation.time|default:'' }}"
     },
 
@@ -211,11 +210,10 @@ const latestData = {
     order: {
         id: "{{ last_order.id|default:'' }}",
         price: "{{ last_order.total_price|default:'0' }}",
-        date: "{{ last_order.created_at|date:'Y/m/d'|default:'' }}"
+        date: "{{ last_order.created_at|to_jalali|default:'' }}"
     }
 
 };
-
 </script>
 
 <script src="{% static 'user/js/profile.js' %}"></script>

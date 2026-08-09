@@ -3,14 +3,28 @@ from shop.models import Product
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
-
+from services.models import Service
+from reservation.models import Barber
 def home(request):
     return render(request, "core/home.html")
 
 def services(request):
     return render(request, "core/services.html")
-def service_detail(request,id):
-    return render(request, "core/service_detail.html")
+def service_detail(request, id):
+
+    service = get_object_or_404(
+        Service,
+        id=id,
+        is_active=True
+    )
+
+    return render(
+        request,
+        "core/service_detail.html",
+        {
+            "service": service,
+        }
+    )
 def education(request):
     return render(request, "core/education.html")
 def course_detail(request,id):
@@ -110,7 +124,32 @@ def contact(request):
         }
     )
 def reservation(request):
-    return render(request, "core/reservation.html")
+
+    services = Service.objects.filter(
+        is_active=True
+    ).prefetch_related(
+        "barbers__user"
+    )
+
+    selected_service_id = request.GET.get("service")
+
+    selected_service = None
+
+    if selected_service_id:
+        selected_service = get_object_or_404(
+            Service,
+            id=selected_service_id,
+            is_active=True
+        )
+
+    return render(
+        request,
+        "core/reservation.html",
+        {
+            "services": services,
+            "selected_service": selected_service,
+        }
+    )
 @login_required
 @login_required
 def profile_redirect(request):

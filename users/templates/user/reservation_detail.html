@@ -1,3 +1,4 @@
+{% load jalali %}
 <h2 class="page-title">
     جزئیات رزرو
 </h2>
@@ -36,7 +37,7 @@
     <div class="booking-info">
 
         <div>
-            📅 {{ reservation.date }}
+           📅 {{ reservation.date|to_jalali }}
         </div>
 
 
@@ -84,10 +85,9 @@
             <span>
                 📅 تاریخ رزرو
             </span>
-
-            <strong>
-                {{ reservation.date }}
-            </strong>
+<strong>
+    {{ reservation.date|to_jalali }}
+</strong>
 
         </div>
 

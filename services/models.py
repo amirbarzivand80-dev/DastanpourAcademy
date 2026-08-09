@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class ServiceCategory(models.Model):
 
     name = models.CharField(max_length=100)
@@ -19,6 +20,11 @@ class Service(models.Model):
         blank=True,
         related_name="services"
     )
+    barbers = models.ManyToManyField(
+    "reservation.Barber",
+    blank=True,
+    related_name="services"
+)
 
     description = models.TextField(blank=True)
 

@@ -100,3 +100,22 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.full_name
+    
+class CustomerGalleryImage(models.Model):
+
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name="gallery_images"
+    )
+
+    image = models.ImageField(
+        upload_to="customer_gallery/"
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return f"{self.user.full_name} - {self.id}"

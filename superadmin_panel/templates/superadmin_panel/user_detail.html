@@ -1,1 +1,527 @@
-<h1>User Detail</h1>
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+جزئیات کاربر
+{% endblock %}
+
+{% block content %}
+{% load jalali %}
+<div class="user-detail-page">
+
+```
+<!-- هدر صفحه -->
+<div class="user-detail-top">
+
+    <div>
+        <h2>جزئیات کاربر</h2>
+
+        <p>
+            مشاهده کامل اطلاعات و سوابق
+            {{ user_obj.full_name }}
+        </p>
+    </div>
+
+    <a
+        href="{% url 'superadmin_users' %}"
+        class="user-back-btn"
+    >
+        ← بازگشت به کاربران
+    </a>
+
+</div>
+
+
+<!-- =========================
+     اطلاعات و وضعیت کاربر
+========================== -->
+
+<div class="user-detail-card">
+
+    <div class="user-card-title">
+        <h3>👤 اطلاعات کاربر</h3>
+    </div>
+
+
+    <div class="user-profile-section">
+
+        <div class="user-avatar">
+
+            {% if user_obj.profile_image %}
+
+                <img
+                    src="{{ user_obj.profile_image.url }}"
+                    alt="{{ user_obj.full_name }}"
+                >
+
+            {% else %}
+
+                <span>
+                    {{ user_obj.full_name|first }}
+                </span>
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="user-main-info">
+
+            <h2>
+                {{ user_obj.full_name }}
+            </h2>
+
+            <span>
+                {{ user_obj.phone }}
+            </span>
+
+            <div class="user-role">
+
+                {% if user_obj.is_super_admin %}
+
+                    <span class="role-badge super">
+                        سوپر ادمین
+                    </span>
+
+                {% elif user_obj.is_admin %}
+
+                    <span class="role-badge admin">
+                        ادمین
+                    </span>
+
+                {% elif user_obj.is_barber %}
+
+                    <span class="role-badge barber">
+                        آرایشگر
+                    </span>
+
+                {% else %}
+
+                    <span class="role-badge customer">
+                        مشتری
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="user-info-grid">
+
+        <div class="user-info-item">
+
+            <span>
+                شماره موبایل
+            </span>
+
+            <strong>
+                {{ user_obj.phone }}
+            </strong>
+
+        </div>
+
+
+        <div class="user-info-item">
+
+            <span>
+                وضعیت حساب
+            </span>
+
+            {% if user_obj.is_active %}
+
+                <strong class="status-active">
+                    ● فعال
+                </strong>
+
+            {% else %}
+
+                <strong class="status-inactive">
+                    ● غیرفعال
+                </strong>
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="user-info-item">
+
+            <span>
+                تاریخ ثبت نام
+            </span>
+
+            <strong>
+                {{ user_obj.created_at|to_jalali }}
+            </strong>
+
+        </div>
+
+
+        <div class="user-info-item">
+
+            <span>
+                آدرس
+            </span>
+
+            <strong>
+                {{ user_obj.address|default:"ثبت نشده" }}
+            </strong>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================
+     سوابق نوبت‌ها
+========================== -->
+
+<div class="user-detail-card">
+
+    <div class="section-title">
+
+        <div>
+            <h3>📅 سوابق نوبت‌ها</h3>
+
+            <p>
+                تاریخچه نوبت‌های ثبت‌شده توسط این کاربر
+            </p>
+        </div>
+
+        <span class="section-count">
+            {{ reservations|length }}
+            نوبت
+        </span>
+
+    </div>
+
+
+    <div class="history-list">
+
+        {% for reservation in reservations %}
+
+            <div class="history-card">
+
+                <div class="history-main">
+
+                    <div class="history-icon">
+                        📅
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            {{ reservation.service.name }}
+                        </strong>
+
+                        <span>
+                            آرایشگر:
+                            {{ reservation.barber.user.full_name }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="history-meta">
+
+                    <span>
+                        {{ reservation.date|to_jalali }}
+                    </span>
+
+                    <strong>
+                        {{ reservation.time }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        {% empty %}
+
+            <div class="empty-state">
+
+                <span>
+                    📅
+                </span>
+
+                <p>
+                    این کاربر تاکنون نوبتی نداشته است.
+                </p>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================
+     سفارش‌ها و پرداخت‌ها
+========================== -->
+
+<div class="user-detail-card">
+
+    <div class="section-title">
+
+        <div>
+            <h3>🛍 سفارش‌ها و پرداخت‌ها</h3>
+
+            <p>
+                تاریخچه سفارش‌ها و وضعیت پرداخت کاربر
+            </p>
+        </div>
+
+        <span class="section-count">
+            {{ orders|length }}
+            سفارش
+        </span>
+
+    </div>
+
+
+    <div class="history-list">
+
+        {% for order in orders %}
+
+            <div class="order-card">
+
+                <div class="order-main">
+
+                    <div class="order-icon">
+                        🛍
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            سفارش #{{ order.id }}
+                        </strong>
+
+                        <span>
+                            {{ order.get_status_display }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="order-payment">
+
+                    <span>
+                        مبلغ سفارش
+                    </span>
+
+                    <strong>
+                        {{ order.total_price }}
+                        تومان
+                    </strong>
+
+                </div>
+
+            </div>
+
+        {% empty %}
+
+            <div class="empty-state">
+
+                <span>
+                    🛍
+                </span>
+
+                <p>
+                    این کاربر تاکنون سفارشی نداشته است.
+                </p>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================
+     گالری مشتری
+========================== -->
+
+<div class="user-detail-card">
+
+    <div class="section-title gallery-title">
+
+        <div>
+
+            <h3>
+                🖼 گالری تصاویر مشتری
+            </h3>
+
+            <p>
+                آرشیو داخلی تصاویر این مشتری
+            </p>
+
+        </div>
+
+
+        <a
+            href="{% url 'customer_gallery_add' user_obj.id %}"
+            class="gallery-add-btn"
+        >
+            + افزودن تصویر
+        </a>
+
+    </div>
+
+
+    <div class="gallery-warning">
+        این تصاویر فقط برای مدیریت و آرشیو داخلی هستند
+        و برای مشتری نمایش داده نمی‌شوند.
+    </div>
+
+
+    <div class="customer-gallery">
+
+        {% for image in gallery_images %}
+
+            <div class="gallery-item">
+
+                <img
+                    src="{{ image.image.url }}"
+                    alt="تصویر {{ user_obj.full_name }}"
+                    onclick="openCustomerImage('{{ image.image.url }}')"
+                >
+
+
+                <form
+                    method="POST"
+                    action="{% url 'customer_gallery_delete' image.id %}"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="gallery-delete-btn"
+                        onclick="return confirm('آیا از حذف این تصویر مطمئن هستید؟')"
+                    >
+                        حذف
+                    </button>
+
+                </form>
+
+            </div>
+
+        {% empty %}
+
+            <div class="empty-state gallery-empty">
+
+                <span>
+                    🖼
+                </span>
+
+                <p>
+                    هنوز تصویری برای این مشتری ثبت نشده است.
+                </p>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+```
+
+</div>
+
+<!-- =========================
+     Image Lightbox
+========================== -->
+
+<div
+    id="customerImageModal"
+    class="customer-image-modal"
+    onclick="closeCustomerImage()"
+>
+
+```
+<button
+    type="button"
+    class="customer-image-close"
+    onclick="closeCustomerImage(event)"
+>
+    ×
+</button>
+
+
+<img
+    id="customerModalImage"
+    src=""
+    alt="تصویر مشتری"
+    onclick="event.stopPropagation()"
+>
+```
+
+</div>
+
+<script>
+
+function openCustomerImage(imageUrl) {
+
+    const modal =
+        document.getElementById("customerImageModal");
+
+    const image =
+        document.getElementById("customerModalImage");
+
+    image.src = imageUrl;
+
+    modal.classList.add("active");
+
+    document.body.style.overflow = "hidden";
+}
+
+
+function closeCustomerImage(event) {
+
+    if (event) {
+        event.stopPropagation();
+    }
+
+    const modal =
+        document.getElementById("customerImageModal");
+
+    const image =
+        document.getElementById("customerModalImage");
+
+    modal.classList.remove("active");
+
+    image.src = "";
+
+    document.body.style.overflow = "";
+}
+
+
+document.addEventListener("keydown", function(event) {
+
+    if (event.key === "Escape") {
+        closeCustomerImage();
+    }
+
+});
+
+</script>
+
+{% endblock %}

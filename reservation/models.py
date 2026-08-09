@@ -88,12 +88,17 @@ class BarberDayOff(models.Model):
 class Reservation(models.Model):
 
     STATUS_CHOICES = [
-        ("pending", "در انتظار"),
+        ("pending", "در انتظار پرداخت"),
         ("approved", "تایید شده"),
         ("done", "انجام شده"),
         ("cancel", "لغو شده"),
     ]
 
+    PAYMENT_STATUS_CHOICES = [
+        ("pending", "در انتظار پرداخت"),
+        ("paid", "پرداخت شده"),
+        ("failed", "ناموفق"),
+    ]
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -103,24 +108,20 @@ class Reservation(models.Model):
         related_name="reservations"
     )
 
-
     customer_name = models.CharField(
         max_length=100,
         blank=True
     )
-
 
     customer_phone = models.CharField(
         max_length=20,
         blank=True
     )
 
-
     service = models.ForeignKey(
         Service,
         on_delete=models.CASCADE
     )
-
 
     barber = models.ForeignKey(
         Barber,
@@ -128,12 +129,27 @@ class Reservation(models.Model):
         related_name="reservations"
     )
 
-
     date = models.DateField()
-
 
     time = models.TimeField()
 
+    # -----------------------------
+    # مبلغ‌ها
+    # -----------------------------
+
+    service_price = models.PositiveBigIntegerField(
+        default=0,
+        help_text="قیمت خدمت در زمان رزرو"
+    )
+
+    deposit_amount = models.PositiveBigIntegerField(
+        default=0,
+        help_text="مبلغ بیعانه"
+    )
+
+    # -----------------------------
+    # وضعیت رزرو
+    # -----------------------------
 
     status = models.CharField(
         max_length=20,
@@ -141,11 +157,29 @@ class Reservation(models.Model):
         default="pending"
     )
 
+    # -----------------------------
+    # وضعیت پرداخت
+    # -----------------------------
+
+    payment_status = models.CharField(
+        max_length=20,
+        choices=PAYMENT_STATUS_CHOICES,
+        default="pending"
+    )
+
+    # -----------------------------
+    # اطلاعات پرداخت
+    # -----------------------------
+
+    payment_reference = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True
+    )
 
     created_at = models.DateTimeField(
         auto_now_add=True
     )
-
 
     class Meta:
 
@@ -154,7 +188,6 @@ class Reservation(models.Model):
             "date",
             "time",
         )
-
 
     def __str__(self):
 

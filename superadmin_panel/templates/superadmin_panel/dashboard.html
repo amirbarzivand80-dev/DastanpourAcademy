@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-
+{% load jalali %}
 <!-- =======================
         کارت های آماری
 ======================== -->
@@ -100,7 +100,7 @@
                 <td>{{ r.user.full_name }}</td>
                 <td>{{ r.service.name }}</td>
                 <td>{{ r.barber.user.full_name }}</td>
-                <td>{{ r.date }}</td>
+                <td>{{ r.date|to_jalali}}</td>
                 <td>{{ r.time }}</td>
                 <td>{{ r.get_status_display }}</td>
 

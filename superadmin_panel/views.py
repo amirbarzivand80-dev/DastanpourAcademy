@@ -5,7 +5,15 @@ from django.shortcuts import render, redirect
 from users.models import CustomUser
 from reservation.models import Reservation, Barber
 from services.models import Service
+from django.utils import timezone
+import jdatetime
+from datetime import datetime
+import jdatetime
+from users.models import  CustomerGalleryImage
 
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from django.shortcuts import render
 from .forms import UserEditForm, BarberForm
 from reservation.models import Barber
 from django.http import JsonResponse
@@ -33,6 +41,7 @@ from academy.models import Course, CourseStudent,CourseSession,CourseFeature
 from django.shortcuts import get_object_or_404, render
 from academy.models import CourseTopic
 from academy.models import CourseImage
+from .forms import BarberForm, BarberEditForm
 @login_required
 def dashboard(request):
 
@@ -125,21 +134,44 @@ def users_list(request):
     )
 
 
+
 @login_required
 def user_detail(request, id):
 
-    user = CustomUser.objects.get(id=id)
+    user = get_object_or_404(
+        CustomUser,
+        id=id
+    )
 
-    context = {
+    reservations = Reservation.objects.filter(
+        user=user
+    ).select_related(
+        "barber__user",
+        "service"
+    ).order_by(
+        "-date",
+        "-time"
+    )
 
-        "user_obj": user,
+    orders = Order.objects.filter(
+        user=user
+    ).order_by(
+        "-created_at"
+    )
 
-    }
+    gallery_images = user.gallery_images.all().order_by(
+        "-created_at"
+    )
 
     return render(
         request,
         "superadmin_panel/user_detail.html",
-        context
+        {
+            "user_obj": user,
+            "reservations": reservations,
+            "orders": orders,
+            "gallery_images": gallery_images,
+        }
     )
 
 
@@ -203,8 +235,48 @@ def barbers_list(request):
             "barbers": barbers
         }
     )
+@login_required
+def barber_edit(request, id):
 
+    barber = get_object_or_404(
+        Barber,
+        id=id
+    )
 
+    if request.method == "POST":
+
+        form = BarberEditForm(
+            request.POST,
+            instance=barber
+        )
+
+        if form.is_valid():
+
+            form.save()
+
+            messages.success(
+                request,
+                "اطلاعات آرایشگر با موفقیت ویرایش شد."
+            )
+
+            return redirect(
+                "superadmin_barbers"
+            )
+
+    else:
+
+        form = BarberEditForm(
+            instance=barber
+        )
+
+    return render(
+        request,
+        "superadmin_panel/barber_edit.html",
+        {
+            "form": form,
+            "barber": barber,
+        }
+    )
 @login_required
 def barber_add(request, user_id):
 
@@ -276,6 +348,7 @@ def barber_search(request):
         request,
         "superadmin_panel/barber_add.html"
     )
+
 @login_required
 def reservations_list(request):
 
@@ -285,17 +358,21 @@ def reservations_list(request):
         "service"
     )
 
-    # اگر آرایشگر باشد فقط نوبت‌های خودش را ببیند
+    # ---------------------------------
+    # اگر آرایشگر باشد فقط نوبت‌های خودش
+    # ---------------------------------
+
     if request.user.is_barber:
 
         reservations = reservations.filter(
             barber__user=request.user
         )
 
-    # اگر سوپرادمین یا مدیر باشد همه نوبت‌ها را ببیند
-    else:
+    # ---------------------------------
+    # فیلترهای سوپر ادمین / مدیر
+    # ---------------------------------
 
-        reservations = reservations.order_by("-date", "-time")
+    else:
 
         search = request.GET.get("search")
 
@@ -303,11 +380,14 @@ def reservations_list(request):
 
         date = request.GET.get("date")
 
+
         if search:
 
             reservations = reservations.filter(
-                user__full_name__icontains=search
+                Q(user__full_name__icontains=search) |
+                Q(customer_name__icontains=search)
             )
+
 
         if barber:
 
@@ -315,26 +395,106 @@ def reservations_list(request):
                 barber_id=barber
             )
 
+
         if date:
 
             reservations = reservations.filter(
                 date=date
             )
 
+
+    # ---------------------------------
+    # تشخیص حالت نمایش
+    # ---------------------------------
+
+    show_past = request.GET.get("past") == "1"
+
+
+    # تاریخ و ساعت فعلی
+    now = datetime.now()
+
+    today = now.date()
+
+    current_time = now.time()
+
+
+    # ---------------------------------
+    # نوبت‌های گذشته
+    # ---------------------------------
+
+    if show_past:
+
+        reservations = reservations.filter(
+
+            Q(date__lt=today) |
+
+            Q(
+                date=today,
+                time__lt=current_time
+            )
+
+        ).order_by(
+            "-date",
+            "-time"
+        )
+
+
+    # ---------------------------------
+    # نوبت‌های پیش‌رو
+    # ---------------------------------
+
+    else:
+
+        reservations = reservations.filter(
+
+            Q(date__gt=today) |
+
+            Q(
+                date=today,
+                time__gte=current_time
+            )
+
+        ).order_by(
+            "date",
+            "time"
+        )
+
+
+    # ---------------------------------
+    # تبدیل تاریخ میلادی به شمسی
+    # ---------------------------------
+
+    for reservation in reservations:
+
+        reservation.jalali_date = (
+            jdatetime.date.fromgregorian(
+                date=reservation.date
+            ).strftime("%Y/%m/%d")
+        )
+
+
+    # ---------------------------------
+    # Context
+    # ---------------------------------
+
     context = {
 
-        "reservations": reservations.order_by("-date", "-time"),
+        "reservations": reservations,
 
-        "barbers": Barber.objects.select_related("user").all(),
+        "barbers": Barber.objects.select_related(
+            "user"
+        ).all(),
+
+        "show_past": show_past,
 
     }
+
 
     return render(
         request,
         "superadmin_panel/reservations.html",
         context
     )
-
 
 
 @login_required
@@ -601,7 +761,25 @@ def admin_remove(request, user_id):
     return redirect("superadmin_admins")
 
 
+@login_required
+def barber_delete(request, id):
 
+    barber = get_object_or_404(
+        Barber,
+        id=id
+    )
+
+    if request.method == "POST":
+
+        barber.is_active = False
+        barber.save()
+
+        messages.success(
+            request,
+            "آرایشگر با موفقیت غیرفعال شد."
+        )
+
+    return redirect("superadmin_barbers")
 
 @login_required
 def barber_blocked_times(request):
@@ -735,14 +913,12 @@ def barber_walkin_reservation(request):
                 end_time__gt=time
             ).exists()
 
-
             if reservation_exists or blocked_exists:
 
                 messages.error(
                     request,
                     "این ساعت در دسترس نیست."
                 )
-
 
             else:
 
@@ -766,22 +942,18 @@ def barber_walkin_reservation(request):
 
                 )
 
-
                 messages.success(
                     request,
                     "نوبت حضوری ثبت شد."
                 )
 
-
                 return redirect(
                     "barber_walkin_reservation"
                 )
 
-
     else:
 
         form = WalkInReservationForm()
-
 
     reservations = Reservation.objects.filter(
         barber=barber
@@ -790,23 +962,85 @@ def barber_walkin_reservation(request):
         "-time"
     )
 
-
     return render(
-
         request,
-
         "superadmin_panel/barber_walkin.html",
-
         {
             "form": form,
-
             "reservations": reservations,
-
         }
-
     )
 
+@login_required
+def barber_walkin_busy_times(request):
 
+    barber = Barber.objects.get(user=request.user)
+
+    date = request.GET.get("date")
+
+    if not date:
+        return JsonResponse([], safe=False)
+
+    reservations = Reservation.objects.filter(
+        barber=barber,
+        date=date
+    )
+
+    blocked_times = BarberBlockedTime.objects.filter(
+        barber=barber,
+        date=date
+    )
+
+    data = []
+
+    # =========================
+    # نوبت‌های رزرو شده
+    # =========================
+
+    for reservation in reservations:
+
+        data.append(
+            reservation.time.strftime("%H:%M")
+        )
+
+
+    # =========================
+    # زمان‌های مسدود شده
+    # =========================
+
+    for blocked in blocked_times:
+
+        current = blocked.start_time
+
+        while current < blocked.end_time:
+
+            data.append(
+                current.strftime("%H:%M")
+            )
+
+            total_minutes = (
+                current.hour * 60
+                + current.minute
+                + barber.appointment_duration
+            )
+
+            hour = total_minutes // 60
+            minute = total_minutes % 60
+
+            if hour >= 24:
+                break
+
+            current = current.replace(
+                hour=hour,
+                minute=minute,
+                second=0,
+                microsecond=0
+            )
+
+    return JsonResponse(
+        list(set(data)),
+        safe=False
+    )
 
 @login_required
 def academy_courses(request):
@@ -1951,4 +2185,66 @@ def superadmin_user_delete(request, id):
 
     return redirect(
         "superadmin_users"
+    )
+
+@login_required
+def customer_gallery_add(request, user_id):
+
+    user = get_object_or_404(
+        CustomUser,
+        id=user_id
+    )
+
+    if request.method == "POST":
+
+        image = request.FILES.get("image")
+
+        if image:
+
+            CustomerGalleryImage.objects.create(
+                user=user,
+                image=image
+            )
+
+            messages.success(
+                request,
+                "تصویر با موفقیت به گالری مشتری اضافه شد."
+            )
+
+            return redirect(
+                "superadmin_user_detail",
+                id=user.id
+            )
+
+    return render(
+        request,
+        "superadmin_panel/customer_gallery_add.html",
+        {
+            "user_obj": user
+        }
+    )
+
+
+@login_required
+def customer_gallery_delete(request, image_id):
+
+    image = get_object_or_404(
+        CustomerGalleryImage,
+        id=image_id
+    )
+
+    user_id = image.user.id
+
+    if request.method == "POST":
+
+        image.delete()
+
+        messages.success(
+            request,
+            "تصویر با موفقیت حذف شد."
+        )
+
+    return redirect(
+        "superadmin_user_detail",
+        id=user_id
     )

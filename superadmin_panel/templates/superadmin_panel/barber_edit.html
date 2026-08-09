@@ -1,0 +1,102 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+ویرایش آرایشگر
+{% endblock %}
+
+{% block content %}
+
+<div class="edit-page">
+
+```
+<div class="edit-card">
+
+    <div class="edit-header">
+        <h2>ویرایش آرایشگر</h2>
+        <p>
+            ساعت کاری و تنظیمات نوبت آرایشگر را ویرایش کنید.
+        </p>
+    </div>
+
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+
+        <div class="form-group">
+
+            <label>
+                شروع ساعت کاری
+            </label>
+
+            {{ form.work_start }}
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                پایان ساعت کاری
+            </label>
+
+            {{ form.work_end }}
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                مدت هر نوبت
+            </label>
+
+            {{ form.appointment_duration }}
+
+            <small>
+                مدت زمان هر نوبت را به دقیقه وارد کنید.
+            </small>
+
+        </div>
+
+
+        <div class="form-group checkbox-group">
+
+            <label>
+                {{ form.is_active }}
+                آرایشگر فعال باشد
+            </label>
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <button
+                type="submit"
+                class="btn-edit">
+
+                ذخیره تغییرات
+
+            </button>
+
+
+            <a
+                href="{% url 'superadmin_barbers' %}"
+                class="btn-delete">
+
+                انصراف
+
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+```
+
+</div>
+
+{% endblock %}

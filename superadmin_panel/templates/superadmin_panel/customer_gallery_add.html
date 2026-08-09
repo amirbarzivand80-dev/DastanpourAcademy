@@ -1,0 +1,59 @@
+
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+افزودن تصویر به گالری مشتری
+{% endblock %}
+
+{% block content %}
+
+<h2>
+    🖼 افزودن تصویر
+</h2>
+
+<p>
+    مشتری:
+    <strong>
+        {{ user_obj.full_name }}
+    </strong>
+</p>
+
+<form
+    method="POST"
+    enctype="multipart/form-data"
+>
+
+    {% csrf_token %}
+
+    <div class="form-group">
+
+        <label>
+            انتخاب تصویر
+        </label>
+
+        <input
+            type="file"
+            name="image"
+            accept="image/*"
+            required
+        >
+
+    </div>
+
+    <button
+        type="submit"
+        class="btn-edit"
+    >
+        افزودن تصویر
+    </button>
+
+    <a
+        href="{% url 'superadmin_user_detail' user_obj.id %}"
+        class="back-btn"
+    >
+        انصراف
+    </a>
+
+</form>
+
+{% endblock %}

@@ -1,3 +1,4 @@
+{% load jalali %}
 <h2 class="page-title">
     جزئیات سفارش #{{ order.id }}
 </h2>
@@ -16,7 +17,7 @@
 
             <p>
                 تاریخ:
-                {{ order.created_at|date:"Y/m/d" }}
+               {{ order.created_at|to_jalali }}
             </p>
 
         </div>

@@ -6,26 +6,70 @@
 
 {% block content %}
 
-<h2 class="page-title">
-    {{ title }}
-</h2>
-
-<form method="POST" enctype="multipart/form-data" class="form-box">
+<form method="POST" enctype="multipart/form-data">
 
     {% csrf_token %}
 
-    {{ form.as_p }}
+    {{ form.non_field_errors }}
+
+    <div>
+        {{ form.name.label_tag }}
+        {{ form.name }}
+        {{ form.name.errors }}
+    </div>
+
+    <div>
+        {{ form.category.label_tag }}
+        {{ form.category }}
+        {{ form.category.errors }}
+    </div>
+
+    <div>
+        <label>آرایشگرهای ارائه‌دهنده خدمت</label>
+
+        {{ form.barbers }}
+
+        {{ form.barbers.errors }}
+    </div>
+
+    <div>
+        {{ form.description.label_tag }}
+        {{ form.description }}
+        {{ form.description.errors }}
+    </div>
+
+    <div>
+        {{ form.price.label_tag }}
+        {{ form.price }}
+        {{ form.price.errors }}
+    </div>
+
+    <div>
+        {{ form.order.label_tag }}
+        {{ form.order }}
+        {{ form.order.errors }}
+    </div>
+
+    <div>
+        {{ form.image.label_tag }}
+        {{ form.image }}
+        {{ form.image.errors }}
+    </div>
+
+    <div>
+        {{ form.is_active.label_tag }}
+        {{ form.is_active }}
+        {{ form.is_active.errors }}
+    </div>
 
     <button type="submit" class="btn-edit">
-
         ذخیره
-
     </button>
 
-    <a href="{% url 'superadmin_services' %}" class="btn-delete">
-
+    <a
+        href="{% url 'superadmin_services' %}"
+        class="btn-delete">
         انصراف
-
     </a>
 
 </form>

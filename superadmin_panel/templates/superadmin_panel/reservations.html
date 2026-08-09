@@ -44,7 +44,27 @@
     <button type="submit" class="btn-edit">
         جستجو
     </button>
+{% if show_past %}
 
+    <a
+        href="{% url 'superadmin_reservations' %}"
+        class="btn-edit">
+
+        ← نمایش نوبت‌های پیش‌رو
+
+    </a>
+
+{% else %}
+
+    <a
+        href="?past=1"
+        class="btn-edit">
+
+        نمایش نوبت‌های گذشته
+
+    </a>
+
+{% endif %}
 </form>
 <li>
     <a href="{% url 'barber_walkin_reservation' %}" class="btn-add">
@@ -78,13 +98,19 @@
 
             <tr>
 
-                <td>{{ reservation.user.full_name }}</td>
+                <td>
+    {% if reservation.user %}
+        {{ reservation.user.full_name }}
+    {% else %}
+        {{ reservation.customer_name }}
+    {% endif %}
+</td>
 
                 <td>{{ reservation.service.name }}</td>
 
                 <td>{{ reservation.barber.user.full_name }}</td>
 
-                <td>{{ reservation.date }}</td>
+                <td>{{ reservation.jalali_date }}</td>
 
                 <td>{{ reservation.time }}</td>
 

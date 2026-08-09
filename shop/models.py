@@ -166,14 +166,17 @@ class CartItem(models.Model):
 class Order(models.Model):
 
     STATUS_CHOICES = (
-
         ("pending", "در انتظار پرداخت"),
         ("paid", "پرداخت شده"),
         ("sent", "ارسال شده"),
         ("completed", "تکمیل شده"),
-
+        ("cancelled", "لغو شده"),
     )
 
+    DELIVERY_CHOICES = (
+        ("self", "خودم تحویل می‌گیرم"),
+        ("other", "شخص دیگر تحویل می‌گیرد"),
+    )
 
     user = models.ForeignKey(
         "users.CustomUser",
@@ -181,24 +184,55 @@ class Order(models.Model):
         related_name="orders"
     )
 
+    # -----------------------------
+    # اطلاعات خریدار
+    # -----------------------------
 
     full_name = models.CharField(
         max_length=100
     )
 
-
     phone = models.CharField(
         max_length=11
     )
 
+    postal_code = models.CharField(
+        max_length=10
+    )
 
     address = models.TextField()
 
+    # -----------------------------
+    # اطلاعات تحویل گیرنده
+    # -----------------------------
+
+    delivery_type = models.CharField(
+        max_length=10,
+        choices=DELIVERY_CHOICES,
+        default="self"
+    )
+
+    receiver_name = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    receiver_phone = models.CharField(
+        max_length=11,
+        blank=True
+    )
+
+    # -----------------------------
+    # مبلغ سفارش
+    # -----------------------------
 
     total_price = models.PositiveIntegerField(
         default=0
     )
 
+    # -----------------------------
+    # وضعیت سفارش
+    # -----------------------------
 
     status = models.CharField(
         max_length=20,
@@ -206,16 +240,13 @@ class Order(models.Model):
         default="pending"
     )
 
-
     created_at = models.DateTimeField(
         auto_now_add=True
     )
 
-
     def __str__(self):
 
         return f"Order {self.id} - {self.user}"
-    
 class OrderItem(models.Model):
 
     order = models.ForeignKey(

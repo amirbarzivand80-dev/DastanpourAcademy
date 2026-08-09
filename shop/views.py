@@ -3,6 +3,7 @@ from .models import Product
 from django.shortcuts import get_object_or_404, redirect
 from .models import Product, Cart, CartItem
 from core.models import ActivityLog
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 def product_detail(request, slug):
 
@@ -113,7 +114,7 @@ def remove_from_cart(request, item_id):
 from django.http import JsonResponse
 
 
-@login_required
+
 @login_required
 def update_cart_quantity(request, item_id):
 
@@ -145,7 +146,7 @@ from django.shortcuts import render
 from .models import Cart
 from .models import Order, OrderItem
 
-@login_required
+
 @login_required
 def checkout(request):
 
@@ -154,7 +155,13 @@ def checkout(request):
         user=request.user
     )
 
-    items = cart.items.all()
+    items = cart.items.select_related(
+        "product"
+    ).all()
+
+    if not items.exists():
+
+        return redirect("cart")
 
     total_price = sum(
         item.total_price()
@@ -163,23 +170,129 @@ def checkout(request):
 
     if request.method == "POST":
 
+        full_name = request.POST.get(
+            "full_name",
+            ""
+        ).strip()
+
+        phone = request.POST.get(
+            "phone",
+            ""
+        ).strip()
+
+        postal_code = request.POST.get(
+            "postal_code",
+            ""
+        ).strip()
+
+        address = request.POST.get(
+            "address",
+            ""
+        ).strip()
+
+        delivery_type = request.POST.get(
+            "delivery_type",
+            "self"
+        )
+
+        receiver_name = request.POST.get(
+            "receiver_name",
+            ""
+        ).strip()
+
+        receiver_phone = request.POST.get(
+            "receiver_phone",
+            ""
+        ).strip()
+
+        # -----------------------------
+        # بررسی اطلاعات ضروری
+        # -----------------------------
+
+        if not full_name:
+            messages.error(
+                request,
+                "نام و نام خانوادگی را وارد کنید."
+            )
+            return redirect("checkout")
+
+        if not phone:
+            messages.error(
+                request,
+                "شماره تلفن را وارد کنید."
+            )
+            return redirect("checkout")
+
+        if not postal_code:
+            messages.error(
+                request,
+                "کد پستی را وارد کنید."
+            )
+            return redirect("checkout")
+
+        if not address:
+            messages.error(
+                request,
+                "آدرس را وارد کنید."
+            )
+            return redirect("checkout")
+
+        # -----------------------------
+        # بررسی تحویل گیرنده
+        # -----------------------------
+
+        if delivery_type == "other":
+
+            if not receiver_name:
+                messages.error(
+                    request,
+                    "نام تحویل‌گیرنده را وارد کنید."
+                )
+                return redirect("checkout")
+
+            if not receiver_phone:
+                messages.error(
+                    request,
+                    "شماره تحویل‌گیرنده را وارد کنید."
+                )
+                return redirect("checkout")
+
+        else:
+
+            receiver_name = ""
+            receiver_phone = ""
+
+        # -----------------------------
+        # ساخت سفارش
+        # -----------------------------
+
         order = Order.objects.create(
 
             user=request.user,
 
-            full_name=request.POST.get("full_name"),
+            full_name=full_name,
 
-            phone=request.POST.get("phone"),
+            phone=phone,
 
-            address=request.POST.get("address"),
+            postal_code=postal_code,
+
+            address=address,
+
+            delivery_type=delivery_type,
+
+            receiver_name=receiver_name,
+
+            receiver_phone=receiver_phone,
 
             total_price=total_price,
 
+            status="pending",
+
         )
-        ActivityLog.objects.create(
-         user=request.user,
-         action=f"{request.user.full_name} یک سفارش جدید ثبت کرد"
-)
+
+        # -----------------------------
+        # ساخت آیتم‌های سفارش
+        # -----------------------------
 
         for item in items:
 
@@ -200,8 +313,25 @@ def checkout(request):
 
             )
 
+        # -----------------------------
+        # ثبت لاگ
+        # -----------------------------
+
+        ActivityLog.objects.create(
+
+            user=request.user,
+
+            action=f"{request.user.full_name} یک سفارش جدید ثبت کرد"
+
+        )
+
+        # -----------------------------
+        # فعلاً سبد خرید خالی شود
+        # -----------------------------
+
         items.delete()
 
+        # فعلاً برگرد به سبد خرید
         return redirect("cart")
 
     return render(
