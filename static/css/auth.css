@@ -103,3 +103,73 @@
 #registerForm{
     display:none;
 }
+/* صفحه تأیید شماره موبایل */
+
+.verify-page {
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 130px 0;
+}
+
+.verify-card {
+    width: 480px;
+    background: rgba(255, 255, 255, .75);
+    backdrop-filter: blur(15px);
+    border-radius: 22px;
+    padding: 40px;
+    box-shadow:
+        0 0 10px rgba(214, 182, 122, .7),
+        0 0 30px rgba(214, 182, 122, .4),
+        0 0 60px rgba(214, 182, 122, .2);
+    border: 1px solid rgba(214, 182, 122, .5);
+    text-align: center;
+}
+
+.verify-card h2 {
+    color: #c89b3c;
+    font-size: 30px;
+    margin-bottom: 15px;
+}
+
+.verify-card p {
+    color: #555;
+    font-size: 16px;
+    margin-bottom: 25px;
+}
+
+.verify-card input {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    font-size: 18px;
+    text-align: center;
+    letter-spacing: 6px;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+.verify-card input:focus {
+    outline: none;
+    border-color: #c89b3c;
+    box-shadow: 0 0 8px rgba(200, 155, 60, .5);
+}
+
+.verify-card button {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background: #d8a64b;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.verify-card button:hover {
+    background: #bf8d33;
+}

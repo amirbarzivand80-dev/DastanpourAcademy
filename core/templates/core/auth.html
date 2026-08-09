@@ -59,9 +59,13 @@
 </form>
 
         <!-- فرم ثبت نام -->
-<form id="registerForm"
-      method="POST"
-      action="{% url 'register' %}">
+<!-- فرم ثبت نام -->
+
+<form
+    id="registerForm"
+    method="POST"
+    action="{% url 'register' %}"
+>
 
     {% csrf_token %}
 

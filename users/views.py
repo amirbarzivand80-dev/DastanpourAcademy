@@ -9,6 +9,12 @@ from django.http import JsonResponse
 from .permissions import *
 from django.shortcuts import redirect
 from core.models import ActivityLog
+from django.shortcuts import get_object_or_404
+from .models import CustomUser, PhoneVerificationCode
+import jdatetime
+from django.utils import timezone
+from datetime import timedelta
+import random
 from .permissions import (
     is_superadmin,
     is_admin,
@@ -96,9 +102,6 @@ def register_view(request):
 
         form = RegisterForm(request.POST)
 
-        print(request.POST)
-        print(form.errors)
-
         if form.is_valid():
 
             user = form.save(commit=False)
@@ -107,29 +110,32 @@ def register_view(request):
 
             user.set_password(password)
 
+            user.phone_verified = False
+
             user.save()
 
-
-            user = authenticate(
-                request,
-                phone=user.phone,
-                password=password
-            )
-
-
-            if user:
-
-                login(request, user)
-
-
-            ActivityLog.objects.create(
+            # حذف کدهای قبلی
+            PhoneVerificationCode.objects.filter(
                 user=user,
-                action=f"{user.full_name} ثبت نام کرد"
+                is_used=False
+            ).update(is_used=True)
+
+            # کد تست
+            code = "114477"
+
+            # وقتی پنل پیامکی وصل شد،
+            # این قسمت را با کد تصادفی جایگزین می‌کنیم.
+
+            PhoneVerificationCode.objects.create(
+                user=user,
+                code=code,
+                expires_at=timezone.now() + timedelta(minutes=5)
             )
 
+            # ذخیره کاربر در session
+            request.session["pending_verification_user_id"] = user.id
 
-            return redirect("/")
-
+            return redirect("verify_phone")
 
     return render(
         request,
@@ -137,6 +143,132 @@ def register_view(request):
         {
             "form": form,
             "mode": "register",
+        }
+    )
+
+def verify_phone(request):
+
+    user_id = request.session.get(
+        "pending_verification_user_id"
+    )
+
+    if not user_id:
+        return redirect("register")
+
+    user = get_object_or_404(
+        CustomUser,
+        id=user_id
+    )
+
+    if user.phone_verified:
+        return redirect("/")
+
+    if request.method == "POST":
+
+        entered_code = request.POST.get("code", "").strip()
+
+        verification = PhoneVerificationCode.objects.filter(
+            user=user,
+            is_used=False
+        ).order_by("-created_at").first()
+
+        # کد اضطراری تست
+        if entered_code == "114477":
+
+            user.phone_verified = True
+            user.save(update_fields=["phone_verified"])
+
+            if verification:
+                verification.is_used = True
+                verification.save(update_fields=["is_used"])
+
+            request.session.pop(
+                "pending_verification_user_id",
+                None
+            )
+
+            ActivityLog.objects.create(
+                user=user,
+                action=f"{user.full_name} شماره موبایل خود را تأیید کرد"
+            )
+
+            login(
+                request,
+                user,
+                backend="users.backends.PhoneBackend"
+            )
+
+            return redirect("/")
+
+        # بررسی کد واقعی
+        if not verification:
+
+            messages.error(
+                request,
+                "کد تأیید یافت نشد."
+            )
+
+        elif verification.is_expired():
+
+            messages.error(
+                request,
+                "کد تأیید منقضی شده است."
+            )
+
+        elif verification.attempts >= 5:
+
+            messages.error(
+                request,
+                "تعداد تلاش‌های مجاز تمام شده است."
+            )
+
+        elif verification.code != entered_code:
+
+            verification.attempts += 1
+            verification.save(
+                update_fields=["attempts"]
+            )
+
+            messages.error(
+                request,
+                "کد تأیید اشتباه است."
+            )
+
+        else:
+
+            verification.is_used = True
+            verification.save(
+                update_fields=["is_used"]
+            )
+
+            user.phone_verified = True
+            user.save(
+                update_fields=["phone_verified"]
+            )
+
+            request.session.pop(
+                "pending_verification_user_id",
+                None
+            )
+
+            ActivityLog.objects.create(
+                user=user,
+                action=f"{user.full_name} شماره موبایل خود را تأیید کرد"
+            )
+
+            login(
+                request,
+                user,
+                backend="users.backends.PhoneBackend"
+            )
+
+            return redirect("/")
+
+    return render(
+        request,
+        "core/verify_phone.html",
+        {
+            "phone": user.phone,
         }
     )
 
@@ -154,6 +286,12 @@ def login_view(request):
         )
 
         if user is not None:
+
+            if not user.phone_verified:
+
+                request.session["pending_verification_user_id"] = user.id
+
+                return redirect("verify_phone")
 
             login(request, user)
 

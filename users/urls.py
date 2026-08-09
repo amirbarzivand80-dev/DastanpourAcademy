@@ -10,6 +10,12 @@ urlpatterns = [
     path("profile/", views.profile_view, name="profile"),
 
     path(
+    "verify-phone/",
+    views.verify_phone,
+    name="verify_phone"
+),
+
+    path(
         "upload-profile-image/",
         views.upload_profile_image,
         name="upload_profile_image"
