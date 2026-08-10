@@ -15,6 +15,7 @@ import jdatetime
 from django.utils import timezone
 from datetime import timedelta
 import random
+from .sms import send_otp_sms
 from .permissions import (
     is_superadmin,
     is_admin,
@@ -120,22 +121,45 @@ def register_view(request):
                 is_used=False
             ).update(is_used=True)
 
-            # کد تست
-            code = "114477"
+            # ساخت کد تصادفی ۶ رقمی
+            code = str(random.randint(100000, 999999))
 
-            # وقتی پنل پیامکی وصل شد،
-            # این قسمت را با کد تصادفی جایگزین می‌کنیم.
-
+            # ذخیره کد
             PhoneVerificationCode.objects.create(
                 user=user,
                 code=code,
                 expires_at=timezone.now() + timedelta(minutes=5)
             )
 
+            # ارسال کد واقعی با Panelchi
+            response = send_otp_sms(
+                user.phone,
+                code
+            )
+
+            # بررسی نتیجه ارسال پیامک
+            if response is None or not response.ok:
+
+                messages.error(
+                    request,
+                    "ارسال کد تأیید با مشکل مواجه شد. لطفاً بعداً تلاش کنید."
+                )
+
+                return redirect("register")
+
             # ذخیره کاربر در session
-            request.session["pending_verification_user_id"] = user.id
+            request.session[
+                "pending_verification_user_id"
+            ] = user.id
 
             return redirect("verify_phone")
+
+        else:
+
+            print(
+                "REGISTER FORM ERRORS:",
+                form.errors
+            )
 
     return render(
         request,
@@ -145,6 +169,7 @@ def register_view(request):
             "mode": "register",
         }
     )
+
 
 def verify_phone(request):
 
@@ -165,42 +190,21 @@ def verify_phone(request):
 
     if request.method == "POST":
 
-        entered_code = request.POST.get("code", "").strip()
+        entered_code = request.POST.get(
+            "code",
+            ""
+        ).strip()
 
-        verification = PhoneVerificationCode.objects.filter(
-            user=user,
-            is_used=False
-        ).order_by("-created_at").first()
-
-        # کد اضطراری تست
-        if entered_code == "114477":
-
-            user.phone_verified = True
-            user.save(update_fields=["phone_verified"])
-
-            if verification:
-                verification.is_used = True
-                verification.save(update_fields=["is_used"])
-
-            request.session.pop(
-                "pending_verification_user_id",
-                None
-            )
-
-            ActivityLog.objects.create(
+        verification = (
+            PhoneVerificationCode.objects
+            .filter(
                 user=user,
-                action=f"{user.full_name} شماره موبایل خود را تأیید کرد"
+                is_used=False
             )
+            .order_by("-created_at")
+            .first()
+        )
 
-            login(
-                request,
-                user,
-                backend="users.backends.PhoneBackend"
-            )
-
-            return redirect("/")
-
-        # بررسی کد واقعی
         if not verification:
 
             messages.error(
@@ -225,6 +229,7 @@ def verify_phone(request):
         elif verification.code != entered_code:
 
             verification.attempts += 1
+
             verification.save(
                 update_fields=["attempts"]
             )
@@ -237,11 +242,13 @@ def verify_phone(request):
         else:
 
             verification.is_used = True
+
             verification.save(
                 update_fields=["is_used"]
             )
 
             user.phone_verified = True
+
             user.save(
                 update_fields=["phone_verified"]
             )
