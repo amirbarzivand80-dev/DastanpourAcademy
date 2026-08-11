@@ -86,33 +86,29 @@
 
                 </td>
 
-                <td>
+              <td class="action-buttons">
 
-                    <a href="{% url 'superadmin_user_detail' user.id %}" class="btn-details">
-
-جزئیات
-
-</a>
-
-    <a href="{% url 'superadmin_user_edit' user.id %}" class="btn-edit">
-
-        ویرایش
-
+    <a href="{% url 'superadmin_user_detail' user.id %}"
+       class="btn-details">
+        جزئیات
     </a>
 
-   <form method="POST" action="{% url 'superadmin_user_delete' user.id %}" style="display:inline;">
-    
-    {% csrf_token %}
+    <a href="{% url 'superadmin_user_edit' user.id %}"
+       class="btn-edit">
+        ویرایش
+    </a>
 
-    <button 
-        type="submit" 
-        class="btn-delete"
-        onclick="return confirm('آیا از حذف این کاربر مطمئن هستید؟')"
-    >
-        حذف
-    </button>
+    <form method="post"
+          style="display:inline;">
+        {% csrf_token %}
 
-</form>
+        <button
+            type="submit"
+            class="btn-delete"
+            onclick="return confirm('آیا از حذف این کاربر مطمئن هستید؟')">
+            حذف
+        </button>
+    </form>
 
 </td>
 

@@ -50,7 +50,7 @@
         href="{% url 'superadmin_reservations' %}"
         class="btn-edit">
 
-        ← نمایش نوبت‌های پیش‌رو
+        نمایش نوبت‌های گذشته
 
     </a>
 
@@ -59,8 +59,7 @@
     <a
         href="?past=1"
         class="btn-edit">
-
-        نمایش نوبت‌های گذشته
+ ← نمایش نوبت‌های پیش‌رو
 
     </a>
 
@@ -92,7 +91,7 @@
 
         </thead>
 
-        <tbody>
+       <tbody id="reservations-table-body">
 
         {% for reservation in reservations %}
 

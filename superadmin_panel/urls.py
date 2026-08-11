@@ -8,7 +8,11 @@ urlpatterns = [
         views.dashboard,
         name="superadmin_dashboard"
     ),
-
+    path(
+    "live/",
+    views.dashboard_live,
+    name="superadmin_dashboard_live"
+),
     path(
         "users/",
         views.users_list,
@@ -95,7 +99,11 @@ path(
     views.reservations_list,
     name="superadmin_reservations",
 ),
-
+path(
+    "reservations/live/",
+    views.reservations_live,
+    name="superadmin_reservations_live",
+),
 
 
 

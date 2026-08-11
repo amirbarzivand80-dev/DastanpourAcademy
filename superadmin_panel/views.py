@@ -10,7 +10,6 @@ import jdatetime
 from datetime import datetime
 import jdatetime
 from users.models import  CustomerGalleryImage
-
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import render
@@ -115,6 +114,49 @@ def dashboard(request):
     # اگر هیچکدام نبود
     return redirect("profile")
 
+@login_required
+def dashboard_live(request):
+
+    reservations = Reservation.objects.select_related(
+        "user",
+        "barber__user",
+        "service"
+    )
+
+    if request.user.is_barber:
+        reservations = reservations.filter(
+            barber__user=request.user
+        )
+
+    reservations = reservations.order_by("-created_at")[:8]
+
+    data = []
+
+    for reservation in reservations:
+
+        if reservation.user:
+            customer_name = reservation.user.full_name
+        else:
+            customer_name = reservation.customer_name
+
+        jalali_date = jdatetime.date.fromgregorian(
+            date=reservation.date
+        ).strftime("%Y/%m/%d")
+
+        data.append({
+            "id": reservation.id,
+            "customer_name": customer_name,
+            "service": reservation.service.name,
+            "barber": reservation.barber.user.full_name,
+            "date": jalali_date,
+            "time": reservation.time.strftime("%H:%M"),
+            "status": reservation.get_status_display(),
+        })
+
+    return JsonResponse({
+        "reservation_count": Reservation.objects.count(),
+        "reservations": data,
+    })
 
 @login_required
 def users_list(request):
@@ -495,7 +537,143 @@ def reservations_list(request):
         "superadmin_panel/reservations.html",
         context
     )
+@login_required
+def reservations_live(request):
 
+    reservations = Reservation.objects.select_related(
+        "user",
+        "barber__user",
+        "service"
+    )
+
+    # -----------------------------
+    # آرایشگر فقط نوبت‌های خودش
+    # -----------------------------
+
+    if request.user.is_barber:
+
+        reservations = reservations.filter(
+            barber__user=request.user
+        )
+
+    # -----------------------------
+    # فیلتر جستجو
+    # -----------------------------
+
+    else:
+
+        search = request.GET.get("search")
+
+        barber = request.GET.get("barber")
+
+        date = request.GET.get("date")
+
+        if search:
+
+            reservations = reservations.filter(
+                Q(user__full_name__icontains=search) |
+                Q(customer_name__icontains=search)
+            )
+
+        if barber:
+
+            reservations = reservations.filter(
+                barber_id=barber
+            )
+
+        if date:
+
+            reservations = reservations.filter(
+                date=date
+            )
+
+    # -----------------------------
+    # پیش‌رو / گذشته
+    # -----------------------------
+
+    show_past = request.GET.get("past") == "1"
+
+    now = timezone.localtime()
+
+    today = now.date()
+
+    current_time = now.time()
+
+    if show_past:
+
+        reservations = reservations.filter(
+
+            Q(date__lt=today) |
+
+            Q(
+                date=today,
+                time__lt=current_time
+            )
+
+        ).order_by(
+            "-date",
+            "-time"
+        )
+
+    else:
+
+        reservations = reservations.filter(
+
+            Q(date__gt=today) |
+
+            Q(
+                date=today,
+                time__gte=current_time
+            )
+
+        ).order_by(
+            "date",
+            "time"
+        )
+
+    # -----------------------------
+    # تبدیل اطلاعات به JSON
+    # -----------------------------
+
+    data = []
+
+    for reservation in reservations:
+
+        if reservation.user:
+
+            customer_name = reservation.user.full_name
+
+        else:
+
+            customer_name = reservation.customer_name
+
+        jalali_date = jdatetime.date.fromgregorian(
+            date=reservation.date
+        ).strftime("%Y/%m/%d")
+
+        data.append({
+
+            "id": reservation.id,
+
+            "customer_name": customer_name,
+
+            "service": reservation.service.name,
+
+            "barber": reservation.barber.user.full_name,
+
+            "date": jalali_date,
+
+            "time": reservation.time.strftime("%H:%M"),
+
+            "status": reservation.status,
+
+        })
+
+    return JsonResponse({
+
+        "reservations": data
+
+    })
 
 @login_required
 def reservation_status(request, id):
