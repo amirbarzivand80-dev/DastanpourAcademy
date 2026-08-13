@@ -101,7 +101,8 @@ class Course(models.Model):
     is_active = models.BooleanField(
         default=True
     )
-
+    show_on_home = models.BooleanField(default=False)
+    
     created_at = models.DateTimeField(
         auto_now_add=True
     )

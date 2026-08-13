@@ -63,7 +63,8 @@ class Product(models.Model):
     )
 
     is_active = models.BooleanField(default=True)
-
+    
+    show_on_home = models.BooleanField(default=False)
     
     related_products = models.ManyToManyField(
         "self",

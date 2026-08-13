@@ -1,12 +1,36 @@
 from django.shortcuts import render
 from shop.models import Product
+from academy.models import Course
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from services.models import Service
 from reservation.models import Barber
 def home(request):
-    return render(request, "core/home.html")
+
+    products = Product.objects.filter(
+        is_active=True
+    ).exclude(
+        slug=""
+    ).order_by("-created_at")[:10]
+
+    courses = Course.objects.filter(
+        is_active=True
+    ).order_by("-created_at")[:10]
+
+    latest_products = products[:5]
+    latest_courses = courses[:5]
+
+    return render(
+        request,
+        "core/home.html",
+        {
+            "products": products,
+            "courses": courses,
+            "latest_products": latest_products,
+            "latest_courses": latest_courses,
+        }
+    )
 
 def services(request):
     return render(request, "core/services.html")
@@ -32,24 +56,20 @@ def course_detail(request,id):
 def shop(request):
     return render(request, "core/shop.html")
 from shop.models import Product
-def product_detail(request, id):
+def product_detail(request, slug):
 
     product = get_object_or_404(
         Product,
-        id=id
+        slug=slug
     )
 
-
     related_products = product.related_products.all()
-
 
     comments = product.comments.filter(
         is_active=True
     )
 
-
     print("RELATED:", related_products)
-
 
     return render(
         request,

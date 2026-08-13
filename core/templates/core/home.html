@@ -34,110 +34,40 @@
     </div>
 
 </section>
-<section class="cards-section">
+<section class="home-achievements">
 
     <div class="container">
 
-        <div class="cards">
+        <div class="home-achievements-grid">
 
-            <!-- خدمات -->
-
-            <div class="card">
-
-                <div class="card-image">
-
-                    <img src="{% static 'images/service.jpg' %}" alt="خدمات">
-
-                </div>
-
-                <div class="card-icon">
-
-                    💈
-
-                </div>
-
-                <div class="card-body">
-
-                    <h3>خدمات</h3>
-
-                    <p>
-                        انواع خدمات اصلاح، گریم، فیشیال و پیرایش
-                        با جدیدترین متدهای روز دنیا
-                    </p>
-
-                    <a href="{% url 'services' %}" class="card-btn">
-    مشاهده خدمات
-    <span>→</span>
-</a>
-
-                </div>
-
+            <div class="home-achievement-card">
+                <i class="fa-solid fa-award"></i>
+                <h3 class="counter" data-target="25">0</h3>
+                <span>سال تجربه</span>
             </div>
 
-            <!-- آموزش -->
-
-            <div class="card">
-
-                <div class="card-image">
-
-                    <img src="{% static 'images/academy.jpg' %}" alt="آموزش">
-
-                </div>
-
-                <div class="card-icon">
-
-                    🎓
-
-                </div>
-
-                <div class="card-body">
-
-                    <h3>آموزش</h3>
-
-                    <p>
-                        آموزش تخصصی آرایشگری مردانه
-                        از مبتدی تا فوق حرفه‌ای
-                    </p>
-
-                    <a href="{% url 'education' %}" class="card-btn">
-    مشاهده دوره‌ها
-    <span>→</span>
-</a>
-
-                </div>
-
+            <div class="home-achievement-card">
+                <i class="fa-solid fa-user-graduate"></i>
+                <h3 class="counter" data-target="5000">0</h3>
+                <span>هنرجوی آموزش دیده</span>
             </div>
 
-            <!-- فروشگاه -->
+            <div class="home-achievement-card">
+                <i class="fa-solid fa-scissors"></i>
+                <h3 class="counter" data-target="12000">0</h3>
+                <span>خدمات انجام شده</span>
+            </div>
 
-            <div class="card">
+            <div class="home-achievement-card">
+                <i class="fa-solid fa-star"></i>
+                <h3 class="counter" data-target="98">0</h3>
+                <span>درصد رضایت مشتریان</span>
+            </div>
 
-                <div class="card-image">
-
-                    <img src="{% static 'images/shop.jpg' %}" alt="فروشگاه">
-
-                </div>
-
-                <div class="card-icon">
-
-                    🛍
-
-                </div>
-
-                <div class="card-body">
-
-                    <h3>فروشگاه</h3>
-
-                    <p>
-                        محصولات اورجینال آرایشگری
-                        با تضمین کیفیت و اصالت
-                    </p>
-<a href="{% url 'shop' %}" class="card-btn">
-    مشاهده محصولات
-    <span>→</span>
-</a>
-                </div>
-
+            <div class="home-achievement-card">
+                <i class="fa-solid fa-certificate"></i>
+                <h3 class="counter" data-target="15">0</h3>
+                <span>افتخار و گواهینامه</span>
             </div>
 
         </div>
@@ -192,12 +122,17 @@
     </li>
 
 </ul>
-            </ul>
+            
 
                
           <a href="{% url 'about' %}" class="about-btn">
-    درباره آکادمی
-</a>
+بیشتر بدانید</a>
+
+
+    <a href="{% url 'education' %}" class="about-btn about-register-btn">
+        ثبت‌نام آموزش
+    </a>
+
 
         </div>
 
@@ -205,48 +140,341 @@
 
 </section>
 
-<section class="stats-section">
+<!-- ================= HOME SHOWCASE ================= -->
+
+<section class="home-showcase">
 
     <div class="container">
 
-        <div class="stats-grid">
+        <!-- ================= فروشگاه ================= -->
 
-            <div class="stat-box">
+        <div class="showcase-row">
 
-                <h2 class="counter" data-target="25">
-    <span>0</span>
-</h2>
+            <div class="showcase-info">
 
-                <span>سال تجربه</span>
+                <span>SHOP</span>
 
-            </div>
+                <h2>فروشگاه</h2>
 
-            <div class="stat-box">
+                <p>
+                    محصولات حرفه‌ای و تخصصی مورد استفاده در مجموعه
+                </p>
 
-               <h2 class="counter" data-target="5000">
-    <span>0</span>
-</h2>
-
-                <span>هنرجوی آموزش دیده</span>
-
-            </div>
-
-            <div class="stat-box">
-
-                <h2 class="counter" data-target="12000">
-    <span>0</span>
-</h2>
-
-                <span>خدمات انجام شده</span>
+                <a href="{% url 'shop' %}">
+                    مشاهده همه محصولات
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
 
             </div>
 
-            <div class="stat-box">
 
-               <h2 class="counter" data-target="15">
-    <span>0</span>
-</h2>
-                <span>افتخار و گواهینامه</span>
+            <div class="showcase-products">
+
+                <button class="showcase-arrow showcase-prev" type="button">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+
+                <div class="showcase-slider">
+
+                    <div class="showcase-track">
+
+                        {% for product in products %}
+
+                           <div
+    class="showcase-card"
+    data-product-url="{% url 'product_detail' product.slug %}"
+>
+
+                                <div class="showcase-image">
+
+                                    {% if product.image %}
+
+                                        <img
+                                            src="{{ product.image.url }}"
+                                            alt="{{ product.name }}"
+                                        >
+
+                                    {% endif %}
+
+                                </div>
+
+                                <div class="showcase-card-body">
+
+                                    <h3>
+                                        {{ product.name }}
+                                    </h3>
+
+                                    <div class="showcase-price">
+
+                                        {% if product.discount_price %}
+
+                                            <span class="old-price">
+                                                {{ product.price|floatformat:0 }}
+                                            </span>
+
+                                            <strong>
+                                                {{ product.discount_price|floatformat:0 }}
+                                                تومان
+                                            </strong>
+
+                                        {% else %}
+
+                                            <strong>
+                                                {{ product.price|floatformat:0 }}
+                                                تومان
+                                            </strong>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                    <a
+                                        href="{% url 'add_to_cart' product.id %}"
+                                        class="quick-buy"
+                                    >
+                                        خرید سریع
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        {% empty %}
+
+                            <p class="showcase-empty">
+                                محصولی برای نمایش وجود ندارد.
+                            </p>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+                <button class="showcase-arrow showcase-next" type="button">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================= آموزش ================= -->
+
+        <div class="showcase-row showcase-row-reverse">
+
+            <div class="showcase-info">
+
+                <span>EDUCATION</span>
+
+                <h2>آموزش‌ها</h2>
+
+                <p>
+                    دوره‌های تخصصی آموزش آرایشگری مردانه
+                </p>
+
+                <a href="{% url 'education' %}">
+                    مشاهده همه دوره‌ها
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+
+            </div>
+
+
+            <div class="showcase-products">
+
+                <button class="showcase-arrow showcase-prev" type="button">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+
+                <div class="showcase-slider">
+
+                    <div class="showcase-track">
+
+                        {% for course in courses %}
+
+                          <div
+    class="showcase-card"
+    data-course-url="{% url 'course_detail' course.slug %}"
+>
+
+                                <div class="showcase-image">
+
+                                    {% if course.image %}
+
+                                        <img
+                                            src="{{ course.image.url }}"
+                                            alt="{{ course.title }}"
+                                        >
+
+                                    {% endif %}
+
+                                </div>
+
+                                <div class="showcase-card-body">
+
+                                    <h3>
+                                        {{ course.title }}
+                                    </h3>
+
+                                    <div class="showcase-price">
+
+                                        {% if course.price == 0 %}
+
+                                            <strong>
+                                                رایگان
+                                            </strong>
+
+                                        {% else %}
+
+                                            <strong>
+                                                {{ course.price|floatformat:0 }}
+                                                تومان
+                                            </strong>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                    <a
+                                        href="{% url 'course_detail' course.slug %}"
+                                        class="quick-buy"
+                                    >
+                                        مشاهده دوره
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        {% empty %}
+
+                            <p class="showcase-empty">
+                                دوره‌ای برای نمایش وجود ندارد.
+                            </p>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+                <button class="showcase-arrow showcase-next" type="button">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================= جدیدترین‌ها ================= -->
+
+        <div class="showcase-row">
+
+            <div class="showcase-info">
+
+                <span>NEW</span>
+
+                <h2>جدیدترین‌ها</h2>
+
+                <p>
+                    جدیدترین محصولات اضافه شده به فروشگاه
+                </p>
+
+                <a href="{% url 'shop' %}">
+                    مشاهده همه محصولات
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+
+            </div>
+
+
+            <div class="showcase-products">
+
+                <button class="showcase-arrow showcase-prev" type="button">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+
+                <div class="showcase-slider">
+
+                    <div class="showcase-track">
+
+                        {% for product in latest_products %}
+
+                               <div
+        class="showcase-card"
+        data-product-url="{% url 'product_detail' product.slug %}"
+    >
+
+                                <div class="showcase-image">
+
+                                    {% if product.image %}
+
+                                        <img
+                                            src="{{ product.image.url }}"
+                                            alt="{{ product.name }}"
+                                        >
+
+                                    {% endif %}
+
+                                </div>
+
+                                <div class="showcase-card-body">
+
+                                    <h3>
+                                        {{ product.name }}
+                                    </h3>
+
+                                    <div class="showcase-price">
+
+                                        {% if product.discount_price %}
+
+                                            <strong>
+                                                {{ product.discount_price|floatformat:0 }}
+                                                تومان
+                                            </strong>
+
+                                        {% else %}
+
+                                            <strong>
+                                                {{ product.price|floatformat:0 }}
+                                                تومان
+                                            </strong>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                    <a
+                                        href="{% url 'add_to_cart' product.id %}"
+                                        class="quick-buy"
+                                    >
+                                        خرید سریع
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        {% empty %}
+
+                            <p class="showcase-empty">
+                                محصول جدیدی برای نمایش وجود ندارد.
+                            </p>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+                <button class="showcase-arrow showcase-next" type="button">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
 
             </div>
 
