@@ -50,7 +50,7 @@ def course_detail(request, slug):
     )
 
 
-@login_required
+@login_required(login_url="/login/")
 def course_register(request, slug):
 
     course = get_object_or_404(

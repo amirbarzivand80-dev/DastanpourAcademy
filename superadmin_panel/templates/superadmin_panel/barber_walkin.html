@@ -1,41 +1,97 @@
-```html
 {% extends "superadmin_panel/base.html" %}
 
 {% block title %}
 ثبت نوبت حضوری
 {% endblock %}
+
 {% load static %}
-{% block content %}
 {% load jalali %}
+
+{% block content %}
+
 <div class="walkin-container">
 
-    <h2>ثبت نوبت حضوری</h2>
+    <h2>
+        ثبت نوبت حضوری
+    </h2>
+
 
     <form method="POST">
 
         {% csrf_token %}
 
-        <!-- نام مشتری -->
+
+        <!-- ========================= -->
+        <!-- انتخاب آرایشگر برای ادمین -->
+        <!-- ========================= -->
+
+        {% if is_admin %}
+
         <div class="form-group">
 
-            {{ form.customer_name.label_tag }}
+            <label for="barber-select">
+                💈 آرایشگر
+            </label>
 
-            {{ form.customer_name }}
+            <select
+                name="barber"
+                id="barber-select"
+                required
+            >
+
+                <option value="">
+                    انتخاب آرایشگر
+                </option>
+
+                {% for barber_item in barbers %}
+
+                <option
+                    value="{{ barber_item.id }}"
+                    {% if selected_barber and selected_barber.id == barber_item.id %}
+                        selected
+                    {% endif %}
+                >
+
+                    {{ barber_item.user.full_name }}
+
+                </option>
+
+                {% endfor %}
+
+            </select>
 
         </div>
 
-
-        <!-- شماره موبایل -->
-        <div class="form-group">
-
-            {{ form.customer_phone.label_tag }}
-
-            {{ form.customer_phone }}
-
-        </div>
+        {% endif %}
 
 
+       <!-- نام مشتری -->
+<div class="form-group">
+
+    <label for="{{ form.customer_name.id_for_label }}">
+        نام مشتری
+    </label>
+
+    {{ form.customer_name }}
+
+</div>
+
+
+<!-- شماره موبایل -->
+<div class="form-group">
+
+    <label for="{{ form.customer_phone.id_for_label }}">
+        شماره موبایل
+    </label>
+
+    {{ form.customer_phone }}
+
+</div>
+
+        <!-- ========================= -->
         <!-- خدمت -->
+        <!-- ========================= -->
+
         <div class="form-group">
 
             {{ form.service.label_tag }}
@@ -45,14 +101,21 @@
         </div>
 
 
+        <!-- ========================= -->
         <!-- تاریخ شمسی -->
+        <!-- ========================= -->
+
         <div class="form-group">
 
             <label>
                 تاریخ
             </label>
 
-            <div id="openCalendar" class="date-input">
+
+            <div
+                id="openCalendar"
+                class="date-input"
+            >
 
                 <span id="selectedDate">
                     برای انتخاب تاریخ کلیک کنید
@@ -61,6 +124,7 @@
                 <i class="fa-solid fa-calendar-days"></i>
 
             </div>
+
 
             <input
                 type="hidden"
@@ -71,50 +135,77 @@
         </div>
 
 
+        <!-- ========================= -->
         <!-- ساعت -->
+        <!-- ========================= -->
+
         <div class="form-group">
 
-    <label>
-        ساعت
-    </label>
-
-    <div id="timeGrid" class="time-grid">
-
-        <!-- ساعت‌ها توسط JavaScript ساخته می‌شوند -->
-
-    </div>
-
-    <input
-        type="hidden"
-        name="time"
-        id="hiddenTime"
-    >
-
-</div>
+            <label>
+                ساعت
+            </label>
 
 
-        <button type="submit" class="btn-edit">
+            <div
+                id="timeGrid"
+                class="time-grid"
+            >
+
+                <p>
+                    ابتدا تاریخ را انتخاب کنید.
+                </p>
+
+            </div>
+
+
+            <input
+                type="hidden"
+                name="time"
+                id="hiddenTime"
+            >
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- ثبت -->
+        <!-- ========================= -->
+
+        <button
+            type="submit"
+            class="btn-edit"
+        >
+
             ثبت نوبت
+
         </button>
 
     </form>
+
 
 
     <!-- ========================= -->
     <!-- تقویم -->
     <!-- ========================= -->
 
-    <div id="calendarModal" class="calendar-modal">
+    <div
+        id="calendarModal"
+        class="calendar-modal"
+    >
 
         <div class="calendar-content">
 
+
             <div class="calendar-header">
+
 
                 <button
                     type="button"
                     id="prevMonth"
                 >
+
                     ماه قبل
+
                 </button>
 
 
@@ -125,11 +216,19 @@
                     type="button"
                     id="nextMonth"
                 >
+
                     ماه بعد
+
                 </button>
+
 
             </div>
 
+
+
+            <!-- ========================= -->
+            <!-- روزهای هفته -->
+            <!-- ========================= -->
 
             <div class="week-days">
 
@@ -144,14 +243,21 @@
             </div>
 
 
+
+            <!-- ========================= -->
+            <!-- روزهای ماه -->
+            <!-- ========================= -->
+
             <div
                 id="calendar-days"
                 class="calendar-days"
             ></div>
 
+
         </div>
 
     </div>
+
 
 
     <!-- ========================= -->
@@ -169,15 +275,33 @@
 
             <tr>
 
-                <th>مشتری</th>
+                <th>
+                    مشتری
+                </th>
 
-                <th>خدمت</th>
+                <th>
+                    خدمت
+                </th>
 
-                <th>تاریخ</th>
+                {% if is_admin %}
 
-                <th>ساعت</th>
+                <th>
+                    آرایشگر
+                </th>
 
-                <th>وضعیت</th>
+                {% endif %}
+
+                <th>
+                    تاریخ
+                </th>
+
+                <th>
+                    ساعت
+                </th>
+
+                <th>
+                    وضعیت
+                </th>
 
             </tr>
 
@@ -186,9 +310,13 @@
 
         <tbody>
 
+
             {% for item in reservations %}
 
             <tr>
+
+
+                <!-- مشتری -->
 
                 <td>
 
@@ -205,23 +333,59 @@
                 </td>
 
 
+
+                <!-- خدمت -->
+
                 <td>
+
                     {{ item.service.name }}
+
                 </td>
 
 
+
+                <!-- آرایشگر -->
+
+                {% if is_admin %}
+
                 <td>
+
+                    {{ item.barber.user.full_name }}
+
+                </td>
+
+                {% endif %}
+
+
+
+                <!-- تاریخ -->
+
+                <td>
+
                     {{ item.date|to_jalali }}
+
                 </td>
 
+
+
+                <!-- ساعت -->
+
                 <td>
+
                     {{ item.time }}
+
                 </td>
 
+
+
+                <!-- وضعیت -->
 
                 <td>
+
                     {{ item.get_status_display }}
+
                 </td>
+
 
             </tr>
 
@@ -230,20 +394,40 @@
 
             <tr>
 
-                <td colspan="5">
+                <td
+                    colspan="{% if is_admin %}6{% else %}5{% endif %}"
+                >
+
                     نوبتی ثبت نشده است.
+
                 </td>
 
             </tr>
 
             {% endfor %}
 
+
         </tbody>
 
     </table>
 
+
 </div>
+
+
+
+<!-- ========================= -->
+<!-- JALAALI -->
+<!-- ========================= -->
+
 <script src="https://cdn.jsdelivr.net/npm/jalaali-js/dist/jalaali.min.js"></script>
+
+
+<!-- ========================= -->
+<!-- WALK-IN JS -->
+<!-- ========================= -->
+
 <script src="{% static 'js/barber_walkin.js' %}"></script>
+
+
 {% endblock %}
-```

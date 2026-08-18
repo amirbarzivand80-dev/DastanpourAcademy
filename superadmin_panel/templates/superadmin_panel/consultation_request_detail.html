@@ -1,0 +1,123 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block content %}
+{% load jalali %}
+
+<h2 class="page-title">
+    جزئیات درخواست مشاوره
+</h2>
+
+<div class="details-card">
+
+    <div class="consultation-detail">
+
+        <div class="detail-row">
+
+            <strong>
+                نام و نام خانوادگی
+            </strong>
+
+            <span>
+                {{ consultation.full_name }}
+            </span>
+
+        </div>
+
+
+        <div class="detail-row">
+
+            <strong>
+                شماره تماس
+            </strong>
+
+            <span dir="ltr">
+                {{ consultation.phone }}
+            </span>
+
+        </div>
+
+
+        <div class="detail-row">
+
+            <strong>
+                موضوع مشاوره
+            </strong>
+
+            <span>
+                {{ consultation.get_subject_display }}
+            </span>
+
+        </div>
+
+
+        <div class="detail-row">
+
+            <strong>
+                تاریخ درخواست
+            </strong>
+
+            <span>
+                {{ consultation.created_at|to_jalali }}
+            </span>
+
+        </div>
+
+
+        <div class="detail-row">
+
+            <strong>
+                وضعیت
+            </strong>
+
+            <span>
+
+                {% if consultation.is_read %}
+                    بررسی شده
+                {% else %}
+                    جدید
+                {% endif %}
+
+            </span>
+
+        </div>
+
+
+        <div class="detail-message">
+
+            <strong>
+                توضیحات
+            </strong>
+
+            <div class="message-box">
+
+                {% if consultation.message %}
+
+                    {{ consultation.message|linebreaksbr }}
+
+                {% else %}
+
+                    توضیحی ثبت نشده است.
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <div class="detail-actions">
+
+            <a
+                href="{% url 'consultation_requests' %}"
+                class="details-btn"
+            >
+                بازگشت به درخواست‌ها
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

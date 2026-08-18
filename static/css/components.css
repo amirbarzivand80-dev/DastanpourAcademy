@@ -3099,3 +3099,483 @@
     }
 
 }
+
+/* =====================================================
+   HOME GALLERY - 3 IMAGES
+===================================================== */
+
+.home-puzzle-gallery {
+    padding: 30px 0 110px;
+}
+
+.home-gallery-grid {
+    width: min(100%, 1200px);
+    margin: 0 auto;
+
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 14px;
+}
+
+.home-gallery-item {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+
+    overflow: hidden;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 12px 30px rgba(0, 0, 0, .15);
+
+    background: #ddd;
+}
+
+.home-gallery-item img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    transition: transform .4s ease;
+}
+
+.home-gallery-item:hover img {
+    transform: scale(1.04);
+}
+
+
+/* ================= MORE BUTTON ================= */
+
+.home-gallery-more {
+    display: flex;
+    justify-content: center;
+
+    margin-top: 40px;
+}
+
+.home-gallery-more a {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 13px 28px;
+
+    border-radius: 14px;
+
+    background: #C9A227;
+    color: #111;
+
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 800;
+
+    transition: .3s;
+}
+
+.home-gallery-more a:hover {
+    background: #dfbd4d;
+
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 12px 28px rgba(201, 162, 39, .3);
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 700px) {
+
+    .home-puzzle-gallery {
+        padding: 50px 0 80px;
+    }
+
+    .home-gallery-grid {
+        width: 92%;
+        gap: 8px;
+    }
+
+    .home-gallery-item {
+        border-radius: 12px;
+    }
+
+    .home-gallery-more {
+        margin-top: 30px;
+    }
+
+}
+/* =====================================================
+   HOME VIDEO + CONSULTATION
+===================================================== */
+
+.home-video-section {
+    padding: 35px 0 90px;
+}
+
+
+/* ================= VIDEO ================= */
+
+.home-video-wrapper {
+    width: min(100%, 900px);
+    aspect-ratio: 16 / 9;
+
+    margin: 0 auto;
+
+    overflow: hidden;
+
+    border-radius: 24px;
+
+    background: #111;
+
+    border: 1px solid rgba(201, 162, 39, .25);
+
+    box-shadow:
+        0 20px 55px rgba(0, 0, 0, .18);
+}
+
+.home-video-wrapper video {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+
+/* ================= CONSULTATION CARD ================= */
+
+.home-consultation-card {
+    width: min(100%, 1000px);
+
+    margin: 28px auto 0;
+
+    padding: 30px 34px;
+
+    box-sizing: border-box;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 30px;
+
+    min-height: 115px;
+
+    border-radius: 20px;
+
+    background: #151515;
+
+    border: 1px solid rgba(201, 162, 39, .25);
+
+    box-shadow:
+        0 15px 40px rgba(0, 0, 0, .14);
+
+    transition: .3s ease;
+}
+
+.home-consultation-card:hover {
+    border-color: rgba(201, 162, 39, .5);
+
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 20px 45px rgba(0, 0, 0, .2);
+}
+
+
+/* ================= CONTENT ================= */
+
+.consultation-content {
+    display: flex;
+
+    align-items: center;
+
+    gap: 17px;
+
+    text-align: right;
+}
+
+.consultation-icon {
+    width: 65px;
+    height: 65px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 15px;
+
+    background: rgba(201, 162, 39, .12);
+
+    border: 1px solid rgba(201, 162, 39, .25);
+
+    color: #C9A227;
+
+    font-size: 22px;
+}
+
+.consultation-content h3 {
+    margin: 0 0 6px;
+
+    color: #fff;
+
+    font-size: 21px;
+
+    font-weight: 800;
+}
+
+.consultation-content p {
+    margin: 0;
+
+    color: #aaa;
+
+    font-size: 13px;
+
+    line-height: 1.8;
+}
+
+
+/* ================= BUTTON ================= */
+
+.consultation-btn {
+    flex-shrink: 0;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 9px;
+
+    padding: 15px 27px;
+
+    border-radius: 13px;
+
+    background: #C9A227;
+
+    color: #111;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    font-weight: 800;
+
+    transition: .3s ease;
+}
+
+.consultation-btn:hover {
+    background: #dfbd4d;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 10px 25px rgba(201, 162, 39, .25);
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 700px) {
+
+    .home-video-section {
+        padding: 20px 0 65px;
+    }
+
+    .home-video-wrapper {
+        width: 94%;
+
+        aspect-ratio: 16 / 10;
+
+        border-radius: 18px;
+    }
+
+    .home-consultation-card {
+        width: 94%;
+
+        padding: 20px;
+
+        min-height: auto;
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+        gap: 15px;
+
+        border-radius: 17px;
+    }
+
+    .consultation-content {
+        gap: 12px;
+    }
+
+    .consultation-icon {
+        width: 45px;
+        height: 45px;
+
+        border-radius: 12px;
+
+        font-size: 18px;
+    }
+
+    .consultation-content h3 {
+        font-size: 14px;
+    }
+
+    .consultation-content p {
+        font-size: 11px;
+
+        line-height: 1.8;
+    }
+
+    .consultation-btn {
+        width: 100%;
+
+        padding: 11px;
+
+        font-size: 12px;
+    }
+}
+
+
+
+/* =========================
+   FLOATING SOCIAL BUTTONS
+========================= */
+
+.home-social-floating {
+    position: fixed;
+    left: 25px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 110px;
+    height: 150px;
+    z-index: 9999;
+}
+
+
+/* دایره‌ها */
+
+.home-social-floating a {
+    position: absolute;
+
+    width: 48px;
+    height: 48px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text-decoration: none;
+
+    background: #111;
+
+    border: 1px solid rgba(212, 175, 55, 0.7);
+
+    box-shadow:
+        0 5px 18px rgba(0, 0, 0, 0.35);
+
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+
+/* آیکون */
+
+.home-social-floating i {
+    font-size: 20px;
+    color: #d4af37;
+}
+
+
+/* موقعیت مثلثی */
+
+.home-social-instagram {
+    top: 0;
+    left: 31px;
+}
+
+.home-social-telegram {
+    top: 50px;
+    left: 0;
+}
+
+.home-social-whatsapp {
+    top: 50px;
+    left: 62px;
+}
+
+.home-social-phone {
+    top: 100px;
+    left: 31px;
+}
+
+
+/* Hover */
+
+.home-social-floating a:hover {
+    transform: scale(1.12);
+
+    box-shadow:
+        0 8px 25px rgba(212, 175, 55, 0.3);
+}
+
+
+/* موبایل */
+
+@media (max-width: 768px) {
+
+    .home-social-floating {
+        left: 10px;
+        width: 82px;
+        height: 112px;
+    }
+
+    .home-social-floating a {
+        width: 38px;
+        height: 38px;
+    }
+
+    .home-social-floating i {
+        font-size: 16px;
+    }
+
+    .home-social-instagram {
+        top: 0;
+        left: 22px;
+    }
+
+    .home-social-telegram {
+        top: 37px;
+        left: 0;
+    }
+
+    .home-social-whatsapp {
+        top: 37px;
+        left: 44px;
+    }
+
+    .home-social-phone {
+        top: 74px;
+        left: 22px;
+    }
+
+}

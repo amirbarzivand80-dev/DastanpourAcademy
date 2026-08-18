@@ -1,4 +1,5 @@
 {% extends "superadmin_panel/base.html" %}
+{% load price_filters %}
 
 {% block title %}
 داشبورد
@@ -142,7 +143,7 @@
 
                 <strong>{{ order.user.full_name }}</strong>
 
-                <span>{{ order.total_price }} تومان</span>
+                <span>{{ order.total_price|price_format }} تومان</span>
 
             </div>
 

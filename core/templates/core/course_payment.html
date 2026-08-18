@@ -1,5 +1,6 @@
 {% extends "core/base.html" %}
 {% load static %}
+{% load price_filters %}
 
 
 {% block title %}
@@ -41,7 +42,7 @@
 
 
             <span>
-                {{ course.price }} تومان
+                {{ course.price|price_format }} تومان
             </span>
 
 

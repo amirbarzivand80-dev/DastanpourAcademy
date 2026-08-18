@@ -51,8 +51,7 @@ def shop(request):
             "categories": categories,
         }
     )
-
-@login_required
+@login_required(login_url="/login/")
 def add_to_cart(request, product_id):
 
     product = get_object_or_404(
@@ -75,7 +74,7 @@ def add_to_cart(request, product_id):
 
     return redirect("cart")
 
-@login_required
+@login_required(login_url="/login/")
 def cart(request):
 
     cart, created = Cart.objects.get_or_create(
@@ -98,7 +97,7 @@ def cart(request):
             "total_price": total_price,
         }
     )
-@login_required
+@login_required(login_url="/login/")
 def remove_from_cart(request, item_id):
 
     item = get_object_or_404(
@@ -115,7 +114,7 @@ from django.http import JsonResponse
 
 
 
-@login_required
+@login_required(login_url="/login/")
 def update_cart_quantity(request, item_id):
 
     print("UPDATE CART START")
@@ -146,8 +145,7 @@ from django.shortcuts import render
 from .models import Cart
 from .models import Order, OrderItem
 
-
-@login_required
+@login_required(login_url="/login/")
 def checkout(request):
 
     cart = get_object_or_404(

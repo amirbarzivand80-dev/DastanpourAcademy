@@ -1,0 +1,106 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+مدیریت قیمت {{ service.name }}
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h2>
+        مدیریت قیمت خدمت
+    </h2>
+
+    <p>
+        {{ service.name }}
+    </p>
+
+</div>
+
+
+<form method="POST">
+
+    {% csrf_token %}
+
+
+    <!-- قیمت پایه -->
+
+    <div class="form-group">
+
+        <label>
+            قیمت پایه خدمت
+        </label>
+
+        <input
+            type="number"
+            value="{{ service.price }}"
+            disabled
+        >
+
+        <small>
+            قیمت پایه فقط از بخش ویرایش خدمت تغییر می‌کند.
+        </small>
+
+    </div>
+
+
+    <hr>
+
+
+    <!-- قیمت آرایشگرها -->
+
+    <h3>
+        قیمت هر آرایشگر
+    </h3>
+
+
+    {% if barbers %}
+
+        {% for barber in barbers %}
+
+            <div class="form-group">
+
+                <label>
+                    {{ barber.user.full_name }}
+                </label>
+
+                <input
+                    type="number"
+                    name="price_{{ barber.id }}"
+                    value="{{ price_dict|get_item:barber.id|default:'' }}"
+                    min="0"
+                    placeholder="قیمت به تومان"
+                >
+
+            </div>
+
+        {% endfor %}
+
+
+        <button
+            type="submit"
+            class="btn-edit"
+        >
+            ذخیره قیمت‌ها
+        </button>
+
+    {% else %}
+
+        <p>
+            هنوز هیچ آرایشگری برای این خدمت انتخاب نشده است.
+        </p>
+
+    {% endif %}
+
+
+    <a
+        href="{% url 'superadmin_services' %}"
+        class="btn-delete"
+    >
+        بازگشت
+    </a>
+
+</form>
+
+{% endblock %}

@@ -240,6 +240,16 @@ class Order(models.Model):
         choices=STATUS_CHOICES,
         default="pending"
     )
+    confirmation_sms_sent = models.BooleanField(
+    default=False
+)
+    
+    tracking_code = models.CharField(
+    max_length=20,
+    unique=True,
+    blank=True,
+    null=True
+)
 
     created_at = models.DateTimeField(
         auto_now_add=True

@@ -1,5 +1,6 @@
 {% extends "core/base.html" %}
 {% load static %}
+{% load price_filters %}
 
 {% block title %}جزئیات دوره{% endblock %}
 
@@ -123,7 +124,7 @@
                 {% if course.course_type == "free" %}
 <strong>رایگان</strong>
 {% else %}
-<strong>{{ course.price }} تومان</strong>
+<strong>{{ course.price|price_format }} تومان</strong>
 {% endif %}
             </div>
 

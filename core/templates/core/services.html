@@ -1,5 +1,6 @@
 {% extends "core/base.html" %}
 {% load static %}
+{% load price_filters %}
 
 {% block title %}
 خدمات | آکادمی احمد داستانپور
@@ -13,89 +14,182 @@
 
         <div class="services-header">
 
-            <h1>خدمات مجموعه </h1>
+            <h1>خدمات مجموعه</h1>
 
             <div class="title-line"></div>
 
         </div>
-<div class="services-search">
 
-    <input
-        type="text"
-        id="serviceSearch"
-        placeholder="جستجوی خدمات...">
 
-</div>
-       <div class="services-filter">
+        <!-- =========================
+             SEARCH
+        ========================== -->
 
-    <button class="active" data-filter="all">
-        همه
-    </button>
+        <div class="services-search">
 
-    {% for category in categories %}
+            <input
+                type="text"
+                id="serviceSearch"
+                placeholder="جستجوی خدمات..."
+            >
 
-        <button data-filter="{{ category.id }}">
-            {{ category.name }}
-        </button>
+        </div>
 
-    {% endfor %}
 
-</div>
+        <!-- =========================
+             FILTER
+        ========================== -->
+
+        <div class="services-filter">
+
+            <button
+                class="active"
+                data-filter="all"
+            >
+                همه
+            </button>
+
+            {% for category in categories %}
+
+                <button
+                    data-filter="{{ category.id }}"
+                >
+                    {{ category.name }}
+                </button>
+
+            {% endfor %}
+
+        </div>
+
+
+        <!-- =========================
+             SERVICES
+        ========================== -->
 
         <div class="services-grid">
 
-        {% for service in services %}
+            {% for service in services %}
 
-            <a href="{% url 'service_detail' service.id %}" class="service-link">
+                <div
+                    class="service-link"
+                    data-service-url="{% url 'service_detail' service.id %}"
+                >
 
-                <div class="service-card"
-                     data-category="{{ service.category.id }}">
+                    <div
+                        class="service-card"
+                        data-category="{{ service.category.id }}"
+                    >
 
-                    <div class="service-image">
 
-                        {% if service.image %}
-                            <img src="{{ service.image.url }}" alt="{{ service.name }}">
-                        {% else %}
-                            <img src="{% static 'images/default-service.jpg' %}" alt="">
-                        {% endif %}
+                        <!-- =========================
+                             IMAGE
+                        ========================== -->
 
-                        <div class="service-icon">
-                            ✂️
+                        <div class="service-image">
+
+                            <div class="service-slides">
+
+                                {% if service.image %}
+
+                                    <img
+                                        src="{{ service.image.url }}"
+                                        alt="{{ service.name }}"
+                                        class="service-slide active"
+                                    >
+
+                                {% endif %}
+
+
+                                {% for service_image in service.images.all %}
+
+                                    <img
+                                        src="{{ service_image.image.url }}"
+                                        alt="{{ service.name }}"
+                                        class="service-slide"
+                                    >
+
+                                {% endfor %}
+
+
+                                {% if not service.image and not service.images.all %}
+
+                                    <img
+                                        src="{% static 'images/default-service.jpg' %}"
+                                        alt="{{ service.name }}"
+                                        class="service-slide active"
+                                    >
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <!-- دکمه قبلی -->
+
+                            <button
+                                type="button"
+                                class="service-slider-btn service-prev"
+                            >
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+
+
+                            <!-- دکمه بعدی -->
+
+                            <button
+                                type="button"
+                                class="service-slider-btn service-next"
+                            >
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </button>
+
                         </div>
 
-                    </div>
 
-                    <div class="service-content">
+                        <!-- =========================
+                             CONTENT
+                        ========================== -->
 
-                        <h3>{{ service.name }}</h3>
+                        <div class="service-content">
 
-                        <p>
-                            {{ service.description }}
-                        </p>
+                            <h3>
+                                {{ service.name }}
+                            </h3>
 
-                        <div class="service-price">
-                            {{ service.price }} تومان
+
+                            <div class="service-price">
+                                {{ service.price|price_format }} تومان
+                            </div>
+
+
+                            <a
+                                href="{% url 'reservation' %}?service={{ service.id }}"
+                                class="service-book-btn"
+                            >
+                                رزرو
+                            </a>
+
                         </div>
 
                     </div>
 
                 </div>
 
-            </a>
 
-        {% empty %}
+            {% empty %}
 
-            <h3 style="color:white;text-align:center;">
-                هنوز سرویسی ثبت نشده است.
-            </h3>
+                <h3 style="color:white;text-align:center;">
+                    هنوز سرویسی ثبت نشده است.
+                </h3>
 
-        {% endfor %}
+            {% endfor %}
 
         </div>
 
     </div>
 
 </section>
+
 
 <script src="{% static 'js/services.js' %}"></script>
 

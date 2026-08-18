@@ -1,4 +1,5 @@
 {% extends "superadmin_panel/base.html" %}
+{% load price_filters %}
 
 {% block content %}
 
@@ -64,7 +65,7 @@
 
             <td>{{ course.teacher }}</td>
 
-            <td>{{ course.price }}</td>
+            <td>{{ course.price|price_format }}</td>
 
             <td>
 

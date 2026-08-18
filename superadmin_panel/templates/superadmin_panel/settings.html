@@ -64,50 +64,94 @@ value="{{ request.user.address|default:'' }}">
 </div>
 
 
-
 <div class="form-group">
 
-<label>
-🎂 تاریخ تولد
-</label>
+    <label>
+        🎂 تاریخ تولد
+    </label>
 
-<input
-type="date"
-name="birth_date"
-value="{{ request.user.birth_date|date:'Y-m-d' }}">
+    <div class="profile-date-input"
+         data-target="birth_date">
+
+        <span>
+            {% if request.user.birth_date %}
+                تاریخ انتخاب شده
+            {% else %}
+                برای انتخاب تاریخ کلیک کنید
+            {% endif %}
+        </span>
+
+        <i class="fa-solid fa-calendar-days"></i>
+
+    </div>
+
+    <input
+        type="hidden"
+        name="birth_date"
+        id="birth_date"
+        value="{{ request.user.birth_date|date:'Y-m-d' }}">
 
 </div>
 
 
-
 <div class="form-group">
 
-<label>
-💍 تاریخ ازدواج
-</label>
+    <label>
+        💍 تاریخ ازدواج
+    </label>
 
-<input
-type="date"
-name="marriage_date"
-value="{{ request.user.marriage_date|date:'Y-m-d' }}">
+    <div class="profile-date-input"
+         data-target="marriage_date">
+
+        <span>
+            {% if request.user.marriage_date %}
+                تاریخ انتخاب شده
+            {% else %}
+                برای انتخاب تاریخ کلیک کنید
+            {% endif %}
+        </span>
+
+        <i class="fa-solid fa-calendar-days"></i>
+
+    </div>
+
+    <input
+        type="hidden"
+        name="marriage_date"
+        id="marriage_date"
+        value="{{ request.user.marriage_date|date:'Y-m-d' }}">
 
 </div>
 
 
-
 <div class="form-group">
 
-<label>
-👶 تاریخ تولد فرزند
-</label>
+    <label>
+        👶 تاریخ تولد فرزند
+    </label>
 
-<input
-type="date"
-name="child_birth"
-value="{{ request.user.child_birth|date:'Y-m-d' }}">
+    <div class="profile-date-input"
+         data-target="child_birth">
+
+        <span>
+            {% if request.user.child_birth %}
+                تاریخ انتخاب شده
+            {% else %}
+                برای انتخاب تاریخ کلیک کنید
+            {% endif %}
+        </span>
+
+        <i class="fa-solid fa-calendar-days"></i>
+
+    </div>
+
+    <input
+        type="hidden"
+        name="child_birth"
+        id="child_birth"
+        value="{{ request.user.child_birth|date:'Y-m-d' }}">
 
 </div>
-
 
 
 <div class="form-actions">

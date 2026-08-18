@@ -82,6 +82,30 @@ def product_detail(request, slug):
     )
 def cart(request):
     return render(request,"core/cart.html")
+from .models import ConsultationRequest
+
+def consultation(request):
+
+    if request.method == "POST":
+
+        full_name = request.POST.get("full_name")
+        phone = request.POST.get("phone")
+        subject = request.POST.get("subject")
+        message = request.POST.get("message")
+
+        ConsultationRequest.objects.create(
+            full_name=full_name,
+            phone=phone,
+            subject=subject,
+            message=message
+        )
+
+        return redirect("consultation")
+
+    return render(
+        request,
+        "core/consultation.html"
+    )
 from shop.models import Favorite
 
 @login_required(login_url="/login/")
@@ -175,6 +199,9 @@ def reservation(request):
 def profile_redirect(request):
 
     user = request.user
+    print("USER:", user.full_name)
+    print("IS BARBER:", user.is_barber)
+    print("GROUPS:", list(user.groups.values_list("name", flat=True)))
 
 
     if user.is_superuser:

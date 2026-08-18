@@ -18,6 +18,16 @@ urlpatterns = [
         views.users_list,
         name="superadmin_users"
     ),
+    path(
+    "superadmin/consultation-requests/",
+    views.consultation_requests,
+    name="consultation_requests"
+),
+path(
+    "consultation-requests/<int:request_id>/",
+    views.consultation_request_detail,
+    name="consultation_request_detail"
+),
 
     path(
         "users/<int:id>/",
@@ -143,7 +153,23 @@ path(
     views.service_delete,
     name="superadmin_service_delete",
 ),
+path(
+    "services/<int:id>/gallery/",
+    views.service_gallery,
+    name="service_gallery",
+),
 
+path(
+    "services/<int:id>/gallery/add/",
+    views.add_service_gallery,
+    name="add_service_gallery",
+),
+
+path(
+    "services/gallery/<int:image_id>/delete/",
+    views.delete_service_gallery,
+    name="delete_service_gallery",
+),
 path(
     "admins/",
     views.admins_list,

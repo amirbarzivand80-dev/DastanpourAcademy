@@ -74,6 +74,7 @@ path(
     privacy,
     name="privacy"
 ),
+path("consultation/", views.consultation, name="consultation"),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,

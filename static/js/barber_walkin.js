@@ -34,6 +34,35 @@ document.addEventListener("DOMContentLoaded", function () {
     const hiddenTime =
         document.getElementById("hiddenTime");
 
+    // اگر کاربر ادمین باشد این وجود دارد
+    const barberSelect =
+        document.getElementById("barber-select");
+
+
+    // =========================
+    // بررسی عناصر
+    // =========================
+
+    if (
+        !openCalendar ||
+        !calendarModal ||
+        !calendar ||
+        !calendarTitle ||
+        !prevMonth ||
+        !nextMonth ||
+        !selectedDate ||
+        !hiddenDate ||
+        !timeGrid ||
+        !hiddenTime
+    ) {
+
+        console.error(
+            "عناصر تقویم پیدا نشدند."
+        );
+
+        return;
+    }
+
 
     // =========================
     // بررسی Jalaali
@@ -41,7 +70,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!window.jalaali) {
 
-        console.error("JALAALI NOT FOUND");
+        console.error(
+            "JALAALI NOT FOUND"
+        );
 
         return;
     }
@@ -73,7 +104,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // =========================
 
     const monthNames = [
+
         "",
+
         "فروردین",
         "اردیبهشت",
         "خرداد",
@@ -86,7 +119,55 @@ document.addEventListener("DOMContentLoaded", function () {
         "دی",
         "بهمن",
         "اسفند"
+
     ];
+
+
+    // =====================================================
+    // گرفتن آرایشگر انتخاب شده
+    // =====================================================
+
+    function getSelectedBarber() {
+
+        // اگر select وجود نداشته باشد
+        // یعنی کاربر آرایشگر است
+        if (!barberSelect) {
+
+            return "";
+
+        }
+
+        return barberSelect.value;
+
+    }
+
+
+    // =====================================================
+    // بررسی انتخاب آرایشگر
+    // =====================================================
+
+    function checkBarberSelected() {
+
+        // آرایشگر خودش انتخاب شده
+        if (!barberSelect) {
+
+            return true;
+
+        }
+
+        if (!barberSelect.value) {
+
+            alert(
+                "لطفاً ابتدا آرایشگر را انتخاب کنید."
+            );
+
+            return false;
+
+        }
+
+        return true;
+
+    }
 
 
     // =========================
@@ -129,11 +210,15 @@ document.addEventListener("DOMContentLoaded", function () {
         let startDay =
             firstDate.getDay();
 
+
         startDay =
             (startDay + 1) % 7;
 
 
+        // =========================
         // خانه‌های خالی
+        // =========================
+
         for (
             let i = 0;
             i < startDay;
@@ -141,16 +226,24 @@ document.addEventListener("DOMContentLoaded", function () {
         ) {
 
             const empty =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
             empty.className =
                 "calendar-day empty";
 
-            calendar.appendChild(empty);
+            calendar.appendChild(
+                empty
+            );
+
         }
 
 
+        // =========================
         // روزهای ماه
+        // =========================
+
         for (
             let day = 1;
             day <= monthDays;
@@ -158,7 +251,9 @@ document.addEventListener("DOMContentLoaded", function () {
         ) {
 
             const dayBox =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
             dayBox.className =
                 "calendar-day";
@@ -194,17 +289,27 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
 
+            // =========================
+            // روزهای گذشته
+            // =========================
+
             if (selected < today) {
 
                 dayBox.classList.add(
                     "disabled"
                 );
 
-            } else {
+            }
+
+            else {
 
                 dayBox.addEventListener(
                     "click",
                     function () {
+
+                        // =========================
+                        // انتخاب روز
+                        // =========================
 
                         document
                             .querySelectorAll(
@@ -226,34 +331,52 @@ document.addEventListener("DOMContentLoaded", function () {
                         );
 
 
-                        // نمایش شمسی
+                        // =========================
+                        // نمایش تاریخ شمسی
+                        // =========================
+
                         selectedDate.innerText =
+
                             viewYear +
                             "/" +
-                            String(viewMonth)
-                                .padStart(2, "0") +
+                            String(
+                                viewMonth
+                            ).padStart(2, "0") +
                             "/" +
-                            String(day)
-                                .padStart(2, "0");
+                            String(
+                                day
+                            ).padStart(2, "0");
 
 
+                        // =========================
                         // تاریخ میلادی برای Django
+                        // =========================
+
                         hiddenDate.value =
+
                             gregorian.gy +
                             "-" +
-                            String(gregorian.gm)
-                                .padStart(2, "0") +
+                            String(
+                                gregorian.gm
+                            ).padStart(2, "0") +
                             "-" +
-                            String(gregorian.gd)
-                                .padStart(2, "0");
+                            String(
+                                gregorian.gd
+                            ).padStart(2, "0");
 
 
+                        // =========================
                         // بستن تقویم
+                        // =========================
+
                         calendarModal.style.display =
                             "none";
 
 
+                        // =========================
                         // ساخت ساعت‌ها
+                        // =========================
+
                         createTimes(
                             hiddenDate.value
                         );
@@ -273,18 +396,60 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // =========================
+    // =====================================================
     // گرفتن ساعت‌های پر از Django
-    // =========================
+    // =====================================================
 
     async function getBusyTimes(date) {
 
         try {
 
+            const barberId =
+                getSelectedBarber();
+
+
+            // =========================
+            // اگر ادمین است
+            // =========================
+
+            if (
+                barberSelect &&
+                !barberId
+            ) {
+
+                return [];
+
+            }
+
+
+            // =========================
+            // ساخت URL
+            // =========================
+
+            let url =
+
+                `/superadmin/barber-walkin/busy-times/?date=${encodeURIComponent(date)}`;
+
+
+            // اگر آرایشگر انتخاب شده
+            // شناسه آن را هم بفرست
+
+            if (barberId) {
+
+                url +=
+                    `&barber_id=${encodeURIComponent(barberId)}`;
+
+            }
+
+
+            console.log(
+                "BUSY TIMES URL:",
+                url
+            );
+
+
             const response =
-                await fetch(
-                   `/superadmin/barber-walkin/busy-times/?date=${date}`
-                );
+                await fetch(url);
 
 
             if (!response.ok) {
@@ -310,7 +475,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
             return busyTimes;
 
-        } catch (error) {
+
+        }
+
+        catch (error) {
 
             console.error(
                 "BUSY TIMES ERROR:",
@@ -324,9 +492,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // =========================
+    // =====================================================
     // ساخت ساعت‌ها
-    // =========================
+    // =====================================================
 
     async function createTimes(date) {
 
@@ -335,9 +503,51 @@ document.addEventListener("DOMContentLoaded", function () {
         hiddenTime.value = "";
 
 
+        // =========================
+        // بررسی آرایشگر
+        // =========================
+
+        if (!checkBarberSelected()) {
+
+            timeGrid.innerHTML = `
+
+                <p>
+                    ابتدا آرایشگر را انتخاب کنید.
+                </p>
+
+            `;
+
+            return;
+
+        }
+
+
+        // =========================
+        // پیام بارگذاری
+        // =========================
+
+        timeGrid.innerHTML = `
+
+            <p>
+                در حال بررسی ساعت‌های آزاد...
+            </p>
+
+        `;
+
+
         const busyTimes =
             await getBusyTimes(date);
 
+
+        timeGrid.innerHTML = "";
+
+
+        let availableCount = 0;
+
+
+        // =========================
+        // ساعت ۹ تا ۲۱
+        // =========================
 
         for (
             let hour = 9;
@@ -350,15 +560,20 @@ document.addEventListener("DOMContentLoaded", function () {
             ) {
 
                 const time =
+
                     String(hour)
                         .padStart(2, "0") +
+
                     ":" +
+
                     String(minute)
                         .padStart(2, "0");
 
 
-                // اگر ساعت رزرو شده باشد
-                // اصلاً نمایش داده نشود
+                // =========================
+                // ساعت رزرو شده
+                // =========================
+
                 if (
                     busyTimes.includes(time)
                 ) {
@@ -366,6 +581,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     continue;
 
                 }
+
+
+                availableCount++;
 
 
                 const button =
@@ -431,19 +649,91 @@ document.addEventListener("DOMContentLoaded", function () {
 
         }
 
+
+        // =========================
+        // هیچ ساعت آزادی نیست
+        // =========================
+
+        if (
+            availableCount === 0
+        ) {
+
+            timeGrid.innerHTML = `
+
+                <p>
+                    برای این تاریخ ساعت آزادی وجود ندارد.
+                </p>
+
+            `;
+
+        }
+
     }
 
 
-    // =========================
+    // =====================================================
+    // تغییر آرایشگر
+    // =====================================================
+
+    if (barberSelect) {
+
+        barberSelect.addEventListener(
+            "change",
+            function () {
+
+                // پاک کردن تاریخ
+                hiddenDate.value = "";
+
+                selectedDate.innerText =
+                    "برای انتخاب تاریخ کلیک کنید";
+
+
+                // پاک کردن ساعت
+                hiddenTime.value = "";
+
+                timeGrid.innerHTML = `
+
+                    <p>
+                        ابتدا تاریخ را انتخاب کنید.
+                    </p>
+
+                `;
+
+
+                console.log(
+                    "SELECTED BARBER:",
+                    barberSelect.value
+                );
+
+            }
+        );
+
+    }
+
+
+    // =====================================================
     // باز کردن تقویم
-    // =========================
+    // =====================================================
 
     openCalendar.addEventListener(
         "click",
         function () {
 
+            // اگر ادمین است
+            // اول آرایشگر باید انتخاب شود
+
+            if (
+                !checkBarberSelected()
+            ) {
+
+                return;
+
+            }
+
+
             calendarModal.style.display =
                 "flex";
+
 
             renderCalendar();
 
@@ -451,9 +741,9 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 
 
-    // =========================
+    // =====================================================
     // ماه قبل
-    // =========================
+    // =====================================================
 
     prevMonth.addEventListener(
         "click",
@@ -461,9 +751,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
             e.preventDefault();
 
+
             viewMonth--;
 
-            if (viewMonth < 1) {
+
+            if (
+                viewMonth < 1
+            ) {
 
                 viewMonth = 12;
 
@@ -471,15 +765,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
             }
 
+
             renderCalendar();
 
         }
     );
 
 
-    // =========================
+    // =====================================================
     // ماه بعد
-    // =========================
+    // =====================================================
 
     nextMonth.addEventListener(
         "click",
@@ -487,9 +782,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
             e.preventDefault();
 
+
             viewMonth++;
 
-            if (viewMonth > 12) {
+
+            if (
+                viewMonth > 12
+            ) {
 
                 viewMonth = 1;
 
@@ -497,15 +796,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
             }
 
+
             renderCalendar();
 
         }
     );
 
 
-    // =========================
+    // =====================================================
     // بستن تقویم
-    // =========================
+    // =====================================================
 
     window.addEventListener(
         "click",

@@ -40,6 +40,13 @@
 
     {% csrf_token %}
 
+       <input
+        type="hidden"
+        name="next"
+        value="{{ next|default:'' }}"
+    >
+
+
     <input
         type="text"
         name="phone"

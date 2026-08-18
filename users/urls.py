@@ -26,7 +26,11 @@ urlpatterns = [
         views.update_profile,
         name="update_profile"
     ),
-
+path(
+    "profile-data/",
+    views.profile_data,
+    name="profile_data"
+),
     path(
         "logout/",
         views.logout_view,

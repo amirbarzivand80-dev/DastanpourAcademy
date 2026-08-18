@@ -6,11 +6,19 @@
 
 {% block content %}
 
+<h2 class="page-title">
+    {{ title }}
+</h2>
+
+
 <form method="POST" enctype="multipart/form-data">
 
     {% csrf_token %}
 
     {{ form.non_field_errors }}
+
+
+    <!-- نام خدمت -->
 
     <div>
         {{ form.name.label_tag }}
@@ -18,59 +26,187 @@
         {{ form.name.errors }}
     </div>
 
+
+    <!-- دسته بندی -->
+
     <div>
         {{ form.category.label_tag }}
         {{ form.category }}
         {{ form.category.errors }}
     </div>
 
-    <div>
-        <label>آرایشگرهای ارائه‌دهنده خدمت</label>
 
-        {{ form.barbers }}
+    <!-- قیمت پایه -->
 
-        {{ form.barbers.errors }}
-    </div>
+    <div style="margin-top:20px;">
 
-    <div>
-        {{ form.description.label_tag }}
-        {{ form.description }}
-        {{ form.description.errors }}
-    </div>
+        <label>
+            قیمت پایه خدمت
+        </label>
 
-    <div>
-        {{ form.price.label_tag }}
         {{ form.price }}
+
         {{ form.price.errors }}
+
+        <small>
+            این قیمت در صفحه خدمات سایت نمایش داده می‌شود.
+        </small>
+
     </div>
 
-    <div>
+
+    <!-- آرایشگرها -->
+
+    <div style="margin-top:25px;">
+
+        <h3>
+            آرایشگرهای ارائه‌دهنده خدمت
+        </h3>
+
+        {% for row in barber_rows %}
+
+            <div style="
+                display:flex;
+                align-items:center;
+                gap:20px;
+                padding:12px;
+                margin:8px 0;
+                border:1px solid #ddd;
+                border-radius:8px;
+            ">
+
+
+                <!-- انتخاب آرایشگر -->
+
+                <label style="
+                    width:220px;
+                    cursor:pointer;
+                ">
+
+                    <input
+                        type="checkbox"
+                        name="barbers"
+                        value="{{ row.barber.id }}"
+
+                        {% if row.selected %}
+                            checked
+                        {% endif %}
+                    >
+
+                    {{ row.barber.user.full_name }}
+
+                </label>
+
+
+                <!-- قیمت اختصاصی -->
+
+                <label>
+
+                    قیمت اختصاصی:
+
+                    <input
+                        type="number"
+                        name="barber_price_{{ row.barber.id }}"
+                        value="{{ row.price }}"
+                        min="0"
+                        placeholder="قیمت پایه"
+                        style="
+                            width:160px;
+                            padding:8px;
+                        "
+                    >
+
+                    تومان
+
+                </label>
+
+            </div>
+
+        {% empty %}
+
+            <p>
+                هیچ آرایشگر فعالی ثبت نشده است.
+            </p>
+
+        {% endfor %}
+
+    </div>
+
+
+    <!-- توضیحات -->
+
+    <div style="margin-top:20px;">
+
+        {{ form.description.label_tag }}
+
+        {{ form.description }}
+
+        {{ form.description.errors }}
+
+    </div>
+
+
+    <!-- ترتیب -->
+
+    <div style="margin-top:20px;">
+
         {{ form.order.label_tag }}
+
         {{ form.order }}
+
         {{ form.order.errors }}
+
     </div>
 
-    <div>
+
+    <!-- عکس -->
+
+    <div style="margin-top:20px;">
+
         {{ form.image.label_tag }}
+
         {{ form.image }}
+
         {{ form.image.errors }}
+
     </div>
 
-    <div>
+
+    <!-- وضعیت -->
+
+    <div style="margin-top:20px;">
+
         {{ form.is_active.label_tag }}
+
         {{ form.is_active }}
+
         {{ form.is_active.errors }}
+
     </div>
 
-    <button type="submit" class="btn-edit">
-        ذخیره
-    </button>
 
-    <a
-        href="{% url 'superadmin_services' %}"
-        class="btn-delete">
-        انصراف
-    </a>
+    <!-- دکمه‌ها -->
+
+    <div style="margin-top:25px;">
+
+        <button
+            type="submit"
+            class="btn-edit">
+
+            ذخیره
+
+        </button>
+
+
+        <a
+            href="{% url 'superadmin_services' %}"
+            class="btn-delete">
+
+            انصراف
+
+        </a>
+
+    </div>
 
 </form>
 

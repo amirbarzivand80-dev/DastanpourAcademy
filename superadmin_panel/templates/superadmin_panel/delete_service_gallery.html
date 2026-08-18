@@ -1,0 +1,48 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+حذف تصویر
+{% endblock %}
+
+{% block content %}
+
+<h2 class="page-title">
+    حذف تصویر
+</h2>
+
+<p>
+    آیا مطمئن هستید که می‌خواهید این تصویر را حذف کنید؟
+</p>
+
+<img
+    src="{{ image.image.url }}"
+    style="
+        width:250px;
+        height:250px;
+        object-fit:cover;
+        border-radius:10px;
+        margin:20px 0;
+    "
+>
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    <button
+        type="submit"
+        class="btn-delete"
+    >
+        بله، حذف شود
+    </button>
+
+    <a
+        href="{% url 'service_gallery' image.service.id %}"
+        class="btn-edit"
+    >
+        انصراف
+    </a>
+
+</form>
+
+{% endblock %}

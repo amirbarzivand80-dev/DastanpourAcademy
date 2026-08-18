@@ -1,350 +1,439 @@
-```html
 {% extends 'core/base.html' %}
 {% load static %}
+{% load price_filters %}
 
 {% block title %}
 رزرو نوبت
 {% endblock %}
 
 {% block content %}
+
 <div class="reservation-page">
 
-<div class="container">
+    <div class="container">
 
-    <div class="reservation-header">
+        <!-- ================================= -->
+        <!-- Header -->
+        <!-- ================================= -->
 
-        <h1>رزرو نوبت</h1>
+        <div class="reservation-header">
 
-        <p>
-            خدمات مورد نظر خود را انتخاب کرده و نوبت خود را رزرو کنید.
-        </p>
+            <h1>رزرو نوبت</h1>
+
+            <p>
+                خدمات مورد نظر خود را انتخاب کرده و نوبت خود را رزرو کنید.
+            </p>
+
+        </div>
+
+
+        <div class="reservation-box">
+
+            <form method="POST" id="reservationForm">
+
+                {% csrf_token %}
+
+
+                <!-- ================================= -->
+                <!-- انتخاب خدمات -->
+                <!-- ================================= -->
+
+                <h2>انتخاب خدمات</h2>
+
+
+                <div class="services-selection">
+
+                    {% for service in services %}
+
+                    <div
+                        class="service-item"
+                        data-service-id="{{ service.id }}"
+                    >
+
+
+                        <!-- ================================= -->
+                        <!-- عنوان خدمت -->
+                        <!-- ================================= -->
+
+                        <button
+                            type="button"
+                            class="accordion"
+                        >
+
+                            <span>
+                                {{ service.name }}
+                            </span>
+
+                            <i class="fa-solid fa-chevron-down"></i>
+
+                        </button>
+
+
+                        <div class="accordion-content">
+
+
+                            <!-- ================================= -->
+                            <!-- انتخاب خدمت -->
+                            <!-- ================================= -->
+
+                            <label class="service-select">
+
+                                <input
+                                    type="checkbox"
+                                    name="services"
+                                    value="{{ service.id }}"
+                                >
+
+                                <span>
+                                    انتخاب این خدمت
+                                </span>
+
+                            </label>
+
+
+                            <!-- ================================= -->
+                            <!-- قیمت آرایشگر انتخاب شده -->
+                            <!-- ================================= -->
+
+                            <div
+                                class="selected-barber-price"
+                                style="display:none;"
+                            >
+
+                                <span>
+                                    قیمت این آرایشگر:
+                                </span>
+
+                                <strong class="barber-price-value">
+                                    0
+                                </strong>
+
+                                <span>
+                                    تومان
+                                </span>
+
+                            </div>
+
+
+                            <!-- ================================= -->
+                            <!-- آرایشگرهای همین خدمت -->
+                            <!-- ================================= -->
+
+                            <div class="service-barbers">
+
+                                <h4>
+                                    انتخاب آرایشگر
+                                </h4>
+
+
+                                <div class="service-barber-grid">
+
+
+                                    {% for barber in service.barbers.all %}
+
+<label
+    class="service-barber-card"
+    data-service-id="{{ service.id }}"
+
+    {% for barber_price in service.barber_prices.all %}
+
+        {% if barber_price.barber_id == barber.id %}
+
+            data-price="{{ barber_price.price }}"
+
+        {% endif %}
+
+    {% endfor %}
+>
+
+
+    <input
+        type="radio"
+        name="barber_{{ service.id }}"
+        value="{{ barber.id }}"
+    >
+
+
+    <!-- قیمت بالای عکس -->
+
+    <div class="barber-card-price">
+
+        {% for barber_price in service.barber_prices.all %}
+
+            {% if barber_price.barber_id == barber.id %}
+
+                {{ barber_price.price|price_format }}
+
+            {% endif %}
+
+        {% endfor %}
+
+        تومان
 
     </div>
 
 
-    <div class="reservation-box">
+    <!-- عکس آرایشگر -->
 
-        <form method="POST" id="reservationForm">
+    {% if barber.user.profile_image %}
 
-            {% csrf_token %}
+        <img
+            src="{{ barber.user.profile_image.url }}"
+            alt="{{ barber.user.full_name }}"
+        >
 
+    {% else %}
 
-            <!-- ================================= -->
-            <!-- انتخاب خدمات -->
-            <!-- ================================= -->
+        <img
+            src="{% static 'images/default-user.jpg' %}"
+            alt="{{ barber.user.full_name }}"
+        >
 
-            <h2>انتخاب خدمات</h2>
-
-            {% for service in services %}
-
-            <div class="service-item">
-
-                <button
-                    type="button"
-                    class="accordion"
-                >
-                    {{ service.name }}
-                </button>
+    {% endif %}
 
 
-                <div class="accordion-content">
+    <!-- نام آرایشگر -->
 
-                    <label>
-
-                  <input
-    type="radio"
-    name="service"
-    value="{{ service.id }}"
-    data-barbers="{% for barber in service.barbers.all %}{{ barber.id }}{% if not forloop.last %},{% endif %}{% endfor %}"
-    {% if selected_service and selected_service.id == service.id %}checked{% endif %}
->
-                        انتخاب این خدمت
-
-                    </label>
+    <span>
+        {{ barber.user.full_name }}
+    </span>
 
 
-                    <p>
-                        قیمت:
-                        {{ service.price }}
-                        تومان
-                    </p>
+</label>
 
 
-                    <p>
-                        {{ service.description }}
-                    </p>
+{% empty %}
 
-                </div>
+    <p class="no-barber">
+        آرایشگری برای این خدمت ثبت نشده است.
+    </p>
 
-            </div>
+{% endfor %}
 
-            {% endfor %}
+                                </div>
 
-
-            <hr>
-
-
-            <!-- ================================= -->
-            <!-- انتخاب آرایشگر -->
-            <!-- ================================= -->
-
-            <div class="barber-section">
-
-                <h2>انتخاب آرایشگر</h2>
+                            </div>
 
 
-                <div class="barber-grid">
+                            <!-- ================================= -->
+                            <!-- تاریخ و ساعت همین خدمت -->
+                            <!-- ================================= -->
 
-                    {% if barbers %}
-
-                        {% for barber in barbers %}
-
-                        <label
-                            class="barber-card"
-                            data-barber-id="{{ barber.id }}"
-                            style="display: none;"
-                        >
-
-                            <input
-                                type="radio"
-                                name="barber"
-                                value="{{ barber.id }}"
+                            <div
+                                class="service-schedule"
+                                data-service-id="{{ service.id }}"
+                                style="display:none;"
                             >
 
 
-                            {% if barber.user.profile_image %}
+                                <!-- ================================= -->
+                                <!-- تاریخ -->
+                                <!-- ================================= -->
 
-                                <img
-                                    src="{{ barber.user.profile_image.url }}"
-                                    alt="{{ barber.user.full_name }}"
+                                <h4>
+                                    انتخاب تاریخ
+                                </h4>
+
+
+                                <div
+                                    class="service-date-input date-input"
+                                    data-service-id="{{ service.id }}"
                                 >
 
-                            {% else %}
+                                    <span class="service-selected-date">
+                                        برای انتخاب تاریخ کلیک کنید
+                                    </span>
 
-                                <img
-                                    src="{% static 'images/default-user.jpg' %}"
-                                    alt="{{ barber.user.full_name }}"
+                                    <i class="fa-solid fa-calendar-days"></i>
+
+                                </div>
+
+
+                                <!-- تاریخ میلادی -->
+                                <!-- این مقدار توسط JS پر می‌شود -->
+
+                                <input
+                                    type="hidden"
+                                    name="date_{{ service.id }}"
+                                    class="service-hidden-date"
                                 >
 
-                            {% endif %}
+
+                                <!-- ================================= -->
+                                <!-- ساعت -->
+                                <!-- ================================= -->
+
+                                <h4 class="service-time-title">
+                                    انتخاب ساعت
+                                </h4>
 
 
-                            <h3>
-                                {{ barber.user.full_name }}
-                            </h3>
+                                <div
+                                    class="selected-service-time"
+                                    data-service-id="{{ service.id }}"
+                                >
 
-                        </label>
+                                    <span>
+                                        ابتدا تاریخ را انتخاب کنید
+                                    </span>
 
-                        {% endfor %}
+                                    <i class="fa-solid fa-clock"></i>
 
-                    {% else %}
-
-                        <p>
-                            هنوز آرایشگری ثبت نشده است.
-                        </p>
-
-                    {% endif %}
-
-                </div>
+                                </div>
 
 
-                <p
-                    id="barberMessage"
-                    style="display: none;"
-                >
-                    برای این خدمت آرایشگری ارائه‌دهنده وجود ندارد.
-                </p>
+                                <!-- ساعت‌ها -->
+                                <!-- توسط JS ساخته می‌شوند -->
 
-            </div>
-
-
-            <hr>
+                                <div
+                                    class="service-time-grid time-grid"
+                                    data-service-id="{{ service.id }}"
+                                    style="display:none;"
+                                ></div>
 
 
-            <!-- ================================= -->
-            <!-- انتخاب تاریخ -->
-            <!-- ================================= -->
+                                <!-- ساعت انتخاب شده -->
 
-            <div class="date-section">
-
-                <h2>انتخاب تاریخ</h2>
-
-
-                <div
-                    id="openCalendar"
-                    class="date-input"
-                >
-
-                    <span id="selectedDate">
-                        برای انتخاب تاریخ کلیک کنید
-                    </span>
+                                <input
+                                    type="hidden"
+                                    name="time_{{ service.id }}"
+                                    class="service-hidden-time"
+                                >
 
 
-                    <i class="fa-solid fa-calendar-days"></i>
-
-                </div>
-
-            </div>
+                            </div>
 
 
-            <!-- تاریخ میلادی برای Django -->
-
-            <input
-                type="hidden"
-                name="date"
-                id="hiddenDate"
-            >
-
-
-            <!-- ساعت انتخاب شده -->
-
-            <input
-                type="hidden"
-                name="time"
-                id="hiddenTime"
-            >
-
-
-            <!-- ================================= -->
-            <!-- تقویم شمسی -->
-            <!-- ================================= -->
-
-            <div
-                id="calendarModal"
-                class="calendar-modal"
-            >
-
-                <div class="calendar-content">
-
-
-                    <!-- ماه قبل -->
-
-                    <button
-                        type="button"
-                        id="prevMonth"
-                    >
-                        ❮
-                    </button>
-
-
-                    <!-- عنوان ماه -->
-
-                    <h3 id="calendarTitle"></h3>
-
-
-                    <!-- ماه بعد -->
-
-                    <button
-                        type="button"
-                        id="nextMonth"
-                    >
-                        ❯
-                    </button>
-
-
-                    <!-- بستن -->
-
-                    <button
-                        type="button"
-                        id="closeCalendar"
-                    >
-                        ✕
-                    </button>
-
-
-                    <!-- روزهای هفته -->
-
-                    <div class="week-days">
-
-                        <span>ش</span>
-                        <span>ی</span>
-                        <span>د</span>
-                        <span>س</span>
-                        <span>چ</span>
-                        <span>پ</span>
-                        <span>ج</span>
+                        </div>
 
                     </div>
 
-
-                    <!-- روزهای تقویم -->
-
-                    <div
-                        id="calendar-days"
-                        class="calendar-days"
-                    ></div>
+                    {% endfor %}
 
                 </div>
 
-            </div>
+
+                <hr>
 
 
-            <hr>
+                <!-- ================================= -->
+                <!-- تقویم اصلی قبلی حذف شد -->
+                <!-- ================================= -->
+                <!--
+                    تاریخ و ساعت هر خدمت به صورت مستقل
+                    داخل همان خدمت انتخاب می‌شود.
+                -->
 
 
-            <!-- ================================= -->
-            <!-- انتخاب ساعت -->
-            <!-- ================================= -->
-
-            <div
-                id="timeSection"
-                style="display: none;"
-            >
-
-                <h2>انتخاب ساعت</h2>
-
+                <!-- ================================= -->
+                <!-- تقویم شمسی -->
+                <!-- ================================= -->
 
                 <div
-                    class="time-grid"
-                    id="timeGrid"
-                ></div>
+                    id="calendarModal"
+                    class="calendar-modal"
+                >
 
-            </div>
-
-
-            <!-- ================================= -->
-            <!-- ثبت نهایی -->
-            <!-- ================================= -->
-
-            <button
-                type="submit"
-                class="reserve-btn"
-            >
-                ثبت نهایی رزرو
-            </button>
+                    <div class="calendar-content">
 
 
-        </form>
+                        <button
+                            type="button"
+                            id="prevMonth"
+                        >
+                            ❮
+                        </button>
+
+
+                        <h3 id="calendarTitle"></h3>
+
+
+                        <button
+                            type="button"
+                            id="nextMonth"
+                        >
+                            ❯
+                        </button>
+
+
+                        <button
+                            type="button"
+                            id="closeCalendar"
+                        >
+                            ✕
+                        </button>
+
+
+                        <div class="week-days">
+
+                            <span>ش</span>
+                            <span>ی</span>
+                            <span>د</span>
+                            <span>س</span>
+                            <span>چ</span>
+                            <span>پ</span>
+                            <span>ج</span>
+
+                        </div>
+
+
+                        <div
+                            id="calendar-days"
+                            class="calendar-days"
+                        ></div>
+
+
+                    </div>
+
+                </div>
+
+
+                <hr>
+
+
+                <!-- ================================= -->
+                <!-- ثبت نهایی همه خدمات -->
+                <!-- ================================= -->
+
+                <button
+                    type="submit"
+                    class="reserve-btn"
+                >
+                    ثبت نهایی رزرو
+                </button>
+
+
+            </form>
+
+        </div>
 
     </div>
 
-</div>
+
+    <!-- ================================= -->
+    <!-- CSS -->
+    <!-- ================================= -->
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/reservation.css' %}"
+    >
 
 
-<!-- ================================= -->
-<!-- CSS -->
-<!-- ================================= -->
+    <!-- ================================= -->
+    <!-- Jalaali -->
+    <!-- ================================= -->
 
-<link
-    rel="stylesheet"
-    href="{% static 'css/reservation.css' %}"
->
+    <script src="https://cdn.jsdelivr.net/npm/jalaali-js/dist/jalaali.min.js"></script>
 
 
-<!-- ================================= -->
-<!-- Jalaali -->
-<!-- ================================= -->
+    <!-- ================================= -->
+    <!-- JavaScript -->
+    <!-- ================================= -->
 
-<script src="https://cdn.jsdelivr.net/npm/jalaali-js/dist/jalaali.min.js"></script>
+    <script src="{% static 'js/reservation.js' %}"></script>
 
-
-<!-- ================================= -->
-<!-- JavaScript صفحه رزرو -->
-<!-- ================================= -->
-
-<script src="{% static 'js/reservation.js' %}"></script>
 
 </div>
 
 {% endblock %}
-```

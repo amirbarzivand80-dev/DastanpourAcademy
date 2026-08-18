@@ -829,3 +829,432 @@ body{
     color: #fff;
 
 }
+
+/* ===========================
+   PROFILE DATE PICKER
+=========================== */
+
+.profile-date-input {
+    position: relative;
+    z-index: 20;
+
+    width: 260px;
+    min-height: 48px;
+
+    padding: 12px 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    background: #151515;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 12px;
+
+    color: #aaa;
+
+    cursor: pointer;
+    user-select: none;
+    pointer-events: auto;
+
+    transition: .3s ease;
+}
+
+.profile-date-input:hover {
+    border-color: #d8b36a;
+    color: #fff;
+}
+
+.profile-date-input span {
+    pointer-events: none;
+}
+
+.profile-date-input i {
+    color: #d8b36a;
+    pointer-events: none;
+}
+
+
+/* ===========================
+   CALENDAR MODAL
+=========================== */
+
+.profile-calendar-modal {
+
+    position: fixed;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(0,0,0,.75);
+
+    z-index: 999999;
+
+    direction: rtl;
+}
+
+
+.profile-calendar-content {
+
+    width: 380px;
+    max-width: 100%;
+
+    padding: 22px;
+
+    background: #1d1d1d;
+
+    border: 1px solid rgba(216,179,106,.35);
+
+    border-radius: 22px;
+
+    box-shadow: 0 20px 60px rgba(0,0,0,.6);
+}
+
+
+/* HEADER */
+
+.profile-calendar-header {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+}
+
+
+.profile-calendar-header h3 {
+
+    flex: 1;
+
+    text-align: center;
+
+    color: #d8b36a;
+
+    font-size: 18px;
+}
+
+
+.profile-calendar-header button {
+
+    width: 40px;
+    height: 40px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #292929;
+
+    color: #fff;
+
+    cursor: pointer;
+
+    font-size: 16px;
+
+    transition: .2s;
+}
+
+
+.profile-calendar-header button:hover {
+
+    background: #d8b36a;
+
+    color: #111;
+}
+
+
+/* WEEK */
+
+.profile-calendar-week {
+
+    display: grid;
+
+    grid-template-columns: repeat(7,1fr);
+
+    gap: 6px;
+
+    margin-bottom: 8px;
+
+    text-align: center;
+}
+
+
+.profile-calendar-week span {
+
+    padding: 8px 0;
+
+    color: #999;
+
+    font-size: 13px;
+}
+
+
+/* DAYS */
+
+.profile-calendar-days {
+
+    display: grid;
+
+    grid-template-columns: repeat(7,1fr);
+
+    gap: 6px;
+}
+
+
+.profile-calendar-day {
+
+    height: 42px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: #252525;
+
+    color: #fff;
+
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+
+.profile-calendar-day:hover {
+
+    background: #d8b36a;
+
+    color: #111;
+}
+
+
+.profile-calendar-day.selected {
+
+    background: #d8b36a;
+
+    color: #111;
+
+    font-weight: bold;
+}
+
+
+.profile-calendar-day.empty {
+
+    background: transparent;
+
+    cursor: default;
+
+    pointer-events: none;
+}
+
+
+/* =========================================
+   USER SETTINGS - ADMIN STYLE
+========================================= */
+
+.details-card{
+    background:#1d1d1d;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:20px;
+    padding:30px;
+}
+
+/* ردیف‌های تنظیمات */
+.details-card .detail-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:25px;
+
+    padding:18px 0;
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.details-card .detail-row:last-child{
+    border-bottom:none;
+}
+
+/* متن عنوان */
+.details-card .detail-row > span{
+    color:#ddd;
+    font-weight:bold;
+    min-width:180px;
+}
+
+/* input های تنظیمات */
+.details-card input[type="text"],
+.details-card input[type="password"]{
+
+    width:100%;
+    max-width:500px;
+
+    height:48px;
+
+    padding:10px 15px;
+
+    background:#151515;
+
+    border:1px solid rgba(255,255,255,.1);
+
+    border-radius:12px;
+
+    color:#fff;
+
+    font-family:Vazirmatn,sans-serif;
+
+    outline:none;
+
+    transition:.3s;
+}
+
+.details-card input[type="text"]:focus,
+.details-card input[type="password"]:focus{
+
+    border-color:#d8b36a;
+
+    box-shadow:0 0 0 2px rgba(216,179,106,.08);
+}
+
+
+/* تاریخ‌ها */
+.details-card .profile-date-input{
+
+    width:100%;
+    max-width:500px;
+
+    min-height:48px;
+
+    padding:12px 15px;
+
+    background:#151515;
+
+    border:1px solid rgba(255,255,255,.1);
+
+    border-radius:12px;
+
+    color:#aaa;
+
+    transition:.3s;
+}
+
+.details-card .profile-date-input:hover{
+
+    border-color:#d8b36a;
+
+    color:#fff;
+}
+
+
+/* دکمه‌ها */
+.details-card .details-btn{
+
+    background:#d8b36a;
+
+    color:#111;
+
+    border:none;
+
+    border-radius:12px;
+
+    padding:11px 22px;
+
+    font-family:Vazirmatn,sans-serif;
+
+    font-weight:bold;
+
+    text-decoration:none;
+
+    transition:.3s;
+}
+
+.details-card .details-btn:hover{
+
+    background:#e3c17b;
+
+    transform:translateY(-2px);
+
+    box-shadow:0 8px 20px rgba(216,179,106,.18);
+}
+
+
+/* دکمه ذخیره */
+.details-card .save-btn{
+
+    background:#d8b36a;
+
+    color:#111;
+}
+
+
+/* خط جداکننده */
+.details-card hr{
+
+    border:none;
+
+    border-top:1px solid rgba(255,255,255,.08);
+
+    margin:30px 0;
+}
+
+
+/* خروج */
+.details-card .logout-btn{
+
+    background:#b32727 !important;
+
+    color:#fff !important;
+}
+
+.details-card .logout-btn:hover{
+
+    background:#d03a3a !important;
+}
+
+
+/* موبایل */
+@media(max-width:700px){
+
+    .details-card{
+        padding:20px;
+    }
+
+    .details-card .detail-row{
+
+        flex-direction:column;
+
+        align-items:stretch;
+
+        gap:12px;
+
+    }
+
+    .details-card .detail-row > span{
+
+        min-width:unset;
+
+    }
+
+    .details-card input[type="text"],
+    .details-card input[type="password"],
+    .details-card .profile-date-input{
+
+        max-width:none;
+
+    }
+
+}

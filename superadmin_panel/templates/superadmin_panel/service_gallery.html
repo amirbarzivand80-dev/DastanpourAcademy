@@ -1,0 +1,87 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+گالری {{ service.name }}
+{% endblock %}
+
+{% block content %}
+
+<h2 class="page-title">
+    گالری تصاویر {{ service.name }}
+</h2>
+
+<div style="margin-bottom:25px;">
+
+    <a
+        href="{% url 'add_service_gallery' service.id %}"
+        class="btn-edit"
+    >
+        + افزودن تصاویر
+    </a>
+
+    <a
+        href="{% url 'superadmin_service_edit' service.id %}"
+        class="btn-delete"
+    >
+        بازگشت به ویرایش خدمت
+    </a>
+
+</div>
+
+
+<div style="
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+    gap:20px;
+">
+
+    {% for image in images %}
+
+        <div style="
+            border:1px solid #ddd;
+            border-radius:12px;
+            padding:10px;
+        ">
+
+            <img
+                src="{{ image.image.url }}"
+                alt="{{ service.name }}"
+                style="
+                    width:100%;
+                    height:200px;
+                    object-fit:cover;
+                    border-radius:8px;
+                "
+            >
+
+            <form
+                method="POST"
+                action="{% url 'delete_service_gallery' image.id %}"
+                style="margin-top:10px;"
+            >
+
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="btn-delete"
+                    onclick="return confirm('این تصویر حذف شود؟');"
+                >
+                    حذف تصویر
+                </button>
+
+            </form>
+
+        </div>
+
+    {% empty %}
+
+        <p>
+            هنوز تصویری برای این خدمت ثبت نشده است.
+        </p>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

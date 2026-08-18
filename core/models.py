@@ -53,3 +53,20 @@ class ActivityLog(models.Model):
         return self.action
     
 
+class ConsultationRequest(models.Model):
+    SUBJECT_CHOICES = [
+        ("education", "مشاوره درباره دوره‌های آموزشی"),
+        ("registration", "ثبت‌نام در دوره"),
+        ("career", "مشاوره ورود به بازار کار"),
+        ("other", "سایر موارد"),
+    ]
+
+    full_name = models.CharField(max_length=150)
+    phone = models.CharField(max_length=20)
+    subject = models.CharField(max_length=30, choices=SUBJECT_CHOICES)
+    message = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.full_name

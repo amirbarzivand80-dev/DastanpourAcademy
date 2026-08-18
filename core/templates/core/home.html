@@ -1,8 +1,55 @@
 {% extends 'core/base.html' %}
 {% load static %}
+{% load price_filters %}
 
 {% block content %}
 
+<!-- ================= FLOATING SOCIAL BUTTONS ================= -->
+
+<div class="home-social-floating">
+
+    <a
+         href="https://instagram.com/ahmaddastanporr"
+        class="home-social-instagram"
+        target="_blank"
+        rel="noopener"
+        aria-label="Instagram"
+    >
+        <i class="fa-brands fa-instagram"></i>
+    </a>
+
+
+    <a
+        href="https://t.me/aamsjvf"
+        class="home-social-telegram"
+        target="_blank"
+        rel="noopener"
+        aria-label="Telegram"
+    >
+        <i class="fa-brands fa-telegram"></i>
+    </a>
+
+
+    <a
+       href="https://wa.me/989133273661"
+        class="home-social-whatsapp"
+        target="_blank"
+        rel="noopener"
+        aria-label="WhatsApp"
+    >
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+
+    <a
+         href="tel:+989133273661"
+        class="home-social-phone"
+        aria-label="تماس"
+    >
+        <i class="fa-solid fa-phone"></i>
+    </a>
+
+</div>
 
 <section class="hero">
 
@@ -140,6 +187,62 @@
 
 </section>
 
+<!-- ================= HOME VIDEO ================= -->
+
+<section class="home-video-section">
+
+    <div class="container">
+
+        <div class="home-video-wrapper">
+
+            <video
+                controls
+                playsinline
+            >
+                <source src="{% static 'videos/intro.mp4' %}" type="video/mp4">
+
+                مرورگر شما از پخش ویدیو پشتیبانی نمی‌کند.
+            </video>
+
+        </div>
+
+
+        <!-- کارت مشاوره -->
+
+        <div class="home-consultation-card">
+
+            <div class="consultation-content">
+
+                <div class="consultation-icon">
+                    <i class="fa-solid fa-headset"></i>
+                </div>
+
+                <div>
+
+                    <h3>
+                        مشاوره رایگان و ثبت‌نام
+                    </h3>
+
+                    <p>
+                      09133273661  برای دریافت مشاوره و اطلاعات بیشتر درباره دوره‌های آموزشی با ما در ارتباط باشید.
+                    </p>
+
+                </div>
+
+            </div>
+
+<a href="{% url 'consultation' %}" class="consultation-btn">
+    دریافت مشاوره
+    <i class="fa-solid fa-arrow-left"></i>
+</a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
 <!-- ================= HOME SHOWCASE ================= -->
 
 <section class="home-showcase">
@@ -209,18 +312,18 @@
                                         {% if product.discount_price %}
 
                                             <span class="old-price">
-                                                {{ product.price|floatformat:0 }}
+                                                {{ product.price|price_format }}
                                             </span>
 
                                             <strong>
-                                                {{ product.discount_price|floatformat:0 }}
+                                                {{ product.discount_price|price_format }}
                                                 تومان
                                             </strong>
 
                                         {% else %}
 
                                             <strong>
-                                                {{ product.price|floatformat:0 }}
+                                                {{ product.price|price_format }}
                                                 تومان
                                             </strong>
 
@@ -330,7 +433,7 @@
                                         {% else %}
 
                                             <strong>
-                                                {{ course.price|floatformat:0 }}
+                                                {{ course.price|price_format }}
                                                 تومان
                                             </strong>
 
@@ -434,14 +537,14 @@
                                         {% if product.discount_price %}
 
                                             <strong>
-                                                {{ product.discount_price|floatformat:0 }}
+                                                {{ product.discount_price|price_format }}
                                                 تومان
                                             </strong>
 
                                         {% else %}
 
                                             <strong>
-                                                {{ product.price|floatformat:0 }}
+                                                {{ product.price|price_format }}
                                                 تومان
                                             </strong>
 
@@ -483,7 +586,38 @@
     </div>
 
 </section>
+<!-- ================= HOME GALLERY ================= -->
 
+<section id="home-puzzle-gallery" class="home-puzzle-gallery">
 
+    <div class="container">
+
+        <div class="home-gallery-grid">
+
+            <div class="home-gallery-item">
+                <img src="{% static 'images/about/about1.jpg' %}" alt="">
+            </div>
+
+            <div class="home-gallery-item">
+                <img src="{% static 'images/about/about2.jpg' %}" alt="">
+            </div>
+
+            <div class="home-gallery-item">
+                <img src="{% static 'images/about/about3.jpg' %}" alt="">
+            </div>
+
+        </div>
+
+        <div class="home-gallery-more">
+
+            <a href="{% url 'about' %}#about-gallery">
+                تصاویر بیشتر
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
 
 {% endblock %}

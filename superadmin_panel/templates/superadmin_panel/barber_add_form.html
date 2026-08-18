@@ -1,35 +1,73 @@
 {% extends "superadmin_panel/base.html" %}
 
+{% block title %}
+ثبت آرایشگر
+{% endblock %}
+
 {% block content %}
 
-<h2>
+<div class="barber-add-page">
 
-ثبت آرایشگر
+```
+<div class="barber-add-card">
 
-</h2>
+    <div class="barber-add-header">
 
-<p>
+        <h2>
+            ثبت آرایشگر
+        </h2>
 
-{{ user_obj.full_name }}
+        <p>
+            تنظیم اطلاعات و ساعات کاری آرایشگر
+        </p>
 
-<br>
+    </div>
 
-{{ user_obj.phone }}
 
-</p>
+    <div class="barber-user-info">
 
-<form method="POST">
+        <p>
+            <strong>نام آرایشگر:</strong>
+            {{ user_obj.full_name }}
+        </p>
 
-{% csrf_token %}
+        <p>
+            <strong>شماره موبایل:</strong>
+            {{ user_obj.phone }}
+        </p>
 
-{{ form.as_p }}
+    </div>
 
-<button type="submit" class="btn-edit">
 
-ثبت
+    <form method="POST" class="barber-add-form">
 
-</button>
+        {% csrf_token %}
 
-</form>
+        {{ form.as_p }}
+
+        <div class="barber-add-actions">
+
+            <button
+                type="submit"
+                class="btn-save"
+            >
+                ثبت آرایشگر
+            </button>
+
+            <a
+                href="{% url 'superadmin_barbers' %}"
+                class="btn-cancel"
+            >
+                انصراف
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+```
+
+</div>
 
 {% endblock %}

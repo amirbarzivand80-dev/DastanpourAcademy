@@ -1,6 +1,7 @@
 ```html
 {% extends 'core/base.html' %}
 {% load static %}
+{% load price_filters %}
 
 {% block title %}
 ثبت سفارش
@@ -231,7 +232,7 @@
                                 </span>
 
                                 <span>
-                                    {{ item.total_price|floatformat:0 }}
+                                    {{ item.total_price|price_format }}
                                     تومان
                                 </span>
 
@@ -247,7 +248,7 @@
                             </span>
 
                             <span>
-                                {{ total_price|floatformat:0 }}
+                                {{ total_price|price_format }}
                                 تومان
                             </span>
 

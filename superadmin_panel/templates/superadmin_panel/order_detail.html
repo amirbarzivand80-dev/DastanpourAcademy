@@ -1,4 +1,5 @@
 {% extends 'superadmin_panel/base.html' %}
+{% load price_filters %}
 
 {% block content %}
 
@@ -177,12 +178,12 @@
             </td>
 
             <td>
-                {{ item.price }}
+                {{ item.price|price_format }}
                 تومان
             </td>
 
             <td>
-                {{ item.total_price }}
+                {{ item.total_price|price_format }}
                 تومان
             </td>
 
@@ -271,7 +272,7 @@
 
     مبلغ نهایی:
 
-    {{ order.total_price }}
+    {{ order.total_price|price_format }}
 
     تومان
 

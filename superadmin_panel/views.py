@@ -17,7 +17,7 @@ from .forms import UserEditForm, BarberForm
 from reservation.models import Barber
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from services.models import Service
+from services.models import Service, BarberServicePrice
 from services.forms import ServiceForm
 from .models import AdminPermission
 from .forms import AdminPermissionForm
@@ -34,12 +34,17 @@ from academy.models import CourseStudent
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render, get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
-
+from users.sms import send_order_confirmation_sms
 from academy.models import Course, CourseStudent
 from academy.models import Course, CourseStudent,CourseSession,CourseFeature
 from django.shortcuts import get_object_or_404, render
 from academy.models import CourseTopic
 from academy.models import CourseImage
+from services.models import (
+    Service,
+    ServiceImage,
+    BarberServicePrice,
+)
 from .forms import BarberForm, BarberEditForm
 @login_required
 def dashboard(request):
@@ -158,6 +163,39 @@ def dashboard_live(request):
         "reservations": data,
     })
 
+from core.models import ConsultationRequest
+
+@login_required
+def consultation_requests(request):
+
+    requests = ConsultationRequest.objects.all().order_by("-created_at")
+
+    return render(
+        request,
+        "superadmin_panel/consultation_requests.html",
+        {
+            "requests": requests
+        }
+    )
+@login_required
+def consultation_request_detail(request, request_id):
+
+    consultation = get_object_or_404(
+        ConsultationRequest,
+        id=request_id
+    )
+
+    if not consultation.is_read:
+        consultation.is_read = True
+        consultation.save(update_fields=["is_read"])
+
+    return render(
+        request,
+        "superadmin_panel/consultation_request_detail.html",
+        {
+            "consultation": consultation
+        }
+    )
 @login_required
 def users_list(request):
 
@@ -323,6 +361,8 @@ def barber_edit(request, id):
 def barber_add(request, user_id):
 
     user = CustomUser.objects.get(id=user_id)
+    print("BARBER GROUP ADDED TO:", user.full_name)
+    print("GROUPS NOW:", list(user.groups.values_list("name", flat=True)))
 
     if request.method == "POST":
 
@@ -335,6 +375,15 @@ def barber_add(request, user_id):
             barber.user = user
 
             barber.save()
+
+            # اضافه کردن کاربر به گروه Barber
+            from django.contrib.auth.models import Group
+
+            barber_group, created = Group.objects.get_or_create(
+                name="Barber"
+            )
+
+            user.groups.add(barber_group)
 
             return redirect("superadmin_barbers")
 
@@ -350,10 +399,6 @@ def barber_add(request, user_id):
             "user_obj": user,
         }
     )
-
-
-
-
 @login_required
 def search_users(request):
 
@@ -716,7 +761,6 @@ def services_list(request):
         }
     )
 
-
 @login_required
 def service_add(request):
 
@@ -729,7 +773,27 @@ def service_add(request):
 
         if form.is_valid():
 
-            form.save()
+            service = form.save()
+
+            # -----------------------------
+            # ذخیره قیمت اختصاصی آرایشگرها
+            # -----------------------------
+
+            for barber in service.barbers.all():
+
+                price = request.POST.get(
+                    f"barber_price_{barber.id}"
+                )
+
+                if price:
+
+                    BarberServicePrice.objects.update_or_create(
+                        service=service,
+                        barber=barber,
+                        defaults={
+                            "price": int(price)
+                        }
+                    )
 
             return redirect("superadmin_services")
 
@@ -737,20 +801,123 @@ def service_add(request):
 
         form = ServiceForm()
 
+    # -----------------------------
+    # آماده کردن آرایشگرها برای قالب
+    # -----------------------------
+
+    barber_rows = []
+
+    for barber in form.fields["barbers"].queryset:
+
+        barber_rows.append({
+            "barber": barber,
+            "selected": (
+                barber in form.instance.barbers.all()
+                if form.instance.pk
+                else False
+            ),
+            "price": form.barber_prices.get(
+                barber.id,
+                ""
+            ),
+        })
+
     return render(
         request,
         "superadmin_panel/service_form.html",
         {
             "form": form,
-            "title": "افزودن خدمت"
+            "title": "افزودن خدمت",
+            "barber_rows": barber_rows,
+        }
+    )
+
+@login_required
+def service_gallery(request, id):
+
+    service = get_object_or_404(
+        Service,
+        id=id
+    )
+
+    images = service.images.all()
+
+    return render(
+        request,
+        "superadmin_panel/service_gallery.html",
+        {
+            "service": service,
+            "images": images,
+        },
+    )
+
+
+@login_required
+def add_service_gallery(request, id):
+
+    service = get_object_or_404(
+        Service,
+        id=id
+    )
+
+    if request.method == "POST":
+
+        images = request.FILES.getlist("images")
+
+        for image in images:
+
+            ServiceImage.objects.create(
+                service=service,
+                image=image
+            )
+
+        return redirect(
+            "service_gallery",
+            id=service.id
+        )
+
+    return render(
+        request,
+        "superadmin_panel/add_service_gallery.html",
+        {
+            "service": service,
         }
     )
 
 
 @login_required
+def delete_service_gallery(request, image_id):
+
+    image = get_object_or_404(
+        ServiceImage,
+        id=image_id
+    )
+
+    service_id = image.service.id
+
+    if request.method == "POST":
+
+        image.delete()
+
+        return redirect(
+            "service_gallery",
+            id=service_id
+        )
+
+    return render(
+        request,
+        "superadmin_panel/delete_service_gallery.html",
+        {
+            "image": image,
+        }
+    )
+@login_required
 def service_edit(request, id):
 
-    service = Service.objects.get(id=id)
+    service = get_object_or_404(
+        Service,
+        id=id
+    )
 
     if request.method == "POST":
 
@@ -762,20 +929,68 @@ def service_edit(request, id):
 
         if form.is_valid():
 
-            form.save()
+            service = form.save()
+
+            # -----------------------------
+            # حذف قیمت‌های قبلی
+            # -----------------------------
+
+            BarberServicePrice.objects.filter(
+                service=service
+            ).delete()
+
+            # -----------------------------
+            # ذخیره قیمت‌های جدید
+            # -----------------------------
+
+            for barber in service.barbers.all():
+
+                price = request.POST.get(
+                    f"barber_price_{barber.id}"
+                )
+
+                if price:
+
+                    BarberServicePrice.objects.create(
+                        service=service,
+                        barber=barber,
+                        price=int(price)
+                    )
 
             return redirect("superadmin_services")
 
     else:
 
-        form = ServiceForm(instance=service)
+        form = ServiceForm(
+            instance=service
+        )
+
+    # -----------------------------
+    # آماده کردن آرایشگرها برای قالب
+    # -----------------------------
+
+    barber_rows = []
+
+    for barber in form.fields["barbers"].queryset:
+
+        barber_rows.append({
+            "barber": barber,
+            "selected": (
+                barber in service.barbers.all()
+            ),
+            "price": form.barber_prices.get(
+                barber.id,
+                ""
+            ),
+        })
 
     return render(
         request,
         "superadmin_panel/service_form.html",
         {
             "form": form,
-            "title": "ویرایش خدمت"
+            "title": "ویرایش خدمت",
+            "barber_rows": barber_rows,
         }
     )
 
@@ -808,6 +1023,8 @@ def admins_list(request):
             "admins": admins
         }
     )
+
+
 @login_required
 def admin_permission(request, user_id):
 
@@ -938,7 +1155,6 @@ def admin_remove(request, user_id):
 
     return redirect("superadmin_admins")
 
-
 @login_required
 def barber_delete(request, id):
 
@@ -949,45 +1165,140 @@ def barber_delete(request, id):
 
     if request.method == "POST":
 
-        barber.is_active = False
-        barber.save()
+        user = barber.user
+
+        # حذف رکورد آرایشگر
+        barber.delete()
+
+        # حذف نقش Barber از کاربر
+        from django.contrib.auth.models import Group
+
+        barber_group = Group.objects.filter(
+            name="Barber"
+        ).first()
+
+        if barber_group:
+            user.groups.remove(barber_group)
 
         messages.success(
             request,
-            "آرایشگر با موفقیت غیرفعال شد."
+            "آرایشگر با موفقیت حذف شد."
         )
 
-    return redirect("superadmin_barbers")
+    return redirect(
+        "superadmin_barbers"
+    )
 
 @login_required
 def barber_blocked_times(request):
 
-    barber = Barber.objects.get(user=request.user)
+    # ==========================================
+    # آرایشگرها
+    # ==========================================
+
+    barbers = Barber.objects.select_related(
+        "user"
+    ).all()
+
+
+    # ==========================================
+    # تشخیص آرایشگر / ادمین
+    # ==========================================
+
+    if getattr(request.user, "barber", False):
+
+        # اگر خود کاربر آرایشگر است
+        barber = get_object_or_404(
+            Barber,
+            user=request.user
+        )
+
+        selected_barber_id = barber.id
+
+    else:
+
+        # اگر ادمین است
+        selected_barber_id = request.GET.get("barber")
+
+        if request.method == "POST":
+            selected_barber_id = request.POST.get("barber")
+
+        barber = None
+
+        if selected_barber_id:
+
+            barber = get_object_or_404(
+                Barber,
+                id=selected_barber_id
+            )
+
+
+    # ==========================================
+    # ثبت بازه مسدود
+    # ==========================================
 
     if request.method == "POST":
 
-        form = BarberBlockedTimeForm(request.POST)
+        form = BarberBlockedTimeForm(
+            request.POST
+        )
 
         if form.is_valid():
 
-            blocked = form.save(commit=False)
+            # اگر ادمین است حتماً باید آرایشگر انتخاب شده باشد
+            if not barber:
 
-            blocked.barber = barber
+                messages.error(
+                    request,
+                    "لطفاً آرایشگر را انتخاب کنید."
+                )
 
-            blocked.save()
+            else:
 
-            return redirect("barber_blocked_times")
+                blocked = form.save(
+                    commit=False
+                )
+
+                blocked.barber = barber
+
+                blocked.save()
+
+                messages.success(
+                    request,
+                    "بازه زمانی با موفقیت بسته شد."
+                )
+
+                return redirect(
+                    "barber_blocked_times"
+                )
 
     else:
 
         form = BarberBlockedTimeForm()
 
-    blocked_times = BarberBlockedTime.objects.filter(
-        barber=barber
-    ).order_by(
-        "-date",
-        "-start_time"
-    )
+
+    # ==========================================
+    # بازه‌های مسدود
+    # ==========================================
+
+    if barber:
+
+        blocked_times = BarberBlockedTime.objects.filter(
+            barber=barber
+        ).order_by(
+            "-date",
+            "-start_time"
+        )
+
+    else:
+
+        # برای ادمین قبل از انتخاب آرایشگر
+        blocked_times = BarberBlockedTime.objects.none()
+
+
+    # ==========================================
+    # ارسال اطلاعات به قالب
+    # ==========================================
 
     return render(
         request,
@@ -995,16 +1306,40 @@ def barber_blocked_times(request):
         {
             "form": form,
             "blocked_times": blocked_times,
+            "barbers": barbers,
+            "selected_barber": barber,
+            "selected_barber_id": selected_barber_id,
         }
     )
+
+
+# =====================================================
+# DELETE
+# =====================================================
+
 @login_required
 def delete_blocked_time(request, pk):
 
     item = get_object_or_404(
         BarberBlockedTime,
-        id=pk,
-        barber__user=request.user
+        id=pk
     )
+
+
+    # اگر آرایشگر است فقط بازه خودش
+    if getattr(request.user, "barber", False):
+
+        if item.barber.user != request.user:
+
+            messages.error(
+                request,
+                "شما اجازه حذف این بازه را ندارید."
+            )
+
+            return redirect(
+                "barber_blocked_times"
+            )
+
 
     item.delete()
 
@@ -1013,17 +1348,45 @@ def delete_blocked_time(request, pk):
         "بازه زمانی حذف شد."
     )
 
-    return redirect("barber_blocked_times")
+    return redirect(
+        "barber_blocked_times"
+    )
+
+
+# =====================================================
+# EDIT
+# =====================================================
+
 @login_required
 def edit_blocked_time(request, pk):
-    
-    barber = Barber.objects.get(user=request.user)
 
     blocked = get_object_or_404(
         BarberBlockedTime,
-        id=pk,
-        barber=barber
+        id=pk
     )
+
+
+    # ==========================================
+    # اگر آرایشگر است
+    # ==========================================
+
+    if getattr(request.user, "barber", False):
+
+        if blocked.barber.user != request.user:
+
+            messages.error(
+                request,
+                "شما اجازه ویرایش این بازه را ندارید."
+            )
+
+            return redirect(
+                "barber_blocked_times"
+            )
+
+
+    # ==========================================
+    # فرم
+    # ==========================================
 
     if request.method == "POST":
 
@@ -1041,7 +1404,9 @@ def edit_blocked_time(request, pk):
                 "بازه زمانی ویرایش شد."
             )
 
-            return redirect("barber_blocked_times")
+            return redirect(
+                "barber_blocked_times"
+            )
 
     else:
 
@@ -1049,12 +1414,23 @@ def edit_blocked_time(request, pk):
             instance=blocked
         )
 
+
+    # ==========================================
+    # لیست آرایشگرها
+    # ==========================================
+
+    barbers = Barber.objects.select_related(
+        "user"
+    ).all()
+
+
     blocked_times = BarberBlockedTime.objects.filter(
-        barber=barber
+        barber=blocked.barber
     ).order_by(
         "-date",
         "-start_time"
     )
+
 
     return render(
         request,
@@ -1062,27 +1438,98 @@ def edit_blocked_time(request, pk):
         {
             "form": form,
             "blocked_times": blocked_times,
+            "barbers": barbers,
+            "selected_barber": blocked.barber,
+            "selected_barber_id": blocked.barber.id,
+            "editing": True,
+            "editing_blocked": blocked,
         }
     )
 @login_required
 def barber_walkin_reservation(request):
 
-    barber = Barber.objects.get(user=request.user)
+    is_admin = (
+        request.user.is_superuser
+        or request.user.admin_permission
+    )
+
+    # =========================
+    # آرایشگرهای موجود
+    # =========================
+
+    barbers = Barber.objects.select_related("user").all()
+
+    # =========================
+    # تعیین آرایشگر
+    # =========================
+
+    if is_admin:
+
+        barber_id = request.POST.get("barber") or request.GET.get("barber")
+
+        if barber_id:
+
+            try:
+                barber = Barber.objects.get(id=barber_id)
+            except Barber.DoesNotExist:
+                messages.error(
+                    request,
+                    "آرایشگر انتخاب شده پیدا نشد."
+                )
+                barber = None
+
+        else:
+
+            barber = None
+
+    else:
+
+        try:
+            barber = Barber.objects.get(
+                user=request.user
+            )
+        except Barber.DoesNotExist:
+
+            messages.error(
+                request,
+                "حساب شما به عنوان آرایشگر ثبت نشده است."
+            )
+
+            return redirect("superadmin")
+
+    # =========================
+    # POST
+    # =========================
 
     if request.method == "POST":
 
         form = WalkInReservationForm(request.POST)
 
-        if form.is_valid():
+        if not barber:
+
+            messages.error(
+                request,
+                "لطفاً یک آرایشگر انتخاب کنید."
+            )
+
+        elif form.is_valid():
 
             date = form.cleaned_data["date"]
             time = form.cleaned_data["time"]
+
+            # =========================
+            # بررسی نوبت موجود
+            # =========================
 
             reservation_exists = Reservation.objects.filter(
                 barber=barber,
                 date=date,
                 time=time
             ).exists()
+
+            # =========================
+            # بررسی ساعت مسدود
+            # =========================
 
             blocked_exists = BarberBlockedTime.objects.filter(
                 barber=barber,
@@ -1095,7 +1542,7 @@ def barber_walkin_reservation(request):
 
                 messages.error(
                     request,
-                    "این ساعت در دسترس نیست."
+                    "این ساعت برای این آرایشگر در دسترس نیست."
                 )
 
             else:
@@ -1104,13 +1551,19 @@ def barber_walkin_reservation(request):
 
                     user=None,
 
-                    customer_name=form.cleaned_data["customer_name"],
+                    customer_name=form.cleaned_data[
+                        "customer_name"
+                    ],
 
-                    customer_phone=form.cleaned_data["customer_phone"],
+                    customer_phone=form.cleaned_data[
+                        "customer_phone"
+                    ],
 
                     barber=barber,
 
-                    service=form.cleaned_data["service"],
+                    service=form.cleaned_data[
+                        "service"
+                    ],
 
                     date=date,
 
@@ -1122,8 +1575,14 @@ def barber_walkin_reservation(request):
 
                 messages.success(
                     request,
-                    "نوبت حضوری ثبت شد."
+                    "نوبت حضوری با موفقیت ثبت شد."
                 )
+
+                if is_admin:
+
+                    return redirect(
+                        "barber_walkin_reservation"
+                    )
 
                 return redirect(
                     "barber_walkin_reservation"
@@ -1133,12 +1592,25 @@ def barber_walkin_reservation(request):
 
         form = WalkInReservationForm()
 
-    reservations = Reservation.objects.filter(
-        barber=barber
-    ).order_by(
-        "-date",
-        "-time"
-    )
+    # =========================
+    # لیست نوبت‌ها
+    # =========================
+
+    if is_admin:
+
+        reservations = Reservation.objects.all().order_by(
+            "-date",
+            "-time"
+        )
+
+    else:
+
+        reservations = Reservation.objects.filter(
+            barber=barber
+        ).order_by(
+            "-date",
+            "-time"
+        )
 
     return render(
         request,
@@ -1146,23 +1618,76 @@ def barber_walkin_reservation(request):
         {
             "form": form,
             "reservations": reservations,
+            "barbers": barbers,
+            "selected_barber": barber,
+            "is_admin": is_admin,
         }
     )
 
 @login_required
 def barber_walkin_busy_times(request):
 
-    barber = Barber.objects.get(user=request.user)
+    is_admin = (
+        request.user.is_superuser
+        or request.user.admin_permission
+    )
+
+    # =========================
+    # تعیین آرایشگر
+    # =========================
+
+    if is_admin:
+
+        barber_id = request.GET.get("barber_id")
+
+        if not barber_id:
+
+            return JsonResponse([], safe=False)
+
+        try:
+
+            barber = Barber.objects.get(
+                id=barber_id
+            )
+
+        except Barber.DoesNotExist:
+
+            return JsonResponse([], safe=False)
+
+    else:
+
+        try:
+
+            barber = Barber.objects.get(
+                user=request.user
+            )
+
+        except Barber.DoesNotExist:
+
+            return JsonResponse([], safe=False)
+
+    # =========================
+    # تاریخ
+    # =========================
 
     date = request.GET.get("date")
 
     if not date:
+
         return JsonResponse([], safe=False)
+
+    # =========================
+    # رزروها
+    # =========================
 
     reservations = Reservation.objects.filter(
         barber=barber,
         date=date
     )
+
+    # =========================
+    # ساعات مسدود
+    # =========================
 
     blocked_times = BarberBlockedTime.objects.filter(
         barber=barber,
@@ -1180,7 +1705,6 @@ def barber_walkin_busy_times(request):
         data.append(
             reservation.time.strftime("%H:%M")
         )
-
 
     # =========================
     # زمان‌های مسدود شده
@@ -2065,10 +2589,40 @@ def update_order_status(request, id):
 
         status = request.POST.get("status")
 
-        order.status = status
+        # وضعیت قبلی سفارش
+        old_status = order.status
 
+        order.status = status
         order.save()
 
+        # ==========================================
+        # ارسال SMS تایید سفارش
+        # فقط هنگام تغییر به paid
+        # و فقط یک بار
+        # ==========================================
+
+        if (
+            status == "paid"
+            and old_status != "paid"
+            and not order.confirmation_sms_sent
+        ):
+
+            response = send_order_confirmation_sms(
+                phone=order.phone,
+                name=order.full_name,
+                order_number=order.id,
+                price=order.total_price,
+            )
+
+            if response and response.status_code in [200, 201]:
+
+                order.confirmation_sms_sent = True
+
+                order.save(
+                    update_fields=[
+                        "confirmation_sms_sent"
+                    ]
+                )
 
     return redirect(
         "order_detail",

@@ -1,0 +1,303 @@
+/* =====================================================
+CONSULTATION PAGE
+===================================================== */
+
+.consultation-page {
+padding: 80px 0 110px;
+min-height: 70vh;
+}
+
+/* ================= HEADER ================= */
+
+.consultation-header {
+max-width: 720px;
+margin: 0 auto 45px;
+
+
+text-align: center;
+
+
+}
+
+.consultation-header span {
+display: block;
+
+
+margin-bottom: 12px;
+
+color: #C9A227;
+
+font-size: 12px;
+
+font-weight: 800;
+
+letter-spacing: 2px;
+
+
+}
+
+.consultation-header h1 {
+margin: 0 0 15px;
+
+
+color: #222;
+
+font-size: 34px;
+
+font-weight: 900;
+
+
+}
+
+.consultation-header p {
+margin: 0;
+
+
+color: #777;
+
+font-size: 14px;
+
+line-height: 2;
+
+
+}
+
+/* ================= FORM WRAPPER ================= */
+
+.consultation-form-wrapper {
+width: min(100%, 720px);
+
+
+margin: 0 auto;
+
+padding: 35px;
+
+box-sizing: border-box;
+
+border-radius: 24px;
+
+background: #151515;
+
+border: 1px solid rgba(201, 162, 39, .25);
+
+box-shadow:
+    0 20px 55px rgba(0, 0, 0, .15);
+
+
+}
+
+/* ================= FORM ================= */
+
+.consultation-form {
+display: flex;
+
+
+flex-direction: column;
+
+gap: 22px;
+
+
+}
+
+/* ================= GROUP ================= */
+
+.form-group {
+display: flex;
+
+
+flex-direction: column;
+
+gap: 9px;
+
+
+}
+
+.form-group label {
+color: #fff;
+
+
+font-size: 13px;
+
+font-weight: 700;
+
+
+}
+
+.form-group label span {
+color: #777;
+
+font-size: 11px;
+
+font-weight: 400;
+
+
+}
+
+/* ================= INPUTS ================= */
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+width: 100%;
+
+
+box-sizing: border-box;
+
+padding: 14px 16px;
+
+border: 1px solid rgba(255, 255, 255, .1);
+
+border-radius: 12px;
+
+outline: none;
+
+background: #202020;
+
+color: #fff;
+
+font-family: inherit;
+
+font-size: 13px;
+
+transition: .3s ease;
+
+
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+color: #666;
+}
+
+.form-group select {
+cursor: pointer;
+}
+
+.form-group textarea {
+resize: vertical;
+
+
+min-height: 130px;
+
+line-height: 1.9;
+
+
+}
+
+/* ================= FOCUS ================= */
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+border-color: #C9A227;
+
+
+box-shadow:
+    0 0 0 3px rgba(201, 162, 39, .08);
+
+
+}
+
+/* ================= BUTTON ================= */
+
+.consultation-submit {
+width: 100%;
+
+margin-top: 5px;
+
+padding: 15px 20px;
+
+display: flex;
+
+align-items: center;
+
+justify-content: center;
+
+gap: 10px;
+
+border: none;
+
+border-radius: 13px;
+
+background: #C9A227;
+
+color: #111;
+
+font-family: inherit;
+
+font-size: 14px;
+
+font-weight: 900;
+
+cursor: pointer;
+
+transition: .3s ease;
+
+}
+
+.consultation-submit:hover {
+background: #dfbd4d;
+
+
+transform: translateY(-2px);
+
+box-shadow:
+    0 12px 30px rgba(201, 162, 39, .25);
+
+
+}
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 700px) {
+
+
+.consultation-page {
+    padding: 55px 0 80px;
+}
+
+.consultation-header {
+    width: 92%;
+
+    margin-bottom: 30px;
+}
+
+.consultation-header h1 {
+    font-size: 27px;
+}
+
+.consultation-header p {
+    font-size: 12px;
+}
+
+.consultation-form-wrapper {
+    width: 94%;
+
+    padding: 23px 18px;
+
+    border-radius: 19px;
+}
+
+.consultation-form {
+    gap: 18px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 13px 14px;
+
+    font-size: 12px;
+}
+
+.consultation-submit {
+    padding: 13px;
+
+    font-size: 12px;
+}
+
+
+}
+
+
+

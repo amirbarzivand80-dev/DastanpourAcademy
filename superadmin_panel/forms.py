@@ -26,21 +26,12 @@ class UserEditForm(forms.ModelForm):
             "child_birth": forms.DateInput(attrs={"type": "date"}),
         }
 
-
 class BarberForm(forms.ModelForm):
-
-    user = forms.ModelChoiceField(
-        queryset=CustomUser.objects.filter(
-            barber__isnull=True
-        ),
-        label="انتخاب کاربر"
-    )
 
     class Meta:
         model = Barber
 
         fields = [
-            "user",
             "work_start",
             "work_end",
             "appointment_duration",
@@ -48,10 +39,18 @@ class BarberForm(forms.ModelForm):
         ]
 
         widgets = {
-            "work_start": forms.TimeInput(attrs={"type": "time"}),
-            "work_end": forms.TimeInput(attrs={"type": "time"}),
-        }
+            "work_start": forms.TimeInput(
+                attrs={"type": "time"}
+            ),
 
+            "work_end": forms.TimeInput(
+                attrs={"type": "time"}
+            ),
+
+            "appointment_duration": forms.NumberInput(
+                attrs={"min": 15}
+            ),
+        }
         
 class BarberEditForm(forms.ModelForm):
 

@@ -1,5 +1,6 @@
 {% extends "core/base.html" %}
 {% load static %}
+{% load price_filters %}
 
 {% block title %}جزئیات خدمات{% endblock %}
 
@@ -61,7 +62,7 @@
 
     <div class="service-price">
 
-        {{ service.price }} تومان
+        {{ service.price|price_format }} تومان
 
     </div>
 

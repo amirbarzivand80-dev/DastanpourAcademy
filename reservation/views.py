@@ -1,12 +1,12 @@
-
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.shortcuts import redirect, render, get_object_or_404
 from django.http import JsonResponse
 
-from services.models import Service
+from services.models import Service, BarberServicePrice
 from .models import Barber, Reservation
 from reservation.models import BarberBlockedTime
 
@@ -18,160 +18,424 @@ from reservation.models import BarberBlockedTime
 @login_required(login_url="/login/")
 def reservation_view(request):
 
-    services = Service.objects.filter(
-        is_active=True
-    ).order_by("order")
+    services = (
+        Service.objects
+        .filter(is_active=True)
+        .order_by("order")
+        .prefetch_related(
+            "barbers",
+            "barber_prices"
+        )
+    )
 
     barbers = Barber.objects.filter(
         is_active=True
     )
 
+    # =====================================================
+    # ثبت رزرو
+    # =====================================================
+
     if request.method == "POST":
 
-        service_id = request.POST.get("service")
-        barber_id = request.POST.get("barber")
-        date_str = request.POST.get("date")
-        time_str = request.POST.get("time")
+        service_ids = request.POST.getlist("services")
 
-        # -----------------------------
-        # بررسی اطلاعات
-        # -----------------------------
-
-        if not all([
-            service_id,
-            barber_id,
-            date_str,
-            time_str
-        ]):
+        if not service_ids:
 
             messages.error(
                 request,
-                "لطفاً تمام اطلاعات را تکمیل کنید."
+                "حداقل یک خدمت را انتخاب کنید."
             )
 
             return redirect("reservation")
 
-        # -----------------------------
-        # دریافت اطلاعات
-        # -----------------------------
+        # جلوگیری از ID تکراری
+        service_ids = list(dict.fromkeys(service_ids))
+
+        reservations_data = []
+
+        # =================================================
+        # بررسی تک تک خدمات
+        # =================================================
+
+        for service_id in service_ids:
+
+            barber_id = request.POST.get(
+                f"barber_{service_id}"
+            )
+
+            date_str = request.POST.get(
+                f"date_{service_id}"
+            )
+
+            time_str = request.POST.get(
+                f"time_{service_id}"
+            )
+
+            # -------------------------------------------------
+            # بررسی اطلاعات
+            # -------------------------------------------------
+
+            if not all([
+                barber_id,
+                date_str,
+                time_str
+            ]):
+
+                messages.error(
+                    request,
+                    "لطفاً آرایشگر، تاریخ و ساعت همه خدمات انتخاب‌شده را مشخص کنید."
+                )
+
+                return redirect("reservation")
+
+            # =================================================
+            # دریافت Service / Barber / Date / Time
+            # =================================================
+
+            try:
+
+                service = Service.objects.get(
+                    id=service_id,
+                    is_active=True
+                )
+
+                barber = Barber.objects.get(
+                    id=barber_id,
+                    is_active=True
+                )
+
+                date = datetime.strptime(
+                    date_str,
+                    "%Y-%m-%d"
+                ).date()
+
+                time = datetime.strptime(
+                    time_str,
+                    "%H:%M"
+                ).time()
+
+            except (
+                Service.DoesNotExist,
+                Barber.DoesNotExist,
+                ValueError
+            ):
+
+                messages.error(
+                    request,
+                    "اطلاعات یکی از خدمات صحیح نیست."
+                )
+
+                return redirect("reservation")
+
+            # =================================================
+            # بررسی ارائه خدمت توسط آرایشگر
+            # =================================================
+
+            if not service.barbers.filter(
+                id=barber.id
+            ).exists():
+
+                messages.error(
+                    request,
+                    f"آرایشگر انتخاب‌شده خدمت «{service.name}» را ارائه نمی‌دهد."
+                )
+
+                return redirect("reservation")
+
+            # =================================================
+            # قیمت اختصاصی آرایشگر
+            # =================================================
+
+            barber_price = (
+                BarberServicePrice.objects
+                .filter(
+                    service=service,
+                    barber=barber
+                )
+                .first()
+            )
+
+            if not barber_price:
+
+                messages.error(
+                    request,
+                    f"قیمت خدمت «{service.name}» برای این آرایشگر ثبت نشده است."
+                )
+
+                return redirect("reservation")
+
+            service_price = barber_price.price
+
+            # =================================================
+            # مدت نوبت
+            # =================================================
+
+            appointment_duration = barber.appointment_duration
+
+            start_datetime = datetime.combine(
+                date,
+                time
+            )
+
+            end_datetime = (
+                start_datetime
+                + timedelta(minutes=appointment_duration)
+            )
+
+            # =================================================
+            # بررسی تداخل با رزروهای قبلی
+            # =================================================
+
+            existing_reservations = (
+                Reservation.objects
+                .filter(
+                    barber=barber,
+                    date=date
+                )
+                .exclude(
+                    status="cancel"
+                )
+            )
+
+            reservation_conflict = False
+
+            for existing in existing_reservations:
+
+                existing_start = datetime.combine(
+                    existing.date,
+                    existing.time
+                )
+
+                existing_end = (
+                    existing_start
+                    + timedelta(
+                        minutes=barber.appointment_duration
+                    )
+                )
+
+                if (
+                    start_datetime < existing_end
+                    and end_datetime > existing_start
+                ):
+
+                    reservation_conflict = True
+                    break
+
+            if reservation_conflict:
+
+                messages.error(
+                    request,
+                    f"ساعت {time.strftime('%H:%M')} "
+                    f"برای {barber.user.full_name} "
+                    f"در خدمت «{service.name}» در دسترس نیست."
+                )
+
+                return redirect("reservation")
+
+            # =================================================
+            # بررسی زمان‌های مسدود
+            # =================================================
+
+            blocked_times = (
+                BarberBlockedTime.objects
+                .filter(
+                    barber=barber,
+                    date=date
+                )
+            )
+
+            blocked_conflict = False
+
+            for blocked in blocked_times:
+
+                blocked_start = datetime.combine(
+                    blocked.date,
+                    blocked.start_time
+                )
+
+                blocked_end = datetime.combine(
+                    blocked.date,
+                    blocked.end_time
+                )
+
+                if (
+                    start_datetime < blocked_end
+                    and end_datetime > blocked_start
+                ):
+
+                    blocked_conflict = True
+                    break
+
+            if blocked_conflict:
+
+                messages.error(
+                    request,
+                    f"ساعت انتخاب‌شده برای "
+                    f"{barber.user.full_name} "
+                    f"در خدمت «{service.name}» مسدود است."
+                )
+
+                return redirect("reservation")
+
+            # =================================================
+            # بررسی تداخل خدمات همین فرم
+            # =================================================
+
+            for item in reservations_data:
+
+                if (
+                    item["barber"].id == barber.id
+                    and item["date"] == date
+                ):
+
+                    selected_start = datetime.combine(
+                        item["date"],
+                        item["time"]
+                    )
+
+                    selected_end = (
+                        selected_start
+                        + timedelta(
+                            minutes=item["appointment_duration"]
+                        )
+                    )
+
+                    if (
+                        start_datetime < selected_end
+                        and end_datetime > selected_start
+                    ):
+
+                        messages.error(
+                            request,
+                            f"دو خدمت انتخاب‌شده برای "
+                            f"{barber.user.full_name} "
+                            f"با هم تداخل زمانی دارند."
+                        )
+
+                        return redirect("reservation")
+
+            # =================================================
+            # بیعانه
+            # =================================================
+
+            deposit_amount = int(
+                service_price * 10 / 100
+            )
+
+            # =================================================
+            # ذخیره اطلاعات خدمت
+            # =================================================
+
+            reservations_data.append({
+
+                "service": service,
+
+                "barber": barber,
+
+                "date": date,
+
+                "time": time,
+
+                "appointment_duration":
+                    appointment_duration,
+
+                "service_price":
+                    service_price,
+
+                "deposit_amount":
+                    deposit_amount,
+
+            })
+
+        # =====================================================
+        # ساخت تمام رزروها
+        # =====================================================
+
+        created_reservation_ids = []
 
         try:
 
-            service = Service.objects.get(
-                id=service_id,
-                is_active=True
-            )
+            with transaction.atomic():
 
-            barber = Barber.objects.get(
-                id=barber_id,
-                is_active=True
-            )
+                for item in reservations_data:
 
-            date = datetime.strptime(
-                date_str,
-                "%Y-%m-%d"
-            ).date()
+                    reservation = Reservation.objects.create(
 
-            time = datetime.strptime(
-                time_str,
-                "%H:%M"
-            ).time()
+                        user=request.user,
+
+                        customer_name=request.user.full_name,
+
+                        customer_phone=request.user.phone,
+
+                        service=item["service"],
+
+                        barber=item["barber"],
+
+                        date=item["date"],
+
+                        time=item["time"],
+
+                        service_price=item["service_price"],
+
+                        deposit_amount=item["deposit_amount"],
+
+                        status="pending",
+
+                        payment_status="pending",
+                    )
+
+                    created_reservation_ids.append(
+                        reservation.id
+                    )
 
         except Exception as e:
 
-            print(e)
+            print(
+                "RESERVATION CREATE ERROR:",
+                e
+            )
 
             messages.error(
                 request,
-                "اطلاعات وارد شده صحیح نیست."
+                "ثبت رزروها با خطا مواجه شد. دوباره تلاش کنید."
             )
 
             return redirect("reservation")
 
-        # -----------------------------
-        # بررسی رزرو قبلی
-        # -----------------------------
+        # =====================================================
+        # ذخیره رزروهای این فرآیند
+        # =====================================================
 
-        reservation_exists = Reservation.objects.filter(
-            barber=barber,
-            date=date,
-            time=time
-        ).exclude(
-            status="cancel"
-        ).exists()
+        request.session[
+            "pending_reservation_ids"
+        ] = created_reservation_ids
 
-        # -----------------------------
-        # بررسی زمان مسدود
-        # -----------------------------
-
-        blocked_exists = BarberBlockedTime.objects.filter(
-            barber=barber,
-            date=date,
-            start_time__lte=time,
-            end_time__gt=time
-        ).exists()
-
-        if reservation_exists or blocked_exists:
-
-            messages.error(
-                request,
-                "این ساعت در دسترس نیست."
-            )
-
-            return redirect("reservation")
-
-        # -----------------------------
-        # محاسبه مبلغ
-        # -----------------------------
-
-        service_price = service.price
-
-        # 10 درصد بیعانه
-        deposit_amount = int(
-            service_price * 10 / 100
+        # انتخاب پرداخت قبلی را پاک می‌کنیم
+        request.session.pop(
+            "pending_payment_type",
+            None
         )
 
-        # -----------------------------
-        # ایجاد رزرو
-        # -----------------------------
-
-        reservation = Reservation.objects.create(
-
-            user=request.user,
-
-            customer_name=request.user.full_name,
-
-            customer_phone=request.user.phone,
-
-            service=service,
-
-            barber=barber,
-
-            date=date,
-
-            time=time,
-
-            service_price=service_price,
-
-            deposit_amount=deposit_amount,
-
-            status="pending",
-
-            payment_status="pending",
+        request.session.pop(
+            "pending_payment_amount",
+            None
         )
 
-        # -----------------------------
+        request.session.modified = True
+
+        # =====================================================
         # انتقال به صفحه پرداخت
-        # -----------------------------
+        # =====================================================
 
         return redirect(
             "reservation_payment",
-            reservation_id=reservation.id
+            reservation_id=created_reservation_ids[-1]
         )
 
-    # -----------------------------
+    # =====================================================
     # نمایش صفحه رزرو
-    # -----------------------------
+    # =====================================================
 
     return render(
         request,
@@ -184,7 +448,7 @@ def reservation_view(request):
 
 
 # =========================================================
-# API ساعت‌های مسدود
+# API ساعت‌های مسدود / رزرو شده
 # =========================================================
 
 @login_required
@@ -204,32 +468,41 @@ def blocked_times_api(request):
         date=date
     )
 
-    reservations = Reservation.objects.filter(
-        barber=barber,
-        date=date
-    ).exclude(
-        status="cancel"
+    reservations = (
+        Reservation.objects
+        .filter(
+            barber=barber,
+            date=date
+        )
+        .exclude(
+            status="cancel"
+        )
     )
 
     data = []
 
-    # -----------------------------
-    # ساعت کاری آرایشگر
-    # -----------------------------
+    # =====================================================
+    # ساعت کاری
+    # =====================================================
 
     data.append({
+
         "type": "working_hours",
 
-        "start": barber.work_start.strftime("%H:%M"),
+        "start":
+            barber.work_start.strftime("%H:%M"),
 
-        "end": barber.work_end.strftime("%H:%M"),
+        "end":
+            barber.work_end.strftime("%H:%M"),
 
-        "duration": barber.appointment_duration,
+        "duration":
+            barber.appointment_duration,
+
     })
 
-    # -----------------------------
-    # ساعت‌های مسدود
-    # -----------------------------
+    # =====================================================
+    # زمان‌های مسدود
+    # =====================================================
 
     for item in blocked:
 
@@ -237,14 +510,17 @@ def blocked_times_api(request):
 
             "type": "blocked",
 
-            "start": item.start_time.strftime("%H:%M"),
+            "start":
+                item.start_time.strftime("%H:%M"),
 
-            "end": item.end_time.strftime("%H:%M"),
+            "end":
+                item.end_time.strftime("%H:%M"),
+
         })
 
-    # -----------------------------
-    # نوبت‌های رزرو شده
-    # -----------------------------
+    # =====================================================
+    # رزروهای قبلی
+    # =====================================================
 
     for item in reservations:
 
@@ -266,9 +542,12 @@ def blocked_times_api(request):
 
             "type": "blocked",
 
-            "start": item.time.strftime("%H:%M"),
+            "start":
+                item.time.strftime("%H:%M"),
 
-            "end": f"{end_hour:02d}:{end_minute:02d}",
+            "end":
+                f"{end_hour:02d}:{end_minute:02d}",
+
         })
 
     return JsonResponse(
@@ -295,6 +574,7 @@ def barber_working_hours(request):
             "work_end": "18:00",
 
             "appointment_duration": 30
+
         })
 
     try:
@@ -315,11 +595,15 @@ def barber_working_hours(request):
 
     return JsonResponse({
 
-        "work_start": barber.work_start.strftime("%H:%M"),
+        "work_start":
+            barber.work_start.strftime("%H:%M"),
 
-        "work_end": barber.work_end.strftime("%H:%M"),
+        "work_end":
+            barber.work_end.strftime("%H:%M"),
 
-        "appointment_duration": barber.appointment_duration
+        "appointment_duration":
+            barber.appointment_duration
+
     })
 
 
@@ -337,6 +621,7 @@ def cancel_reservation(request, id):
         id=id,
 
         user=request.user
+
     )
 
     if reservation.status in [
@@ -352,49 +637,190 @@ def cancel_reservation(request, id):
 
 
 # =========================================================
-# صفحه پرداخت بیعانه
+# صفحه پرداخت
 # =========================================================
-
 @login_required(login_url="/login/")
 def reservation_payment(request, reservation_id):
 
+    # =====================================================
+    # رزرو اصلی
+    # =====================================================
+
     reservation = get_object_or_404(
-
         Reservation,
-
         id=reservation_id,
-
         user=request.user
     )
 
-    # اگر قبلاً پرداخت شده
-    if reservation.payment_status == "paid":
+    # =====================================================
+    # دریافت تمام رزروهای این فرآیند
+    # =====================================================
 
-        messages.info(
-            request,
-            "بیعانه این نوبت قبلاً پرداخت شده است."
+    reservation_ids = request.session.get(
+        "pending_reservation_ids"
+    )
+
+    if not reservation_ids:
+        reservation_ids = [reservation.id]
+
+    reservations = (
+        Reservation.objects
+        .filter(
+            id__in=reservation_ids,
+            user=request.user
         )
+        .exclude(
+            status="cancel"
+        )
+        .order_by(
+            "date",
+            "time"
+        )
+    )
 
-        return redirect("/profile/")
+    # =====================================================
+    # بررسی وجود رزرو
+    # =====================================================
 
-    # اگر رزرو لغو شده
-    if reservation.status == "cancel":
+    if not reservations.exists():
 
         messages.error(
             request,
-            "این نوبت لغو شده است."
+            "هیچ رزرو فعالی برای پرداخت وجود ندارد."
+        )
+
+        request.session.pop(
+            "pending_reservation_ids",
+            None
         )
 
         return redirect("/profile/")
 
-    return render(
+    # =====================================================
+    # محاسبه مبالغ
+    # =====================================================
 
-        request,
-
-        "core/reservation_payment.html",
-
-        {
-            "reservation": reservation
-        }
+    total_price = sum(
+        item.service_price
+        for item in reservations
     )
 
+    total_deposit = sum(
+        item.deposit_amount
+        for item in reservations
+    )
+
+    # =====================================================
+    # اگر فرم پرداخت ارسال شده
+    # =====================================================
+
+    if request.method == "POST":
+
+        payment_type = request.POST.get(
+            "payment_type"
+        )
+
+        # -------------------------------------------------
+        # اعتبارسنجی نوع پرداخت
+        # -------------------------------------------------
+
+        if payment_type not in [
+            "deposit",
+            "full"
+        ]:
+
+            messages.error(
+                request,
+                "نوع پرداخت نامعتبر است."
+            )
+
+            return redirect(
+                "reservation_payment",
+                reservation_id=reservation.id
+            )
+
+        # -------------------------------------------------
+        # تعیین مبلغ قابل پرداخت
+        # -------------------------------------------------
+
+        if payment_type == "deposit":
+
+            payable_amount = total_deposit
+
+        else:
+
+            payable_amount = total_price
+
+        # =================================================
+        # فعلاً درگاه نداریم
+        #
+        # بنابراین انتخاب کاربر را در Session نگه می‌داریم.
+        # بعداً همین payable_amount را می‌دهیم به درگاه.
+        # =================================================
+
+        request.session[
+            "selected_payment_type"
+        ] = payment_type
+
+        request.session[
+            "selected_payment_amount"
+        ] = payable_amount
+
+        request.session.modified = True
+
+        # -------------------------------------------------
+        # فعلاً برگرد به همین صفحه
+        # -------------------------------------------------
+
+        messages.success(
+            request,
+            (
+                "پرداخت بیعانه انتخاب شد."
+                if payment_type == "deposit"
+                else
+                "پرداخت کامل انتخاب شد."
+            )
+        )
+
+        return redirect(
+            "reservation_payment",
+            reservation_id=reservation.id
+        )
+
+    # =====================================================
+    # انتخاب قبلی کاربر
+    # =====================================================
+
+    selected_payment_type = request.session.get(
+        "selected_payment_type",
+        "deposit"
+    )
+
+    selected_payment_amount = request.session.get(
+        "selected_payment_amount",
+        total_deposit
+    )
+
+    # =====================================================
+    # نمایش صفحه
+    # =====================================================
+
+    return render(
+        request,
+        "core/reservation_payment.html",
+        {
+            "reservation": reservation,
+
+            "reservations": reservations,
+
+            "total_price": total_price,
+
+            "total_deposit": total_deposit,
+
+            "selected_payment_type":
+                selected_payment_type,
+
+            "selected_payment_amount":
+                selected_payment_amount,
+        }
+    )

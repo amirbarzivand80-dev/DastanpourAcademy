@@ -1,5 +1,6 @@
 {% extends "core/base.html" %}
 {% load static %}
+{% load price_filters %}
 
 {% block title %}
 فروشگاه | آکادمی احمد داستانپور
@@ -126,19 +127,19 @@ data-id="{{ product.id }}">
 {% if product.discount_price %}
 
 <span class="price">
-{{ product.discount_price }} تومان
+{{ product.discount_price|price_format }} تومان
 </span>
 
 
 <del>
-{{ product.price }} تومان
+{{ product.price|price_format }} تومان
 </del>
 
 
 {% else %}
 
 <span class="price">
-{{ product.price }} تومان
+{{ product.price|price_format }} تومان
 </span>
 
 {% endif %}

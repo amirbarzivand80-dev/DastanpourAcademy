@@ -3,7 +3,9 @@ from django.db import models
 
 class ServiceCategory(models.Model):
 
-    name = models.CharField(max_length=100)
+    name = models.CharField(
+        max_length=100
+    )
 
     def __str__(self):
         return self.name
@@ -11,7 +13,9 @@ class ServiceCategory(models.Model):
 
 class Service(models.Model):
 
-    name = models.CharField(max_length=100)
+    name = models.CharField(
+        max_length=100
+    )
 
     category = models.ForeignKey(
         ServiceCategory,
@@ -20,17 +24,25 @@ class Service(models.Model):
         blank=True,
         related_name="services"
     )
+
     barbers = models.ManyToManyField(
-    "reservation.Barber",
-    blank=True,
-    related_name="services"
-)
+        "reservation.Barber",
+        blank=True,
+        related_name="services"
+    )
 
-    description = models.TextField(blank=True)
+    description = models.TextField(
+        blank=True
+    )
 
-    price = models.PositiveIntegerField(default=0)
+    # قیمت پایه خدمت
+    price = models.PositiveIntegerField(
+        default=0
+    )
 
-    order = models.PositiveIntegerField(default=0)
+    order = models.PositiveIntegerField(
+        default=0
+    )
 
     image = models.ImageField(
         upload_to="services/",
@@ -38,12 +50,56 @@ class Service(models.Model):
         null=True
     )
 
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(
+        default=True
+    )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
     def __str__(self):
         return self.name
+
+
+# =========================================================
+# قیمت اختصاصی هر آرایشگر برای هر خدمت
+# =========================================================
+
+class BarberServicePrice(models.Model):
+
+    barber = models.ForeignKey(
+        "reservation.Barber",
+        on_delete=models.CASCADE,
+        related_name="service_prices"
+    )
+
+    service = models.ForeignKey(
+        Service,
+        on_delete=models.CASCADE,
+        related_name="barber_prices"
+    )
+
+    price = models.PositiveIntegerField(
+        default=0
+    )
+
+    class Meta:
+
+        unique_together = (
+            "barber",
+            "service",
+        )
+
+    def __str__(self):
+
+        return (
+            f"{self.barber} - "
+            f"{self.service} - "
+            f"{self.price}"
+        )
+
+
 class ServiceImage(models.Model):
 
     service = models.ForeignKey(
@@ -57,4 +113,7 @@ class ServiceImage(models.Model):
     )
 
     def __str__(self):
+
         return self.service.name
+    
+

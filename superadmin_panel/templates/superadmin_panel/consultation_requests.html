@@ -1,0 +1,105 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block content %}
+{% load jalali %}
+
+<h2 class="page-title">
+    درخواست‌های مشاوره
+</h2>
+
+<div class="details-card">
+
+    {% if requests %}
+
+    <table class="admin-table">
+
+        <thead>
+
+            <tr>
+
+                <th>نام</th>
+
+                <th>شماره تماس</th>
+
+                <th>موضوع</th>
+
+                <th>تاریخ</th>
+
+                <th>وضعیت</th>
+
+                <th>عملیات</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for request in requests %}
+
+            <tr>
+
+                <td>
+                    {{ request.full_name }}
+                </td>
+
+                <td>
+                    {{ request.phone }}
+                </td>
+
+                <td>
+                    {{ request.get_subject_display }}
+                </td>
+
+                <td>
+                    {{ request.created_at|to_jalali }}
+                </td>
+
+                <td>
+
+                    {% if request.is_read %}
+
+                        <span>
+                            بررسی شده
+                        </span>
+
+                    {% else %}
+
+                        <span>
+                            جدید
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    <a
+                        href="{% url 'consultation_request_detail' request.id %}"
+                        class="details-btn"
+                    >
+                        مشاهده
+                    </a>
+
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    {% else %}
+
+    <p>
+        هیچ درخواست مشاوره‌ای وجود ندارد.
+    </p>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

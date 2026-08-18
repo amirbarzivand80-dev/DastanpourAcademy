@@ -36,11 +36,31 @@
 
     </select>
 
+   <div class="reservation-date-picker">
+
+    <div
+        class="reservation-date-input"
+        id="reservation-date-display">
+
+        <span>
+            {% if request.GET.date %}
+                {{ request.GET.date }}
+            {% else %}
+                انتخاب تاریخ
+            {% endif %}
+        </span>
+
+        <i class="fa-solid fa-calendar-days"></i>
+
+    </div>
+
     <input
-        type="date"
+        type="hidden"
         name="date"
+        id="reservation-date"
         value="{{ request.GET.date }}">
 
+</div>
     <button type="submit" class="btn-edit">
         جستجو
     </button>
@@ -50,7 +70,8 @@
         href="{% url 'superadmin_reservations' %}"
         class="btn-edit">
 
-        نمایش نوبت‌های گذشته
+       
+ ← نمایش نوبت‌های پیش‌رو
 
     </a>
 
@@ -59,8 +80,7 @@
     <a
         href="?past=1"
         class="btn-edit">
- ← نمایش نوبت‌های پیش‌رو
-
+ نمایش نوبت‌های گذشته
     </a>
 
 {% endif %}
@@ -194,5 +214,460 @@
     </table>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/jalaali-js/dist/jalaali.min.js"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const display =
+        document.getElementById("reservation-date-display");
+
+    const hiddenInput =
+        document.getElementById("reservation-date");
+
+    if (!display || !hiddenInput || !window.jalaali) {
+        return;
+    }
+
+
+    const monthNames = [
+
+        "",
+        "فروردین",
+        "اردیبهشت",
+        "خرداد",
+        "تیر",
+        "مرداد",
+        "شهریور",
+        "مهر",
+        "آبان",
+        "آذر",
+        "دی",
+        "بهمن",
+        "اسفند"
+
+    ];
+
+
+    const weekDays = [
+        "ش",
+        "ی",
+        "د",
+        "س",
+        "چ",
+        "پ",
+        "ج"
+    ];
+
+
+    function gregorianToJalali(value) {
+
+        if (!value) {
+            return null;
+        }
+
+        const parts = value.split("-");
+
+        if (parts.length !== 3) {
+            return null;
+        }
+
+        return jalaali.toJalaali(
+            parseInt(parts[0]),
+            parseInt(parts[1]),
+            parseInt(parts[2])
+        );
+
+    }
+
+
+    function formatJalali(jy, jm, jd) {
+
+        return (
+            jy +
+            "/" +
+            String(jm).padStart(2, "0") +
+            "/" +
+            String(jd).padStart(2, "0")
+        );
+
+    }
+
+
+    function openCalendar() {
+
+        const now = new Date();
+
+        const today =
+            jalaali.toJalaali(
+                now.getFullYear(),
+                now.getMonth() + 1,
+                now.getDate()
+            );
+
+
+        let viewYear = today.jy;
+        let viewMonth = today.jm;
+
+
+        const existing =
+            gregorianToJalali(hiddenInput.value);
+
+
+        if (existing) {
+
+            viewYear = existing.jy;
+            viewMonth = existing.jm;
+
+        }
+
+
+        const modal =
+            document.createElement("div");
+
+        modal.className =
+            "reservation-calendar-modal";
+
+
+        modal.innerHTML = `
+
+            <div class="reservation-calendar-content">
+
+                <div class="reservation-calendar-header">
+
+                    <button
+                        type="button"
+                        class="reservation-prev">
+                        ❮
+                    </button>
+
+
+                    <div class="reservation-calendar-title">
+
+                        <select
+                            class="reservation-year">
+                        </select>
+
+                        <span
+                            class="reservation-month">
+                        </span>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="reservation-next">
+                        ❯
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="reservation-close">
+                        ✕
+                    </button>
+
+                </div>
+
+
+                <div class="reservation-calendar-week">
+
+                    ${weekDays.map(day =>
+                        `<span>${day}</span>`
+                    ).join("")}
+
+                </div>
+
+
+                <div class="reservation-calendar-days"></div>
+
+            </div>
+
+        `;
+
+
+        document.body.appendChild(modal);
+
+
+        const yearSelect =
+            modal.querySelector(".reservation-year");
+
+        const monthTitle =
+            modal.querySelector(".reservation-month");
+
+        const daysContainer =
+            modal.querySelector(".reservation-calendar-days");
+
+
+        const currentYear =
+            today.jy;
+
+
+        for (
+            let year = currentYear + 10;
+            year >= 1300;
+            year--
+        ) {
+
+            const option =
+                document.createElement("option");
+
+            option.value = year;
+            option.textContent = year;
+
+            yearSelect.appendChild(option);
+
+        }
+
+
+        yearSelect.value = viewYear;
+
+
+        function renderCalendar() {
+
+            daysContainer.innerHTML = "";
+
+            monthTitle.textContent =
+                monthNames[viewMonth];
+
+            yearSelect.value =
+                viewYear;
+
+
+            const monthDays =
+                jalaali.jalaaliMonthLength(
+                    viewYear,
+                    viewMonth
+                );
+
+
+            const first =
+                jalaali.toGregorian(
+                    viewYear,
+                    viewMonth,
+                    1
+                );
+
+
+            const firstDate =
+                new Date(
+                    first.gy,
+                    first.gm - 1,
+                    first.gd
+                );
+
+
+            let startDay =
+                firstDate.getDay();
+
+
+            startDay =
+                (startDay + 1) % 7;
+
+
+            for (
+                let i = 0;
+                i < startDay;
+                i++
+            ) {
+
+                const empty =
+                    document.createElement("div");
+
+                empty.className =
+                    "reservation-calendar-day empty";
+
+                daysContainer.appendChild(empty);
+
+            }
+
+
+            for (
+                let day = 1;
+                day <= monthDays;
+                day++
+            ) {
+
+                const dayBox =
+                    document.createElement("div");
+
+                dayBox.className =
+                    "reservation-calendar-day";
+
+                dayBox.textContent =
+                    day;
+
+
+                const gregorian =
+                    jalaali.toGregorian(
+                        viewYear,
+                        viewMonth,
+                        day
+                    );
+
+
+                const isoDate =
+                    gregorian.gy +
+                    "-" +
+                    String(gregorian.gm).padStart(2, "0") +
+                    "-" +
+                    String(gregorian.gd).padStart(2, "0");
+
+
+                if (
+                    hiddenInput.value === isoDate
+                ) {
+
+                    dayBox.classList.add("selected");
+
+                }
+
+
+                dayBox.addEventListener(
+                    "click",
+                    function () {
+
+                        hiddenInput.value =
+                            isoDate;
+
+
+                        display.querySelector("span")
+                            .textContent =
+                            formatJalali(
+                                viewYear,
+                                viewMonth,
+                                day
+                            );
+
+
+                        modal.remove();
+
+                    }
+                );
+
+
+                daysContainer.appendChild(dayBox);
+
+            }
+
+        }
+
+
+        yearSelect.addEventListener(
+            "change",
+            function () {
+
+                viewYear =
+                    parseInt(this.value);
+
+                renderCalendar();
+
+            }
+        );
+
+
+        modal.querySelector(".reservation-prev")
+            .addEventListener(
+                "click",
+                function () {
+
+                    viewMonth--;
+
+                    if (viewMonth < 1) {
+
+                        viewMonth = 12;
+                        viewYear--;
+
+                    }
+
+                    renderCalendar();
+
+                }
+            );
+
+
+        modal.querySelector(".reservation-next")
+            .addEventListener(
+                "click",
+                function () {
+
+                    viewMonth++;
+
+                    if (viewMonth > 12) {
+
+                        viewMonth = 1;
+                        viewYear++;
+
+                    }
+
+                    renderCalendar();
+
+                }
+            );
+
+
+        modal.querySelector(".reservation-close")
+            .addEventListener(
+                "click",
+                function () {
+
+                    modal.remove();
+
+                }
+            );
+
+
+        modal.addEventListener(
+            "click",
+            function (event) {
+
+                if (event.target === modal) {
+                    modal.remove();
+                }
+
+            }
+        );
+
+
+        renderCalendar();
+
+    }
+
+
+    display.addEventListener(
+        "click",
+        openCalendar
+    );
+
+
+    // نمایش تاریخ موجود هنگام لود صفحه
+
+    if (hiddenInput.value) {
+
+        const existing =
+            gregorianToJalali(
+                hiddenInput.value
+            );
+
+        if (existing) {
+
+            display.querySelector("span")
+                .textContent =
+                formatJalali(
+                    existing.jy,
+                    existing.jm,
+                    existing.jd
+                );
+
+        }
+
+    }
+
+});
+
+</script>
 
 {% endblock %}

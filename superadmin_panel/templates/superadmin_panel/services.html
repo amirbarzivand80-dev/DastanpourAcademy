@@ -1,4 +1,5 @@
 {% extends "superadmin_panel/base.html" %}
+{% load price_filters %}
 
 {% block title %}
 مدیریت خدمات
@@ -64,7 +65,7 @@
 
     <td>{{ service.category }}</td>
 
-    <td>{{ service.price }}</td>
+    <td>{{ service.price|price_format }}</td>
 
     <td>{{ service.order }}</td>
 
@@ -91,6 +92,14 @@
             ویرایش
 
         </a>
+
+    <a
+        href="{% url 'service_gallery' service.id %}"
+        class="btn-edit">
+
+        گالری تصاویر
+
+    </a>
 
         <a
             href="{% url 'superadmin_service_delete' service.id %}"

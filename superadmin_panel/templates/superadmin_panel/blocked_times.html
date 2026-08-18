@@ -4,74 +4,422 @@
 مدیریت ساعات کاری
 {% endblock %}
 
+{% load static %}
+
 {% block content %}
 
 <h2 class="page-title">
-مدیریت ساعات کاری
+    مدیریت ساعات کاری
 </h2>
 
-<form method="POST">
+
+<!-- ========================================= -->
+<!-- انتخاب آرایشگر برای ادمین -->
+<!-- ========================================= -->
+
+{% if not user.barber %}
+
+<form
+    method="GET"
+    style="margin-bottom: 20px;">
+
+    <div class="form-group">
+
+        <label>
+            👤 انتخاب آرایشگر
+        </label>
+
+        <select
+            name="barber"
+            onchange="this.form.submit()">
+
+            <option value="">
+                انتخاب آرایشگر
+            </option>
+
+            {% for barber in barbers %}
+
+            <option
+                value="{{ barber.id }}"
+                {% if selected_barber_id|stringformat:"s" == barber.id|stringformat:"s" %}
+                    selected
+                {% endif %}
+            >
+
+                {{ barber.user.full_name }}
+
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+    </div>
+
+</form>
+
+{% endif %}
+
+
+<!-- ========================================= -->
+<!-- نمایش آرایشگر انتخاب شده -->
+<!-- ========================================= -->
+
+{% if selected_barber %}
+
+<div class="details-card"
+     style="margin-bottom:20px;">
+
+    <strong>
+        آرایشگر انتخاب شده:
+    </strong>
+
+    {{ selected_barber.user.full_name }}
+
+</div>
+
+{% endif %}
+
+
+<!-- ========================================= -->
+<!-- فرم بستن ساعت -->
+<!-- ========================================= -->
+
+{% if selected_barber or user.barber %}
+
+<form
+    method="POST"
+    id="blocked-time-form">
 
     {% csrf_token %}
 
-    {{ form.as_p }}
 
-    <button class="btn-edit">
+    <!-- ================================= -->
+    <!-- انتخاب آرایشگر برای ادمین -->
+    <!-- ================================= -->
+
+    {% if not user.barber %}
+
+    <div class="form-group">
+
+        <label>
+            👤 آرایشگر
+        </label>
+
+        <select
+            name="barber"
+            required>
+
+            <option value="">
+                انتخاب آرایشگر
+            </option>
+
+            {% for barber in barbers %}
+
+            <option
+                value="{{ barber.id }}"
+                {% if selected_barber_id|stringformat:"s" == barber.id|stringformat:"s" %}
+                    selected
+                {% endif %}
+            >
+
+                {{ barber.user.full_name }}
+
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- ================================= -->
+    <!-- تاریخ شمسی -->
+    <!-- ================================= -->
+
+    <div class="form-group">
+
+        <label>
+            📅 تاریخ
+        </label>
+
+        <div
+            id="openCalendar"
+            class="date-input">
+
+            <span id="selectedDate">
+                برای انتخاب تاریخ کلیک کنید
+            </span>
+
+            <i class="fa-solid fa-calendar-days"></i>
+
+        </div>
+
+        <input
+            type="hidden"
+            name="date"
+            id="hiddenDate">
+
+    </div>
+
+
+    <!-- ================================= -->
+    <!-- ساعت شروع -->
+    <!-- ================================= -->
+
+    <div class="form-group">
+
+        {{ form.start_time.label_tag }}
+
+        {{ form.start_time }}
+
+    </div>
+
+
+    <!-- ================================= -->
+    <!-- ساعت پایان -->
+    <!-- ================================= -->
+
+    <div class="form-group">
+
+        {{ form.end_time.label_tag }}
+
+        {{ form.end_time }}
+
+    </div>
+
+
+    <!-- ================================= -->
+    <!-- دلیل -->
+    <!-- ================================= -->
+
+    <div class="form-group">
+
+        {{ form.reason.label_tag }}
+
+        {{ form.reason }}
+
+    </div>
+
+
+    <button
+        type="submit"
+        class="btn-edit">
+
         ثبت
+
     </button>
 
 </form>
 
+{% else %}
+
+<div class="details-card">
+
+    <h3>
+        انتخاب آرایشگر
+    </h3>
+
+    <p>
+        برای مدیریت ساعات کاری ابتدا یک آرایشگر را انتخاب کنید.
+    </p>
+
+</div>
+
+{% endif %}
+
+
 <hr>
+
+
+<!-- ========================================= -->
+<!-- لیست ساعات بسته شده -->
+<!-- ========================================= -->
+
+{% if selected_barber %}
+
+<h3 class="page-title">
+    ساعات بسته شده
+</h3>
+
 
 <table>
 
-<thead>
+    <thead>
 
-<tr>
+        <tr>
 
-<th>تاریخ</th>
-<th>شروع</th>
-<th>پایان</th>
-<th>دلیل</th>
-<th>عملیات</th>
+            <th>
+                آرایشگر
+            </th>
 
-</tr>
+            <th>
+                تاریخ
+            </th>
 
-</thead>
+            <th>
+                شروع
+            </th>
 
-<tbody>
+            <th>
+                پایان
+            </th>
 
-{% for item in blocked_times %}
+            <th>
+                دلیل
+            </th>
 
-<tr>
+            <th>
+                عملیات
+            </th>
 
-<td>{{ item.date }}</td>
-<td>{{ item.start_time }}</td>
-<td>{{ item.end_time }}</td>
-<td>{{ item.reason }}</td>
+        </tr>
 
-<td>
+    </thead>
 
-<a href="{% url 'edit_blocked_time' item.id %}"
-   class="btn-edit">
-ویرایش
-</a>
 
-<a href="{% url 'delete_blocked_time' item.id %}"
-   class="btn-delete"
-   onclick="return confirm('حذف شود؟');">
-حذف
-</a>
+    <tbody>
 
-</td>
+        {% for item in blocked_times %}
 
-</tr>
+        <tr>
 
-{% endfor %}
+            <td>
+                {{ item.barber.user.full_name }}
+            </td>
 
-</tbody>
+
+            <td>
+                {{ item.date }}
+            </td>
+
+
+            <td>
+                {{ item.start_time }}
+            </td>
+
+
+            <td>
+                {{ item.end_time }}
+            </td>
+
+
+            <td>
+                {{ item.reason }}
+            </td>
+
+
+            <td>
+
+                <a
+                    href="{% url 'edit_blocked_time' item.id %}"
+                    class="btn-edit">
+
+                    ویرایش
+
+                </a>
+
+
+                <a
+                    href="{% url 'delete_blocked_time' item.id %}"
+                    class="btn-delete"
+                    onclick="return confirm('از حذف این بازه زمانی مطمئن هستید؟');">
+
+                    حذف
+
+                </a>
+
+            </td>
+
+        </tr>
+
+        {% empty %}
+
+        <tr>
+
+            <td colspan="6">
+
+                برای این آرایشگر
+                ساعت بسته‌شده‌ای ثبت نشده است.
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
 
 </table>
+
+{% endif %}
+
+
+<!-- ========================================= -->
+<!-- تقویم شمسی -->
+<!-- ========================================= -->
+
+<div
+    id="calendarModal"
+    class="calendar-modal">
+
+    <div class="calendar-content">
+
+        <div class="calendar-header">
+
+            <button
+                type="button"
+                id="prevMonth">
+
+                ماه قبل
+
+            </button>
+
+
+            <h3 id="calendarTitle"></h3>
+
+
+            <button
+                type="button"
+                id="nextMonth">
+
+                ماه بعد
+
+            </button>
+
+        </div>
+
+
+        <div class="week-days">
+
+            <span>ش</span>
+            <span>ی</span>
+            <span>د</span>
+            <span>س</span>
+            <span>چ</span>
+            <span>پ</span>
+            <span>ج</span>
+
+        </div>
+
+
+        <div
+            id="calendar-days"
+            class="calendar-days">
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jalaali-js/dist/jalaali.min.js"></script>
+
+<script src="{% static 'js/blocked_times.js' %}"></script>
+
 
 {% endblock %}

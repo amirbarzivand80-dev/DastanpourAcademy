@@ -1,0 +1,60 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+افزودن تصاویر {{ service.name }}
+{% endblock %}
+
+{% block content %}
+
+<h2 class="page-title">
+    افزودن تصاویر به {{ service.name }}
+</h2>
+
+<form
+    method="POST"
+    enctype="multipart/form-data"
+>
+
+    {% csrf_token %}
+
+    <div style="margin-top:25px;">
+
+        <label>
+            انتخاب تصاویر
+        </label>
+
+        <input
+            type="file"
+            name="images"
+            multiple
+            accept="image/*"
+        >
+
+        <small>
+            می‌توانید چند تصویر را همزمان انتخاب کنید.
+        </small>
+
+    </div>
+
+
+    <div style="margin-top:25px;">
+
+        <button
+            type="submit"
+            class="btn-edit"
+        >
+            ذخیره تصاویر
+        </button>
+
+        <a
+            href="{% url 'service_gallery' service.id %}"
+            class="btn-delete"
+        >
+            انصراف
+        </a>
+
+    </div>
+
+</form>
+
+{% endblock %}

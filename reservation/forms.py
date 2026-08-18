@@ -2,7 +2,6 @@ from django import forms
 
 from .models import BarberBlockedTime, Reservation
 
-
 class BarberBlockedTimeForm(forms.ModelForm):
 
     class Meta:
@@ -16,25 +15,31 @@ class BarberBlockedTimeForm(forms.ModelForm):
         ]
 
         widgets = {
+
             "date": forms.DateInput(
                 attrs={
                     "type": "date"
                 }
             ),
 
-            "start_time": forms.TimeInput(
-                attrs={
-                    "type": "time"
-                }
+            "start_time": forms.Select(
+                choices=[
+                    (f"{hour:02d}:{minute:02d}",
+                     f"{hour:02d}:{minute:02d}")
+                    for hour in range(9, 21)
+                    for minute in (0, 30)
+                ]
             ),
 
-            "end_time": forms.TimeInput(
-                attrs={
-                    "type": "time"
-                }
+            "end_time": forms.Select(
+                choices=[
+                    (f"{hour:02d}:{minute:02d}",
+                     f"{hour:02d}:{minute:02d}")
+                    for hour in range(9, 21)
+                    for minute in (0, 30)
+                ]
             ),
         }
-
 
 class WalkInReservationForm(forms.ModelForm):
 

@@ -170,7 +170,6 @@ def register_view(request):
         }
     )
 
-
 def verify_phone(request):
 
     user_id = request.session.get(
@@ -269,7 +268,12 @@ def verify_phone(request):
                 backend="users.backends.PhoneBackend"
             )
 
-            return redirect("/")
+            next_url = request.session.pop(
+                "login_next",
+                None
+            )
+
+            return redirect(next_url or "/")
 
     return render(
         request,
@@ -278,8 +282,9 @@ def verify_phone(request):
             "phone": user.phone,
         }
     )
-
 def login_view(request):
+
+    next_url = request.GET.get("next") or request.POST.get("next")
 
     if request.method == "POST":
 
@@ -298,11 +303,14 @@ def login_view(request):
 
                 request.session["pending_verification_user_id"] = user.id
 
+                if next_url:
+                    request.session["login_next"] = next_url
+
                 return redirect("verify_phone")
 
             login(request, user)
 
-            return redirect("/")
+            return redirect(next_url or "/")
 
         else:
 
@@ -314,7 +322,10 @@ def login_view(request):
     return render(
         request,
         "core/auth.html",
-        {"mode": "login"}
+        {
+            "mode": "login",
+            "next": next_url,
+        }
     )
 @login_required(login_url="/login/")
 def upload_profile_image(request):

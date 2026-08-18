@@ -1,5 +1,6 @@
 {% extends "core/base.html" %}
 {% load static %}
+{% load price_filters %}
 
 {% block title %}
 جزئیات محصول
@@ -106,11 +107,11 @@
 
 {% if product.discount_price %}
 
-{{ product.discount_price }}
+{{ product.discount_price|price_format }}
 
 {% else %}
 
-{{ product.price }}
+{{ product.price|price_format }}
 
 {% endif %}
 
