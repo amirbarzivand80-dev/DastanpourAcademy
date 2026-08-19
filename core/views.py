@@ -1,25 +1,150 @@
-from django.shortcuts import render
-from shop.models import Product
-from academy.models import Course
-from django.shortcuts import get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect
+from django.utils import timezone
+
+from shop.models import Product, Favorite, ProductComment
+from academy.models import Course
 from services.models import Service
 from reservation.models import Barber
+
+from .models import HomeOffer, ConsultationRequest
+from .forms import ContactMessageForm
+
+from core.offer_utils import (
+    get_product_offer_price,
+    get_course_offer_price,
+)
+
+from shop.forms import ProductCommentForm
+
+# =====================================================
+# HOME
+# =====================================================
+
 def home(request):
 
-    products = Product.objects.filter(
-        is_active=True
-    ).exclude(
-        slug=""
-    ).order_by("-created_at")[:10]
+    # =====================================================
+    # محصولات صفحه اصلی
+    # =====================================================
 
-    courses = Course.objects.filter(
-        is_active=True
-    ).order_by("-created_at")[:10]
+    products = list(
+        Product.objects.filter(
+            is_active=True
+        ).exclude(
+            slug=""
+        ).order_by("-created_at")[:10]
+    )
+
+    # =====================================================
+    # دوره‌های صفحه اصلی
+    # =====================================================
+
+    courses = list(
+        Course.objects.filter(
+            is_active=True
+        ).order_by("-created_at")[:10]
+    )
+
+    # =====================================================
+    # جدیدترین محصولات و دوره‌ها
+    # =====================================================
 
     latest_products = products[:5]
     latest_courses = courses[:5]
+
+    # =====================================================
+    # قیمت تخفیفی محصولات صفحه اصلی
+    # =====================================================
+
+    for product in products:
+
+        offer_price = get_product_offer_price(product)
+
+        print("========== HOME PRODUCT ==========")
+        print("NAME:", product.name)
+        print("PRICE:", product.price)
+        print("DISCOUNT PRICE:", product.discount_price)
+        print("OFFER:", offer_price)
+
+        product.offer_has_discount = offer_price["has_offer"]
+        product.offer_discount_percent = offer_price["discount_percent"]
+        product.offer_old_price = offer_price["old_price"]
+        product.offer_new_price = offer_price["new_price"]
+
+    # =====================================================
+    # قیمت تخفیفی دوره‌های صفحه اصلی
+    # =====================================================
+
+    for course in courses:
+
+        offer_price = get_course_offer_price(course)
+
+        course.offer_has_discount = offer_price["has_offer"]
+        course.offer_discount_percent = offer_price["discount_percent"]
+        course.offer_old_price = offer_price["old_price"]
+        course.offer_new_price = offer_price["new_price"]
+
+    # =====================================================
+    # پیشنهاد فعال صفحه اصلی
+    # =====================================================
+
+    home_offer = HomeOffer.objects.filter(
+        is_active=True,
+        end_time__gt=timezone.now()
+    ).order_by("-created_at").first()
+
+    # =====================================================
+    # محصولات پیشنهاد ویژه
+    # =====================================================
+
+    if home_offer:
+
+        offer_products = list(
+            home_offer.products.all()
+        )
+
+        for product in offer_products:
+
+            offer_price = get_product_offer_price(product)
+
+            print("========== HOME OFFER PRODUCT ==========")
+            print("NAME:", product.name)
+            print("PRICE:", product.price)
+            print("DISCOUNT PRICE:", product.discount_price)
+            print("OFFER:", offer_price)
+
+            product.offer_has_discount = offer_price["has_offer"]
+            product.offer_discount_percent = offer_price["discount_percent"]
+            product.offer_old_price = offer_price["old_price"]
+            product.offer_new_price = offer_price["new_price"]
+
+        # =================================================
+        # دوره‌های پیشنهاد ویژه
+        # =================================================
+
+        offer_courses = list(
+            home_offer.courses.all()
+        )
+
+        for course in offer_courses:
+
+            offer_price = get_course_offer_price(course)
+
+            course.offer_has_discount = offer_price["has_offer"]
+            course.offer_discount_percent = offer_price["discount_percent"]
+            course.offer_old_price = offer_price["old_price"]
+            course.offer_new_price = offer_price["new_price"]
+
+        # =================================================
+        # آماده‌سازی برای Template
+        # =================================================
+
+        home_offer.offer_products = offer_products
+        home_offer.offer_courses = offer_courses
+
+    # =====================================================
+    # RENDER
+    # =====================================================
 
     return render(
         request,
@@ -29,11 +154,22 @@ def home(request):
             "courses": courses,
             "latest_products": latest_products,
             "latest_courses": latest_courses,
+            "home_offer": home_offer,
         }
     )
 
+# =====================================================
+# SERVICES
+# =====================================================
+
 def services(request):
-    return render(request, "core/services.html")
+
+    return render(
+        request,
+        "core/services.html"
+    )
+
+
 def service_detail(request, id):
 
     service = get_object_or_404(
@@ -49,13 +185,44 @@ def service_detail(request, id):
             "service": service,
         }
     )
+
+
+# =====================================================
+# EDUCATION
+# =====================================================
+
 def education(request):
-    return render(request, "core/education.html")
-def course_detail(request,id):
-    return render(request,"core/course_detail.html")
+
+    return render(
+        request,
+        "core/education.html"
+    )
+
+
+def course_detail(request, id):
+
+    return render(
+        request,
+        "core/course_detail.html"
+    )
+
+
+# =====================================================
+# SHOP
+# =====================================================
+
 def shop(request):
-    return render(request, "core/shop.html")
-from shop.models import Product
+
+    return render(
+        request,
+        "core/shop.html"
+    )
+
+
+# =====================================================
+# PRODUCT DETAIL
+# =====================================================
+
 def product_detail(request, slug):
 
     product = get_object_or_404(
@@ -80,9 +247,23 @@ def product_detail(request, slug):
             "comments": comments,
         }
     )
+
+
+# =====================================================
+# CART
+# =====================================================
+
 def cart(request):
-    return render(request,"core/cart.html")
-from .models import ConsultationRequest
+
+    return render(
+        request,
+        "core/cart.html"
+    )
+
+
+# =====================================================
+# CONSULTATION
+# =====================================================
 
 def consultation(request):
 
@@ -106,15 +287,20 @@ def consultation(request):
         request,
         "core/consultation.html"
     )
-from shop.models import Favorite
+
+
+# =====================================================
+# FAVORITES
+# =====================================================
 
 @login_required(login_url="/login/")
 def favorites(request):
 
     favorites = Favorite.objects.filter(
         user=request.user
-    ).select_related("product")
-
+    ).select_related(
+        "product"
+    )
 
     return render(
         request,
@@ -123,42 +309,57 @@ def favorites(request):
             "favorites": favorites
         }
     )
-def about(request):
-    return render(request, "core/about.html")
-from .forms import ContactMessageForm
-from .forms import ContactMessageForm
 
+
+# =====================================================
+# ABOUT
+# =====================================================
+
+def about(request):
+
+    return render(
+        request,
+        "core/about.html"
+    )
+
+
+# =====================================================
+# CONTACT
+# =====================================================
 
 def contact(request):
 
     if request.method == "POST":
 
-        form = ContactMessageForm(request.POST)
+        form = ContactMessageForm(
+            request.POST
+        )
 
         if form.is_valid():
 
-            message = form.save(commit=False)
-
+            message = form.save(
+                commit=False
+            )
 
             if request.user.is_authenticated:
 
                 message.user = request.user
 
-                message.full_name = request.user.full_name
+                message.full_name = (
+                    request.user.full_name
+                )
 
-                message.phone = request.user.phone
-
+                message.phone = (
+                    request.user.phone
+                )
 
             message.save()
 
-
             return redirect("contact")
-
 
     else:
 
         form = ContactMessageForm()
-
 
     return render(
         request,
@@ -167,6 +368,12 @@ def contact(request):
             "form": form
         }
     )
+
+
+# =====================================================
+# RESERVATION
+# =====================================================
+
 def reservation(request):
 
     services = Service.objects.filter(
@@ -175,11 +382,14 @@ def reservation(request):
         "barbers__user"
     )
 
-    selected_service_id = request.GET.get("service")
+    selected_service_id = request.GET.get(
+        "service"
+    )
 
     selected_service = None
 
     if selected_service_id:
+
         selected_service = get_object_or_404(
             Service,
             id=selected_service_id,
@@ -194,31 +404,49 @@ def reservation(request):
             "selected_service": selected_service,
         }
     )
-@login_required
+
+
+# =====================================================
+# PROFILE REDIRECT
+# =====================================================
+
 @login_required
 def profile_redirect(request):
 
     user = request.user
+
     print("USER:", user.full_name)
     print("IS BARBER:", user.is_barber)
-    print("GROUPS:", list(user.groups.values_list("name", flat=True)))
-
+    print(
+        "GROUPS:",
+        list(
+            user.groups.values_list(
+                "name",
+                flat=True
+            )
+        )
+    )
 
     if user.is_superuser:
-        return redirect('dashboard')
 
-    if user.groups.filter(name__in=[
-        'SuperAdmin',
-        'Admin',
-        'Barber'
-    ]).exists():
-        return redirect('dashboard')
+        return redirect("dashboard")
 
-    return redirect('profile')
+    if user.groups.filter(
+        name__in=[
+            "SuperAdmin",
+            "Admin",
+            "Barber"
+        ]
+    ).exists():
 
-from shop.forms import ProductCommentForm
-from shop.models import ProductComment
-from django.contrib.auth.decorators import login_required
+        return redirect("dashboard")
+
+    return redirect("profile")
+
+
+# =====================================================
+# PRODUCT COMMENT
+# =====================================================
 
 @login_required(login_url="/login/")
 def add_comment(request, id):
@@ -228,15 +456,17 @@ def add_comment(request, id):
         id=id
     )
 
-
     if request.method == "POST":
 
-        form = ProductCommentForm(request.POST)
-
+        form = ProductCommentForm(
+            request.POST
+        )
 
         if form.is_valid():
 
-            comment = form.save(commit=False)
+            comment = form.save(
+                commit=False
+            )
 
             comment.user = request.user
 
@@ -246,17 +476,14 @@ def add_comment(request, id):
 
             comment.save()
 
-
             return redirect(
                 "product_detail",
                 slug=product.slug
             )
 
-
     else:
 
         form = ProductCommentForm()
-
 
     return render(
         request,
@@ -267,12 +494,22 @@ def add_comment(request, id):
         }
     )
 
+
+# =====================================================
+# RULES
+# =====================================================
+
 def rules(request):
 
     return render(
         request,
         "core/rules.html"
     )
+
+
+# =====================================================
+# PRIVACY
+# =====================================================
 
 def privacy(request):
 

@@ -60,20 +60,19 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        // تشخیص نوبت‌های گذشته
+       // =========================================
+// تشخیص حالت نمایش
+// =========================================
 
-        const pastButton = document.querySelector(
-            'a[href*="past=1"]'
-        );
+const urlParams = new URLSearchParams(
+    window.location.search
+);
 
-        if (pastButton) {
+if (urlParams.get("past") === "1") {
 
-            params.set(
-                "past",
-                "1"
-            );
+    params.set("past", "1");
 
-        }
+}
 
 
         return params;

@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.shortcuts import render, redirect
-
+from core.models import HomeOffer
 from users.models import CustomUser
 from reservation.models import Reservation, Barber
 from services.models import Service
@@ -39,6 +39,7 @@ from academy.models import Course, CourseStudent
 from academy.models import Course, CourseStudent,CourseSession,CourseFeature
 from django.shortcuts import get_object_or_404, render
 from academy.models import CourseTopic
+from reservation.models import Barber, BarberWorkingDay
 from academy.models import CourseImage
 from services.models import (
     Service,
@@ -334,6 +335,27 @@ def barber_edit(request, id):
 
             form.save()
 
+            # -----------------------------
+            # بروزرسانی روزهای کاری
+            # -----------------------------
+
+            BarberWorkingDay.objects.filter(
+                barber=barber
+            ).delete()
+
+            working_days = form.cleaned_data.get(
+                "working_days",
+                []
+            )
+
+            for day in working_days:
+
+                BarberWorkingDay.objects.create(
+                    barber=barber,
+                    day=int(day),
+                    is_working=True
+                )
+
             messages.success(
                 request,
                 "اطلاعات آرایشگر با موفقیت ویرایش شد."
@@ -345,8 +367,22 @@ def barber_edit(request, id):
 
     else:
 
+        existing_days = BarberWorkingDay.objects.filter(
+            barber=barber,
+            is_working=True
+        ).values_list(
+            "day",
+            flat=True
+        )
+
         form = BarberEditForm(
-            instance=barber
+            instance=barber,
+            initial={
+                "working_days": [
+                    str(day)
+                    for day in existing_days
+                ]
+            }
         )
 
     return render(
@@ -361,8 +397,6 @@ def barber_edit(request, id):
 def barber_add(request, user_id):
 
     user = CustomUser.objects.get(id=user_id)
-    print("BARBER GROUP ADDED TO:", user.full_name)
-    print("GROUPS NOW:", list(user.groups.values_list("name", flat=True)))
 
     if request.method == "POST":
 
@@ -376,7 +410,27 @@ def barber_add(request, user_id):
 
             barber.save()
 
+            # -----------------------------
+            # ذخیره روزهای کاری
+            # -----------------------------
+
+            working_days = form.cleaned_data.get(
+                "working_days",
+                []
+            )
+
+            for day in working_days:
+
+                BarberWorkingDay.objects.create(
+                    barber=barber,
+                    day=int(day),
+                    is_working=True
+                )
+
+            # -----------------------------
             # اضافه کردن کاربر به گروه Barber
+            # -----------------------------
+
             from django.contrib.auth.models import Group
 
             barber_group, created = Group.objects.get_or_create(
@@ -495,10 +549,11 @@ def reservations_list(request):
     # ---------------------------------
 
     show_past = request.GET.get("past") == "1"
+    
 
 
     # تاریخ و ساعت فعلی
-    now = datetime.now()
+    now = timezone.localtime()
 
     today = now.date()
 
@@ -760,7 +815,6 @@ def services_list(request):
             "services": services
         }
     )
-
 @login_required
 def service_add(request):
 
@@ -775,14 +829,14 @@ def service_add(request):
 
             service = form.save()
 
-            # -----------------------------
-            # ذخیره قیمت اختصاصی آرایشگرها
-            # -----------------------------
-
             for barber in service.barbers.all():
 
                 price = request.POST.get(
                     f"barber_price_{barber.id}"
+                )
+
+                duration = request.POST.get(
+                    f"barber_duration_{barber.id}"
                 )
 
                 if price:
@@ -791,35 +845,40 @@ def service_add(request):
                         service=service,
                         barber=barber,
                         defaults={
-                            "price": int(price)
+                            "price": int(price),
+                            "duration": int(duration or 30),
                         }
                     )
 
-            return redirect("superadmin_services")
+            return redirect(
+                "superadmin_services"
+            )
 
     else:
 
         form = ServiceForm()
-
-    # -----------------------------
-    # آماده کردن آرایشگرها برای قالب
-    # -----------------------------
 
     barber_rows = []
 
     for barber in form.fields["barbers"].queryset:
 
         barber_rows.append({
+
             "barber": barber,
+
             "selected": (
                 barber in form.instance.barbers.all()
                 if form.instance.pk
                 else False
             ),
+
             "price": form.barber_prices.get(
                 barber.id,
                 ""
             ),
+
+            "duration": 30,
+
         })
 
     return render(
@@ -931,17 +990,9 @@ def service_edit(request, id):
 
             service = form.save()
 
-            # -----------------------------
-            # حذف قیمت‌های قبلی
-            # -----------------------------
-
             BarberServicePrice.objects.filter(
                 service=service
             ).delete()
-
-            # -----------------------------
-            # ذخیره قیمت‌های جدید
-            # -----------------------------
 
             for barber in service.barbers.all():
 
@@ -949,15 +1000,22 @@ def service_edit(request, id):
                     f"barber_price_{barber.id}"
                 )
 
+                duration = request.POST.get(
+                    f"barber_duration_{barber.id}"
+                )
+
                 if price:
 
                     BarberServicePrice.objects.create(
                         service=service,
                         barber=barber,
-                        price=int(price)
+                        price=int(price),
+                        duration=int(duration or 30)
                     )
 
-            return redirect("superadmin_services")
+            return redirect(
+                "superadmin_services"
+            )
 
     else:
 
@@ -965,23 +1023,37 @@ def service_edit(request, id):
             instance=service
         )
 
-    # -----------------------------
-    # آماده کردن آرایشگرها برای قالب
-    # -----------------------------
-
     barber_rows = []
 
     for barber in form.fields["barbers"].queryset:
 
+        existing_price = (
+            BarberServicePrice.objects.filter(
+                service=service,
+                barber=barber
+            ).first()
+        )
+
         barber_rows.append({
+
             "barber": barber,
+
             "selected": (
                 barber in service.barbers.all()
             ),
-            "price": form.barber_prices.get(
-                barber.id,
-                ""
+
+            "price": (
+                existing_price.price
+                if existing_price
+                else ""
             ),
+
+            "duration": (
+                existing_price.duration
+                if existing_price
+                else 30
+            ),
+
         })
 
     return render(
@@ -993,7 +1065,6 @@ def service_edit(request, id):
             "barber_rows": barber_rows,
         }
     )
-
 
 @login_required
 def service_delete(request, id):
@@ -1147,14 +1218,34 @@ def search_admin_users(request):
 @login_required
 def admin_remove(request, user_id):
 
-    user = CustomUser.objects.get(id=user_id)
+    user = get_object_or_404(
+        CustomUser,
+        id=user_id
+    )
 
-    group = Group.objects.get(name="Admin")
+    if request.method == "POST":
 
-    user.groups.remove(group)
+        # حذف نقش Admin فقط از این کاربر
+        admin_group = Group.objects.filter(
+            name="Admin"
+        ).first()
 
-    return redirect("superadmin_admins")
+        if admin_group:
+            user.groups.remove(admin_group)
 
+        # حذف تمام دسترسی‌های اختصاصی مدیر
+        AdminPermission.objects.filter(
+            user=user
+        ).delete()
+
+        messages.success(
+            request,
+            "مدیر با موفقیت از مدیریت حذف شد."
+        )
+
+    return redirect(
+        "superadmin_admins"
+    )
 @login_required
 def barber_delete(request, id):
 
@@ -2979,4 +3070,360 @@ def customer_gallery_delete(request, image_id):
     return redirect(
         "superadmin_user_detail",
         id=user_id
+    )
+@login_required
+def home_offers(request):
+
+    offers = HomeOffer.objects.all().order_by("-created_at")
+
+    return render(
+        request,
+        "superadmin_panel/home_offers.html",
+        {
+            "offers": offers,
+        }
+    )
+
+@login_required
+def home_offer_add(request):
+
+    products = Product.objects.all().order_by("name")
+    courses = Course.objects.all().order_by("title")
+
+    if request.method == "POST":
+
+        title = request.POST.get("title", "").strip()
+        description = request.POST.get("description", "").strip()
+        discount_percent = request.POST.get("discount_percent", "").strip()
+        end_time = request.POST.get("end_time")
+        is_active = request.POST.get("is_active") == "on"
+
+        # ==========================================
+        # اعتبارسنجی عنوان
+        # ==========================================
+
+        if not title:
+
+            messages.error(
+                request,
+                "عنوان پیشنهاد را وارد کنید."
+            )
+
+            return render(
+                request,
+                "superadmin_panel/home_offer_form.html",
+                {
+                    "products": products,
+                    "courses": courses,
+                    "title": "افزودن پیشنهاد",
+                }
+            )
+
+        # ==========================================
+        # اعتبارسنجی تخفیف
+        # تخفیف اختیاری است
+        # ==========================================
+
+        if discount_percent:
+
+            try:
+
+                discount_percent = int(
+                    discount_percent
+                )
+
+            except (TypeError, ValueError):
+
+                messages.error(
+                    request,
+                    "درصد تخفیف نامعتبر است."
+                )
+
+                return render(
+                    request,
+                    "superadmin_panel/home_offer_form.html",
+                    {
+                        "products": products,
+                        "courses": courses,
+                        "title": "افزودن پیشنهاد",
+                    }
+                )
+
+            if not 0 <= discount_percent <= 100:
+
+                messages.error(
+                    request,
+                    "درصد تخفیف باید بین ۰ تا ۱۰۰ باشد."
+                )
+
+                return render(
+                    request,
+                    "superadmin_panel/home_offer_form.html",
+                    {
+                        "products": products,
+                        "courses": courses,
+                        "title": "افزودن پیشنهاد",
+                    }
+                )
+
+        else:
+
+            discount_percent = None
+
+        # ==========================================
+        # ایجاد پیشنهاد
+        # ==========================================
+
+        offer = HomeOffer.objects.create(
+
+            title=title,
+
+            description=description,
+
+            discount_percent=discount_percent,
+
+            end_time=end_time,
+
+            is_active=is_active,
+
+        )
+
+        # ==========================================
+        # محصولات
+        # ==========================================
+
+        product_ids = request.POST.getlist(
+            "products"
+        )
+
+        offer.products.set(
+            product_ids
+        )
+
+        # ==========================================
+        # دوره‌ها
+        # ==========================================
+
+        course_ids = request.POST.getlist(
+            "courses"
+        )
+
+        offer.courses.set(
+            course_ids
+        )
+
+        messages.success(
+            request,
+            "پیشنهاد با موفقیت ایجاد شد."
+        )
+
+        return redirect(
+            "home_offers"
+        )
+
+    return render(
+        request,
+        "superadmin_panel/home_offer_form.html",
+        {
+            "products": products,
+            "courses": courses,
+            "title": "افزودن پیشنهاد",
+        }
+    )
+
+
+@login_required
+def home_offer_edit(request, pk):
+
+    offer = get_object_or_404(
+        HomeOffer,
+        id=pk
+    )
+
+    products = Product.objects.all().order_by("name")
+    courses = Course.objects.all().order_by("title")
+
+    if request.method == "POST":
+
+        title = request.POST.get(
+            "title",
+            ""
+        ).strip()
+
+        description = request.POST.get(
+            "description",
+            ""
+        ).strip()
+
+        discount_percent = request.POST.get(
+            "discount_percent",
+            ""
+        ).strip()
+
+        end_time = request.POST.get(
+            "end_time"
+        )
+
+        is_active = (
+            request.POST.get("is_active")
+            == "on"
+        )
+
+        # ==========================================
+        # اعتبارسنجی عنوان
+        # ==========================================
+
+        if not title:
+
+            messages.error(
+                request,
+                "عنوان پیشنهاد را وارد کنید."
+            )
+
+            return render(
+                request,
+                "superadmin_panel/home_offer_form.html",
+                {
+                    "offer": offer,
+                    "products": products,
+                    "courses": courses,
+                    "title": "ویرایش پیشنهاد",
+                }
+            )
+
+        # ==========================================
+        # اعتبارسنجی تخفیف
+        # تخفیف اختیاری است
+        # ==========================================
+
+        if discount_percent:
+
+            try:
+
+                discount_percent = int(
+                    discount_percent
+                )
+
+            except (TypeError, ValueError):
+
+                messages.error(
+                    request,
+                    "درصد تخفیف نامعتبر است."
+                )
+
+                return render(
+                    request,
+                    "superadmin_panel/home_offer_form.html",
+                    {
+                        "offer": offer,
+                        "products": products,
+                        "courses": courses,
+                        "title": "ویرایش پیشنهاد",
+                    }
+                )
+
+            if not 0 <= discount_percent <= 100:
+
+                messages.error(
+                    request,
+                    "درصد تخفیف باید بین ۰ تا ۱۰۰ باشد."
+                )
+
+                return render(
+                    request,
+                    "superadmin_panel/home_offer_form.html",
+                    {
+                        "offer": offer,
+                        "products": products,
+                        "courses": courses,
+                        "title": "ویرایش پیشنهاد",
+                    }
+                )
+
+        else:
+
+            discount_percent = None
+
+        # ==========================================
+        # بروزرسانی پیشنهاد
+        # ==========================================
+
+        offer.title = title
+
+        offer.description = description
+
+        offer.discount_percent = (
+            discount_percent
+        )
+
+        offer.end_time = end_time
+
+        offer.is_active = is_active
+
+        offer.save()
+
+        # ==========================================
+        # محصولات
+        # ==========================================
+
+        product_ids = request.POST.getlist(
+            "products"
+        )
+
+        offer.products.set(
+            product_ids
+        )
+
+        # ==========================================
+        # دوره‌ها
+        # ==========================================
+
+        course_ids = request.POST.getlist(
+            "courses"
+        )
+
+        offer.courses.set(
+            course_ids
+        )
+
+        messages.success(
+            request,
+            "پیشنهاد با موفقیت ویرایش شد."
+        )
+
+        return redirect(
+            "home_offers"
+        )
+
+    return render(
+        request,
+        "superadmin_panel/home_offer_form.html",
+        {
+            "offer": offer,
+            "products": products,
+            "courses": courses,
+            "title": "ویرایش پیشنهاد",
+        }
+    )
+
+
+@login_required
+def home_offer_delete(request, pk):
+
+    offer = get_object_or_404(
+        HomeOffer,
+        id=pk
+    )
+
+    if request.method == "POST":
+
+        offer.delete()
+
+        messages.success(
+            request,
+            "پیشنهاد حذف شد."
+        )
+
+    return redirect(
+        "home_offers"
     )

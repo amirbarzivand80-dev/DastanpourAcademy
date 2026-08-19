@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, redirect
 from .models import Product, Cart, CartItem
 from core.models import ActivityLog
 from django.contrib import messages
+from core.offer_utils import get_product_offer_price
 from django.contrib.auth.decorators import login_required
 def product_detail(request, slug):
 
@@ -42,6 +43,16 @@ def shop(request):
     products = Product.objects.all()
 
     categories = Category.objects.all()
+
+    # اعمال تخفیف پیشنهاد ویژه روی محصولات
+    for product in products:
+
+        offer_price = get_product_offer_price(product)
+
+        product.offer_has_discount = offer_price["has_offer"]
+        product.offer_discount_percent = offer_price["discount_percent"]
+        product.offer_old_price = offer_price["old_price"]
+        product.offer_new_price = offer_price["new_price"]
 
     return render(
         request,

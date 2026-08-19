@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-   function createTimes(
+  function createTimes(
     timeGrid,
     hiddenTime,
     blocked = [],
@@ -126,17 +126,11 @@ document.addEventListener("DOMContentLoaded", function () {
     timeGrid.innerHTML = "";
     hiddenTime.value = "";
 
-    const startMinutes =
-        timeToMinutes(workStart);
-
-    const endMinutes =
-        timeToMinutes(workEnd);
+    const startMinutes = timeToMinutes(workStart);
+    const endMinutes = timeToMinutes(workEnd);
 
     const duration =
-        parseInt(
-            appointmentDuration,
-            10
-        ) || 30;
+        parseInt(appointmentDuration, 10) || 30;
 
 
     if (startMinutes >= endMinutes) {
@@ -145,7 +139,6 @@ document.addEventListener("DOMContentLoaded", function () {
             "<p>ساعت کاری آرایشگر صحیح نیست.</p>";
 
         return;
-
     }
 
 
@@ -158,33 +151,23 @@ document.addEventListener("DOMContentLoaded", function () {
     const today =
         currentDate.getFullYear() +
         "-" +
-        String(
-            currentDate.getMonth() + 1
-        ).padStart(2, "0") +
+        String(currentDate.getMonth() + 1).padStart(2, "0") +
         "-" +
-        String(
-            currentDate.getDate()
-        ).padStart(2, "0");
+        String(currentDate.getDate()).padStart(2, "0");
 
 
     const serviceSchedule =
-        hiddenTime.closest(
-            ".service-schedule"
-        );
+        hiddenTime.closest(".service-schedule");
 
 
     const hiddenDate =
         serviceSchedule
-            ? serviceSchedule.querySelector(
-                ".service-hidden-date"
-            )
+            ? serviceSchedule.querySelector(".service-hidden-date")
             : null;
 
 
     const selectedDate =
-        hiddenDate
-            ? hiddenDate.value
-            : "";
+        hiddenDate ? hiddenDate.value : "";
 
 
     const isToday =
@@ -196,6 +179,59 @@ document.addEventListener("DOMContentLoaded", function () {
         currentDate.getMinutes();
 
 
+    // =================================================
+    // ساخت ساعت‌های پایه
+    // همیشه 30 دقیقه‌ای
+    // =================================================
+
+    const slots = new Set();
+
+    for (
+        let minutes = startMinutes;
+        minutes < endMinutes;
+        minutes += 30
+    ) {
+
+        if (minutes + duration <= endMinutes) {
+
+            slots.add(minutes);
+
+        }
+
+    }
+
+
+    // =================================================
+    // پایان رزروهای قبلی را هم اضافه می‌کنیم
+    // =================================================
+
+    blocked.forEach(item => {
+
+        const blockedEnd =
+            timeToMinutes(item.end);
+
+
+        if (
+            blockedEnd >= startMinutes &&
+            blockedEnd < endMinutes &&
+            blockedEnd + duration <= endMinutes
+        ) {
+
+            slots.add(blockedEnd);
+
+        }
+
+    });
+
+
+    // مرتب‌سازی ساعت‌ها
+
+    const sortedSlots =
+        Array.from(slots).sort(
+            (a, b) => a - b
+        );
+
+
     let hasTime = false;
 
 
@@ -203,14 +239,11 @@ document.addEventListener("DOMContentLoaded", function () {
     // ساخت ساعت‌ها
     // =================================================
 
-    for (
-        let minutes = startMinutes;
-        minutes + duration <= endMinutes;
-        minutes += duration
-    ) {
+    sortedSlots.forEach(minutes => {
 
         const time =
             minutesToTime(minutes);
+
 
         const slotEnd =
             minutes + duration;
@@ -225,13 +258,13 @@ document.addEventListener("DOMContentLoaded", function () {
             minutes <= currentMinutes
         ) {
 
-            continue;
+            return;
 
         }
 
 
         // =================================================
-        // بررسی رزرو شده بودن ساعت
+        // بررسی تداخل با رزرو
         // =================================================
 
         let isBlocked = false;
@@ -240,14 +273,10 @@ document.addEventListener("DOMContentLoaded", function () {
         blocked.forEach(item => {
 
             const blockedStart =
-                timeToMinutes(
-                    item.start
-                );
+                timeToMinutes(item.start);
 
             const blockedEnd =
-                timeToMinutes(
-                    item.end
-                );
+                timeToMinutes(item.end);
 
 
             if (
@@ -266,13 +295,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         // =================================================
-        // ساخت دکمه ساعت
+        // ساخت دکمه
         // =================================================
 
         const button =
-            document.createElement(
-                "button"
-            );
+            document.createElement("button");
 
 
         button.type = "button";
@@ -283,14 +310,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         // =================================================
-        // ساعت رزرو شده
+        // ساعت پر
         // =================================================
 
         if (isBlocked) {
 
-            button.classList.add(
-                "booked"
-            );
+            button.classList.add("booked");
 
             button.disabled = true;
 
@@ -311,28 +336,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 function () {
 
                     timeGrid
-                        .querySelectorAll(
-                            ".time-btn"
-                        )
+                        .querySelectorAll(".time-btn")
                         .forEach(btn => {
 
-                            btn.classList.remove(
-                                "active"
-                            );
+                            btn.classList.remove("active");
 
                         });
 
 
-                    button.classList.add(
-                        "active"
-                    );
+                    button.classList.add("active");
 
 
                     hiddenTime.value =
                         time;
 
-
-                    // متن دکمه اصلی ساعت
 
                     const schedule =
                         hiddenTime.closest(
@@ -365,8 +382,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     );
 
 
-                    // بستن Popup
-
                     const modal =
                         document.querySelector(
                             ".service-time-modal"
@@ -385,11 +400,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        timeGrid.appendChild(
-            button
-        );
+        timeGrid.appendChild(button);
 
-    }
+    });
 
 
     // =================================================
@@ -854,42 +867,71 @@ document.addEventListener("DOMContentLoaded", function () {
                 data
             );
 
+const workingHours =
+    data.find(
+        item =>
+            item.type ===
+            "working_hours"
+    );
 
-            const workingHours =
-                data.find(
-                    item =>
-                        item.type ===
-                        "working_hours"
+if (!workingHours) {
+
+    timeGrid.innerHTML =
+        "<p>ساعت کاری آرایشگر پیدا نشد.</p>";
+
+    return;
+
+}
+
+const blocked =
+    data.filter(
+        item =>
+            item.type ===
+            "blocked"
+    );
+
+const selectedBarberCard =
+    serviceItem.querySelector(
+        ".service-barber-card input:checked"
+    );
+
+let duration =
+    workingHours.duration;
+
+if (selectedBarberCard) {
+
+    const barberCard =
+        selectedBarberCard.closest(
+            ".service-barber-card"
+        );
+
+    if (barberCard) {
+
+        const barberDuration =
+            barberCard.dataset.duration;
+
+        if (barberDuration) {
+
+            duration =
+                parseInt(
+                    barberDuration,
+                    10
                 );
 
+        }
 
-            if (!workingHours) {
+    }
 
-                timeGrid.innerHTML =
-                    "<p>ساعت کاری آرایشگر پیدا نشد.</p>";
+}
 
-                return;
-
-            }
-
-
-            const blocked =
-                data.filter(
-                    item =>
-                        item.type ===
-                        "blocked"
-                );
-
-
-            createTimes(
-                timeGrid,
-                hiddenTime,
-                blocked,
-                workingHours.start,
-                workingHours.end,
-                workingHours.duration
-            );
-
+createTimes(
+    timeGrid,
+    hiddenTime,
+    blocked,
+    workingHours.start,
+    workingHours.end,
+    duration
+);
 
             // =================================================
             // ساعت‌ها آماده شدند

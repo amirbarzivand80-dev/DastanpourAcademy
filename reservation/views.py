@@ -14,7 +14,6 @@ from reservation.models import BarberBlockedTime
 # =========================================================
 # صفحه رزرو
 # =========================================================
-
 @login_required(login_url="/login/")
 def reservation_view(request):
 
@@ -49,7 +48,6 @@ def reservation_view(request):
 
             return redirect("reservation")
 
-        # جلوگیری از ID تکراری
         service_ids = list(dict.fromkeys(service_ids))
 
         reservations_data = []
@@ -72,10 +70,6 @@ def reservation_view(request):
                 f"time_{service_id}"
             )
 
-            # -------------------------------------------------
-            # بررسی اطلاعات
-            # -------------------------------------------------
-
             if not all([
                 barber_id,
                 date_str,
@@ -90,7 +84,7 @@ def reservation_view(request):
                 return redirect("reservation")
 
             # =================================================
-            # دریافت Service / Barber / Date / Time
+            # دریافت اطلاعات
             # =================================================
 
             try:
@@ -144,7 +138,7 @@ def reservation_view(request):
                 return redirect("reservation")
 
             # =================================================
-            # قیمت اختصاصی آرایشگر
+            # قیمت و مدت اختصاصی آرایشگر
             # =================================================
 
             barber_price = (
@@ -160,18 +154,18 @@ def reservation_view(request):
 
                 messages.error(
                     request,
-                    f"قیمت خدمت «{service.name}» برای این آرایشگر ثبت نشده است."
+                    f"قیمت و مدت خدمت «{service.name}» برای این آرایشگر ثبت نشده است."
                 )
 
                 return redirect("reservation")
 
             service_price = barber_price.price
 
-            # =================================================
-            # مدت نوبت
-            # =================================================
+            appointment_duration = barber_price.duration
 
-            appointment_duration = barber.appointment_duration
+            # =================================================
+            # محاسبه زمان پایان
+            # =================================================
 
             start_datetime = datetime.combine(
                 date,
@@ -180,8 +174,72 @@ def reservation_view(request):
 
             end_datetime = (
                 start_datetime
-                + timedelta(minutes=appointment_duration)
+                + timedelta(
+                    minutes=appointment_duration
+                )
             )
+
+            # =================================================
+            # بررسی ساعت کاری آرایشگر
+            # =================================================
+
+            work_start = datetime.combine(
+                date,
+                barber.work_start
+            )
+
+            work_end = datetime.combine(
+                date,
+                barber.work_end
+            )
+
+            if (
+                start_datetime < work_start
+                or end_datetime > work_end
+            ):
+
+                messages.error(
+                    request,
+                    f"ساعت انتخاب‌شده خارج از ساعت کاری "
+                    f"{barber.user.full_name} است."
+                )
+
+                return redirect("reservation")
+
+            # =================================================
+            # بررسی روز کاری آرایشگر
+            # =================================================
+
+            weekday = (date.weekday() + 2) % 7
+
+            working_day = barber.working_days.filter(
+                day=weekday,
+                is_working=True
+            ).exists()
+
+            if not working_day:
+
+                messages.error(
+                    request,
+                    f"{barber.user.full_name} در این روز کاری ندارد."
+                )
+
+                return redirect("reservation")
+
+            # =================================================
+            # بررسی روز تعطیل آرایشگر
+            # =================================================
+
+            if barber.days_off.filter(
+                date=date
+            ).exists():
+
+                messages.error(
+                    request,
+                    f"{barber.user.full_name} در این تاریخ تعطیل است."
+                )
+
+                return redirect("reservation")
 
             # =================================================
             # بررسی تداخل با رزروهای قبلی
@@ -196,6 +254,9 @@ def reservation_view(request):
                 .exclude(
                     status="cancel"
                 )
+                .select_related(
+                    "service"
+                )
             )
 
             reservation_conflict = False
@@ -207,10 +268,31 @@ def reservation_view(request):
                     existing.time
                 )
 
+                existing_price = (
+                    BarberServicePrice.objects
+                    .filter(
+                        barber=barber,
+                        service=existing.service
+                    )
+                    .first()
+                )
+
+                if existing_price:
+
+                    existing_duration = (
+                        existing_price.duration
+                    )
+
+                else:
+
+                    existing_duration = (
+                        barber.appointment_duration
+                    )
+
                 existing_end = (
                     existing_start
                     + timedelta(
-                        minutes=barber.appointment_duration
+                        minutes=existing_duration
                     )
                 )
 
@@ -411,7 +493,6 @@ def reservation_view(request):
             "pending_reservation_ids"
         ] = created_reservation_ids
 
-        # انتخاب پرداخت قبلی را پاک می‌کنیم
         request.session.pop(
             "pending_payment_type",
             None
@@ -446,11 +527,9 @@ def reservation_view(request):
         }
     )
 
-
 # =========================================================
 # API ساعت‌های مسدود / رزرو شده
 # =========================================================
-
 @login_required
 def blocked_times_api(request):
 
@@ -476,6 +555,9 @@ def blocked_times_api(request):
         )
         .exclude(
             status="cancel"
+        )
+        .select_related(
+            "service"
         )
     )
 
@@ -529,9 +611,31 @@ def blocked_times_api(request):
             + item.time.minute
         )
 
+        # مدت اختصاصی همین خدمت
+        barber_service_price = (
+            BarberServicePrice.objects
+            .filter(
+                barber=barber,
+                service=item.service
+            )
+            .first()
+        )
+
+        if barber_service_price:
+
+            reservation_duration = (
+                barber_service_price.duration
+            )
+
+        else:
+
+            reservation_duration = (
+                barber.appointment_duration
+            )
+
         end_minutes = (
             start_minutes
-            + barber.appointment_duration
+            + reservation_duration
         )
 
         end_hour = end_minutes // 60
@@ -554,7 +658,6 @@ def blocked_times_api(request):
         data,
         safe=False
     )
-
 
 # =========================================================
 # ساعت کاری آرایشگر

@@ -1,7 +1,7 @@
 from django import forms
 
 from users.models import CustomUser
-from reservation.models import Barber
+from reservation.models import Barber, BarberWorkingDay
 from .models import AdminPermission
 
 class UserEditForm(forms.ModelForm):
@@ -25,8 +25,14 @@ class UserEditForm(forms.ModelForm):
             "marriage_date": forms.DateInput(attrs={"type": "date"}),
             "child_birth": forms.DateInput(attrs={"type": "date"}),
         }
-
 class BarberForm(forms.ModelForm):
+
+    working_days = forms.MultipleChoiceField(
+        choices=BarberWorkingDay.DAYS,
+        widget=forms.CheckboxSelectMultiple(),
+        required=False,
+        label="روزهای کاری"
+    )
 
     class Meta:
         model = Barber
@@ -51,8 +57,16 @@ class BarberForm(forms.ModelForm):
                 attrs={"min": 15}
             ),
         }
-        
+
+
 class BarberEditForm(forms.ModelForm):
+
+    working_days = forms.MultipleChoiceField(
+        choices=BarberWorkingDay.DAYS,
+        widget=forms.CheckboxSelectMultiple(),
+        required=False,
+        label="روزهای کاری"
+    )
 
     class Meta:
         model = Barber

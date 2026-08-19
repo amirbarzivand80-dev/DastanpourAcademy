@@ -102,7 +102,13 @@ data-id="{{ product.id }}">
 <i class="fa-regular fa-heart"></i>
 
 </button>
+{% if product.offer_has_discount %}
 
+    <span class="product-discount-badge">
+        {{ product.offer_discount_percent }}٪ تخفیف
+    </span>
+
+{% endif %}
 
 {% if product.image %}
 
@@ -124,23 +130,31 @@ data-id="{{ product.id }}">
 
 
 
-{% if product.discount_price %}
+{% if product.offer_has_discount %}
 
-<span class="price">
-{{ product.discount_price|price_format }} تومان
-</span>
+    <del>
+        {{ product.offer_old_price|price_format }} تومان
+    </del>
 
+    <span class="price">
+        {{ product.offer_new_price|price_format }} تومان
+    </span>
 
-<del>
-{{ product.price|price_format }} تومان
-</del>
+{% elif product.discount_price %}
 
+    <del>
+        {{ product.price|price_format }} تومان
+    </del>
+
+    <span class="price">
+        {{ product.discount_price|price_format }} تومان
+    </span>
 
 {% else %}
 
-<span class="price">
-{{ product.price|price_format }} تومان
-</span>
+    <span class="price">
+        {{ product.price|price_format }} تومان
+    </span>
 
 {% endif %}
 

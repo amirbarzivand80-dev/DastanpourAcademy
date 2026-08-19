@@ -105,39 +105,37 @@ def register_view(request):
 
         if form.is_valid():
 
-            user = form.save(commit=False)
-
+            phone = form.cleaned_data["phone"]
             password = form.cleaned_data["password"]
+            full_name = form.cleaned_data["full_name"]
 
-            user.set_password(password)
-
-            user.phone_verified = False
-
-            user.save()
-
-            # حذف کدهای قبلی
+            # حذف کدهای قبلی این شماره
             PhoneVerificationCode.objects.filter(
-                user=user,
+                phone=phone,
                 is_used=False
-            ).update(is_used=True)
+            ).update(
+                is_used=True
+            )
 
-            # ساخت کد تصادفی ۶ رقمی
-            code = str(random.randint(100000, 999999))
+            # ساخت کد ۶ رقمی
+            code = str(
+                random.randint(100000, 999999)
+            )
 
             # ذخیره کد
             PhoneVerificationCode.objects.create(
-                user=user,
+                phone=phone,
                 code=code,
                 expires_at=timezone.now() + timedelta(minutes=5)
             )
 
-            # ارسال کد واقعی با Panelchi
+            # ارسال SMS
             response = send_otp_sms(
-                user.phone,
+                phone,
                 code
             )
 
-            # بررسی نتیجه ارسال پیامک
+            # اگر ارسال SMS شکست خورد
             if response is None or not response.ok:
 
                 messages.error(
@@ -147,10 +145,12 @@ def register_view(request):
 
                 return redirect("register")
 
-            # ذخیره کاربر در session
-            request.session[
-                "pending_verification_user_id"
-            ] = user.id
+            # اطلاعات ثبت نام را موقتاً در session نگه می‌داریم
+            request.session["pending_registration"] = {
+                "phone": phone,
+                "full_name": full_name,
+                "password": password,
+            }
 
             return redirect("verify_phone")
 
@@ -169,23 +169,16 @@ def register_view(request):
             "mode": "register",
         }
     )
-
 def verify_phone(request):
 
-    user_id = request.session.get(
-        "pending_verification_user_id"
+    pending_registration = request.session.get(
+        "pending_registration"
     )
 
-    if not user_id:
+    if not pending_registration:
         return redirect("register")
 
-    user = get_object_or_404(
-        CustomUser,
-        id=user_id
-    )
-
-    if user.phone_verified:
-        return redirect("/")
+    phone = pending_registration["phone"]
 
     if request.method == "POST":
 
@@ -197,7 +190,7 @@ def verify_phone(request):
         verification = (
             PhoneVerificationCode.objects
             .filter(
-                user=user,
+                phone=phone,
                 is_used=False
             )
             .order_by("-created_at")
@@ -240,20 +233,29 @@ def verify_phone(request):
 
         else:
 
+            # کد صحیح است
             verification.is_used = True
 
             verification.save(
                 update_fields=["is_used"]
             )
 
-            user.phone_verified = True
-
-            user.save(
-                update_fields=["phone_verified"]
+            # حالااااا کاربر ساخته می‌شود
+            user = CustomUser(
+                phone=pending_registration["phone"],
+                full_name=pending_registration["full_name"],
+                phone_verified=True,
             )
 
+            user.set_password(
+                pending_registration["password"]
+            )
+
+            user.save()
+
+            # پاک کردن اطلاعات موقت ثبت نام
             request.session.pop(
-                "pending_verification_user_id",
+                "pending_registration",
                 None
             )
 
@@ -262,6 +264,7 @@ def verify_phone(request):
                 action=f"{user.full_name} شماره موبایل خود را تأیید کرد"
             )
 
+            # ورود خودکار
             login(
                 request,
                 user,
@@ -273,13 +276,15 @@ def verify_phone(request):
                 None
             )
 
-            return redirect(next_url or "/")
+            return redirect(
+                next_url or "/"
+            )
 
     return render(
         request,
         "core/verify_phone.html",
         {
-            "phone": user.phone,
+            "phone": phone,
         }
     )
 def login_view(request):

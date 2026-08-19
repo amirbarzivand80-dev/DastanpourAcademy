@@ -99,14 +99,21 @@
 
         </a>
 
-        <a
-            href="{% url 'superadmin_admin_remove' admin.id %}"
-            class="btn-delete"
-            onclick="return confirm('آیا از حذف مدیر مطمئن هستید؟');">
+       <form
+    method="POST"
+    action="{% url 'superadmin_admin_remove' admin.id %}"
+    style="display:inline;"
+>
+    {% csrf_token %}
 
-            حذف مدیر
-
-        </a>
+    <button
+        type="submit"
+        class="btn-delete"
+        onclick="return confirm('آیا از حذف مدیر و تمام دسترسی‌های او مطمئن هستید؟');"
+    >
+        حذف مدیر
+    </button>
+</form>
 
     </td>
 

@@ -28,7 +28,29 @@ path(
     views.consultation_request_detail,
     name="consultation_request_detail"
 ),
+path(
+    "home-offers/",
+    views.home_offers,
+    name="home_offers"
+),
 
+path(
+    "home-offers/add/",
+    views.home_offer_add,
+    name="home_offer_add"
+),
+
+path(
+    "home-offers/<int:pk>/edit/",
+    views.home_offer_edit,
+    name="home_offer_edit"
+),
+
+path(
+    "home-offers/<int:pk>/delete/",
+    views.home_offer_delete,
+    name="home_offer_delete"
+),
     path(
         "users/<int:id>/",
         views.user_detail,

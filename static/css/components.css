@@ -2380,7 +2380,7 @@
 
     flex-direction: row;
 
-    gap: 20px;
+    gap: 80px;
 
     width: max-content;
 }
@@ -2647,7 +2647,7 @@
 .showcase-track {
     display: flex;
     flex-wrap: nowrap;
-    gap: 20px;
+    gap: 80px;
     width: max-content;
     will-change: transform;
     user-select: none;
@@ -2804,7 +2804,7 @@
 
     .showcase-track {
 
-        gap: 12px;
+        gap: 50px;
 
     }
 
@@ -2847,7 +2847,7 @@
     }
 
     .showcase-track {
-        gap: 12px !important;
+        gap: 50px !important;
     }
 
     .showcase-card {
@@ -3578,4 +3578,428 @@
         left: 22px;
     }
 
+}
+
+/* =====================================================
+   HOME OFFER
+===================================================== */
+
+.home-offer-section {
+    width: 100%;
+    padding: 55px 0 100px;
+}
+
+.home-offer-card {
+    position: relative;
+    width: 100%;
+    min-height: 600px;
+    padding: 40px;
+    box-sizing: border-box;
+
+    border-radius: 30px;
+
+    background: linear-gradient(
+        135deg,
+        #111,
+        #1d1d1d,
+        #292929
+    );
+
+    border: 1px solid rgba(201,162,39,.3);
+
+    box-shadow:
+        0 25px 60px rgba(0,0,0,.3);
+
+    overflow: hidden;
+}
+
+
+/* ================= HEADER ================= */
+
+.home-offer-content {
+    width: 100%;
+
+    direction: rtl;
+    text-align: right;
+}
+
+.home-offer-label {
+    display: block;
+
+    color: #c9a227;
+
+    font-size: 17px;
+    font-weight: 800;
+
+    margin-bottom: 8px;
+}
+
+.home-offer-content h2 {
+    margin: 0 0 10px;
+
+    color: #fff;
+
+    font-size: 38px;
+    font-weight: 900;
+}
+
+.home-offer-content p {
+    margin: 0 0 15px;
+
+    color: #aaa;
+
+    font-size: 17px;
+    line-height: 2;
+}
+
+.home-offer-discount {
+    display: inline-flex;
+
+    padding: 10px 20px;
+
+    margin-bottom: 28px;
+
+    border-radius: 13px;
+
+    background: rgba(201,162,39,.13);
+
+    border: 1px solid rgba(201,162,39,.4);
+
+    color: #dfbd4c;
+
+    font-size: 19px;
+    font-weight: 900;
+}
+
+
+/* ================= PRODUCTS ================= */
+
+.home-offer-items {
+    width: 100%;
+
+    display: flex;
+
+    flex-direction: row;
+
+    flex-wrap: nowrap;
+
+    gap: 120px;
+
+    direction: rtl;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    padding: 5px 5px 18px;
+
+    box-sizing: border-box;
+
+    cursor: grab;
+
+    scrollbar-width: thin;
+}
+
+.home-offer-items:active {
+    cursor: grabbing;
+}
+
+
+/* ================= CARD ================= */
+
+.home-offer-item {
+ flex: 0 0 330px;
+    width: 330px;
+
+    min-width: 0;
+
+    box-sizing: border-box;
+
+    padding: 15px;
+
+    border-radius: 24px;
+
+    background: linear-gradient(
+        145deg,
+        #fff,
+        #f0ece2
+    );
+
+    border: 1px solid rgba(201,162,39,.25);
+
+    text-decoration: none;
+
+    box-shadow:
+        0 15px 35px rgba(0,0,0,.25);
+
+    transition:
+        transform .3s ease,
+        box-shadow .3s ease;
+}
+
+.home-offer-item:hover {
+    transform: translateY(-7px);
+
+    box-shadow:
+        0 25px 45px rgba(0,0,0,.3);
+}
+
+
+/* ================= IMAGE ================= */
+
+.home-offer-image {
+     width: 100%;
+    height: 330px;
+    overflow: hidden;
+
+    border-radius: 18px;
+}
+
+.home-offer-image img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    pointer-events: none;
+}
+
+
+/* ================= INFO ================= */
+
+.home-offer-product-info {
+
+    direction: rtl;
+
+    text-align: right;
+
+    padding: 15px 8px 5px;
+}
+
+.home-offer-product-info h3 {
+
+    margin: 0 0 14px;
+
+    color: #171717;
+
+    font-size: 20px;
+
+    font-weight: 900;
+
+    line-height: 1.6;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+/* ================= PRICE ================= */
+
+.home-offer-price {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 12px;
+}
+
+.home-offer-old-price {
+
+    color: #999;
+
+    font-size: 14px;
+
+    text-decoration: line-through;
+}
+
+.home-offer-new-price {
+
+    color: #b18a00;
+
+    font-size: 20px;
+
+    font-weight: 900;
+
+    white-space: nowrap;
+}
+
+
+/* ================= TIMER ================= */
+
+.home-offer-action {
+
+    position: absolute;
+
+    top: 22px;
+    left: 22px;
+
+    z-index: 20;
+}
+
+.home-offer-timer {
+
+    min-width: 190px;
+
+    padding: 11px 16px;
+
+    border-radius: 15px;
+
+    background: rgba(0,0,0,.78);
+
+    border: 1px solid rgba(201,162,39,.4);
+
+    backdrop-filter: blur(12px);
+
+    text-align: center;
+
+    box-shadow:
+        0 10px 28px rgba(0,0,0,.35);
+}
+
+.home-offer-timer > span {
+
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #999;
+
+    font-size: 11px;
+}
+
+#homeOfferCountdown {
+
+    display: block;
+
+    color: #d6b43e;
+
+    font-size: 15px;
+
+    font-weight: 900;
+
+    white-space: nowrap;
+}
+
+
+/* ================= SCROLLBAR ================= */
+
+.home-offer-items::-webkit-scrollbar {
+    height: 6px;
+}
+
+.home-offer-items::-webkit-scrollbar-track {
+    background: rgba(255,255,255,.06);
+}
+
+.home-offer-items::-webkit-scrollbar-thumb {
+    background: #c9a227;
+
+    border-radius: 10px;
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 700px) {
+
+    .home-offer-section {
+        padding: 25px 0 70px;
+    }
+
+    .home-offer-card {
+
+        width: 94%;
+
+        margin: auto;
+
+        min-height: 0;
+
+        padding: 22px 15px;
+
+        border-radius: 23px;
+    }
+
+    .home-offer-content h2 {
+        font-size: 27px;
+    }
+
+    .home-offer-content p {
+        font-size: 13px;
+    }
+
+    .home-offer-discount {
+        font-size: 15px;
+        margin-bottom: 20px;
+    }
+
+
+    /* کارت‌ها */
+
+    .home-offer-items {
+
+        gap: 16px;
+
+        padding-bottom: 15px;
+    }
+
+    .home-offer-item {
+
+        flex: 0 0 78%;
+
+        width: 78%;
+
+        padding: 10px;
+
+        border-radius: 18px;
+    }
+
+    .home-offer-image {
+        height: 190px;
+
+        border-radius: 13px;
+    }
+
+    .home-offer-product-info h3 {
+        font-size: 15px;
+    }
+
+    .home-offer-new-price {
+        font-size: 17px;
+    }
+
+    .home-offer-old-price {
+        font-size: 11px;
+    }
+
+
+    /* تایمر */
+
+    .home-offer-action {
+        top: 12px;
+        left: 12px;
+    }
+
+    .home-offer-timer {
+
+        min-width: 135px;
+
+        padding: 7px 10px;
+
+        border-radius: 10px;
+    }
+
+    .home-offer-timer > span {
+        font-size: 8px;
+    }
+
+    #homeOfferCountdown {
+        font-size: 10px;
+    }
 }

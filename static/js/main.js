@@ -435,3 +435,190 @@ document.querySelectorAll(".showcase-card").forEach(card => {
     });
 
 });
+
+/* =====================================================
+   HOME OFFER
+===================================================== */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const offerItems = document.querySelector(".home-offer-items");
+    const countdown = document.getElementById("homeOfferCountdown");
+
+    /* =================================================
+       DRAG / TOUCH SLIDER
+    ================================================= */
+
+    if (offerItems) {
+
+        let isDown = false;
+        let startX = 0;
+        let scrollLeft = 0;
+
+        offerItems.addEventListener("mousedown", function (e) {
+
+            isDown = true;
+
+            offerItems.style.scrollBehavior = "auto";
+
+            startX = e.pageX - offerItems.offsetLeft;
+            scrollLeft = offerItems.scrollLeft;
+
+        });
+
+        offerItems.addEventListener("mouseleave", function () {
+            isDown = false;
+        });
+
+        offerItems.addEventListener("mouseup", function () {
+            isDown = false;
+        });
+
+        offerItems.addEventListener("mousemove", function (e) {
+
+            if (!isDown) return;
+
+            e.preventDefault();
+
+            const x = e.pageX - offerItems.offsetLeft;
+
+            const walk = (x - startX) * 1.5;
+
+            offerItems.scrollLeft = scrollLeft - walk;
+
+        });
+
+
+        /* ================= TOUCH ================= */
+
+        let touchStartX = 0;
+        let touchScrollLeft = 0;
+
+        offerItems.addEventListener("touchstart", function (e) {
+
+            touchStartX = e.touches[0].pageX;
+
+            touchScrollLeft = offerItems.scrollLeft;
+
+        }, { passive: true });
+
+
+        offerItems.addEventListener("touchmove", function (e) {
+
+            const x = e.touches[0].pageX;
+
+            const walk = (x - touchStartX) * 1.5;
+
+            offerItems.scrollLeft =
+                touchScrollLeft - walk;
+
+        }, { passive: true });
+
+    }
+
+
+    /* =================================================
+       COUNTDOWN
+    ================================================= */
+
+    if (countdown) {
+
+        const endTime =
+            countdown.dataset.end;
+
+        if (!endTime) {
+
+            countdown.textContent =
+                "زمان نامشخص";
+
+            return;
+        }
+
+
+        const endDate =
+            new Date(endTime).getTime();
+
+
+        if (isNaN(endDate)) {
+
+            countdown.textContent =
+                "زمان نامعتبر";
+
+            return;
+        }
+
+
+        function updateCountdown() {
+
+            const now =
+                new Date().getTime();
+
+            const distance =
+                endDate - now;
+
+
+            if (distance <= 0) {
+
+                countdown.textContent =
+                    "پیشنهاد به پایان رسید";
+
+                countdown.classList.add(
+                    "home-offer-expired"
+                );
+
+                clearInterval(timer);
+
+                return;
+            }
+
+
+            const days =
+                Math.floor(
+                    distance /
+                    (1000 * 60 * 60 * 24)
+                );
+
+
+            const hours =
+                Math.floor(
+                    (distance %
+                        (1000 * 60 * 60 * 24))
+                    /
+                    (1000 * 60 * 60)
+                );
+
+
+            const minutes =
+                Math.floor(
+                    (distance %
+                        (1000 * 60 * 60))
+                    /
+                    (1000 * 60)
+                );
+
+
+            const seconds =
+                Math.floor(
+                    (distance %
+                        (1000 * 60))
+                    /
+                    1000
+                );
+
+
+            countdown.textContent =
+                `${days} روز  ${hours} ساعت  ${minutes} دقیقه  ${seconds} ثانیه`;
+        }
+
+
+        updateCountdown();
+
+        const timer =
+            setInterval(
+                updateCountdown,
+                1000
+            );
+
+    }
+
+});

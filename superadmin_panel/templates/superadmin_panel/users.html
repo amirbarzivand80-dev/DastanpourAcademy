@@ -98,17 +98,20 @@
         ویرایش
     </a>
 
-    <form method="post"
-          style="display:inline;">
-        {% csrf_token %}
+  <form method="post"
+      action="{% url 'superadmin_user_delete' user.id %}"
+      style="display:inline;">
 
-        <button
-            type="submit"
-            class="btn-delete"
-            onclick="return confirm('آیا از حذف این کاربر مطمئن هستید؟')">
-            حذف
-        </button>
-    </form>
+    {% csrf_token %}
+
+    <button
+        type="submit"
+        class="btn-delete"
+        onclick="return confirm('آیا از حذف این کاربر مطمئن هستید؟')">
+        حذف
+    </button>
+
+</form>
 
 </td>
 

@@ -1,3 +1,4 @@
+
 {% extends "superadmin_panel/base.html" %}
 
 {% block title %}
@@ -73,6 +74,7 @@
                 margin:8px 0;
                 border:1px solid #ddd;
                 border-radius:8px;
+                flex-wrap:wrap;
             ">
 
 
@@ -117,6 +119,29 @@
                     >
 
                     تومان
+
+                </label>
+
+
+                <!-- مدت خدمت -->
+
+                <label>
+
+                    مدت خدمت:
+
+                    <input
+                        type="number"
+                        name="barber_duration_{{ row.barber.id }}"
+                        value="{{ row.duration }}"
+                        min="1"
+                        placeholder="مثلاً 30"
+                        style="
+                            width:120px;
+                            padding:8px;
+                        "
+                    >
+
+                    دقیقه
 
                 </label>
 

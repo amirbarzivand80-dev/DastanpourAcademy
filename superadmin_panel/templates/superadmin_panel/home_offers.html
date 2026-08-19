@@ -1,0 +1,109 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+پیشنهادات صفحه اصلی
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h1>
+        پیشنهادات صفحه اصلی
+    </h1>
+
+    <a href="{% url 'home_offer_add' %}" class="btn">
+        <i class="fa-solid fa-plus"></i>
+        افزودن پیشنهاد
+    </a>
+
+</div>
+
+
+<div class="table-container">
+
+    {% if offers %}
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>عنوان</th>
+                    <th>تخفیف</th>
+                    <th>پایان پیشنهاد</th>
+                    <th>وضعیت</th>
+                    <th>عملیات</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for offer in offers %}
+
+                <tr>
+
+                    <td>
+                        {{ offer.title }}
+                    </td>
+
+                    <td>
+                        {{ offer.discount_percent }}٪
+                    </td>
+
+                    <td>
+                        {{ offer.end_time|date:"Y/m/d H:i" }}
+                    </td>
+
+                    <td>
+
+                        {% if offer.is_active %}
+                            <span>فعال</span>
+                        {% else %}
+                            <span>غیرفعال</span>
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        <a href="{% url 'home_offer_edit' offer.id %}">
+                            ویرایش
+                        </a>
+
+                        <form
+                            method="post"
+                            action="{% url 'home_offer_delete' offer.id %}"
+                            style="display:inline;"
+                        >
+
+                            {% csrf_token %}
+
+                            <button type="submit">
+                                حذف
+                            </button>
+
+                        </form>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    {% else %}
+
+        <p>
+            هنوز هیچ پیشنهادی ثبت نشده است.
+        </p>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

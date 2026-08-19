@@ -149,7 +149,13 @@ class PhoneVerificationCode(models.Model):
     user = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
-        related_name="verification_codes"
+        related_name="verification_codes",
+        blank=True,
+        null=True
+    )
+
+    phone = models.CharField(
+        max_length=11
     )
 
     code = models.CharField(
@@ -174,4 +180,4 @@ class PhoneVerificationCode(models.Model):
         return timezone.now() > self.expires_at
 
     def __str__(self):
-        return f"{self.user.phone} - {self.code}"
+        return f"{self.phone} - {self.code}"

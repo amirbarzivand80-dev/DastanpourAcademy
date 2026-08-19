@@ -95,6 +95,14 @@
     </a>
 </li>
 {% endif %}
+{% if request.user.is_super_admin %}
+<li>
+    <a href="{% url 'home_offers' %}">
+        <i class="fa-solid fa-tags"></i>
+        پیشنهادات صفحه اصلی
+    </a>
+</li>
+{% endif %}
 
 {% if request.user.is_super_admin or request.user.admin_permission.shop_access %}
 <li>

@@ -70,3 +70,47 @@ class ConsultationRequest(models.Model):
 
     def __str__(self):
         return self.full_name
+    
+
+
+class HomeOffer(models.Model):
+
+    title = models.CharField(
+        max_length=200,
+        default="پیشنهادات امروز"
+    )
+
+    description = models.CharField(
+        max_length=300,
+        blank=True
+    )
+
+    discount_percent = models.PositiveIntegerField(
+    null=True,
+    blank=True
+)
+
+    end_time = models.DateTimeField()
+
+    products = models.ManyToManyField(
+        "shop.Product",
+        blank=True,
+        related_name="home_offers"
+    )
+
+    courses = models.ManyToManyField(
+        "academy.Course",
+        blank=True,
+        related_name="home_offers"
+    )
+
+    is_active = models.BooleanField(
+        default=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return self.title

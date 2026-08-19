@@ -63,7 +63,7 @@ class Service(models.Model):
 
 
 # =========================================================
-# قیمت اختصاصی هر آرایشگر برای هر خدمت
+# قیمت و مدت اختصاصی هر آرایشگر برای هر خدمت
 # =========================================================
 
 class BarberServicePrice(models.Model):
@@ -82,6 +82,11 @@ class BarberServicePrice(models.Model):
 
     price = models.PositiveIntegerField(
         default=0
+    )
+
+    duration = models.PositiveIntegerField(
+        default=30,
+        help_text="مدت خدمت به دقیقه"
     )
 
     class Meta:

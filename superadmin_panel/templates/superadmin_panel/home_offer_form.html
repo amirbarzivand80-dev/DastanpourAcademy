@@ -1,0 +1,408 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% load static %}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+
+{% block content %}
+
+<div class="page-header">
+
+    <h1>
+        {{ title }}
+    </h1>
+
+</div>
+
+
+<div class="form-container">
+
+    <form method="post" id="homeOfferForm">
+
+        {% csrf_token %}
+
+
+        <!-- ==================================================
+             عنوان
+        ================================================== -->
+
+        <div class="form-group">
+
+            <label>
+                عنوان پیشنهاد
+            </label>
+
+            <input
+                type="text"
+                name="title"
+                value="{{ offer.title|default:'پیشنهادات امروز' }}"
+                maxlength="200"
+                required
+            >
+
+        </div>
+
+
+        <!-- ==================================================
+             توضیحات
+        ================================================== -->
+
+        <div class="form-group">
+
+            <label>
+                توضیحات
+            </label>
+
+            <textarea
+                name="description"
+                maxlength="300"
+            >{{ offer.description|default:'' }}</textarea>
+
+        </div>
+
+<!-- ==================================================
+     درصد تخفیف
+================================================== -->
+
+<div class="form-group">
+
+    <label>
+        درصد تخفیف
+    </label>
+
+    <input
+        type="number"
+        name="discount_percent"
+        value="{{ offer.discount_percent|default:'' }}"
+        min="0"
+        max="100"
+        placeholder="مثلاً ۲۰"
+    >
+
+    <small>
+        اگر پیشنهاد بدون تخفیف است، این قسمت را خالی بگذارید.
+    </small>
+
+</div>
+
+
+        <!-- ==================================================
+             زمان پایان
+        ================================================== -->
+
+        <div class="form-group">
+
+            <label>
+                زمان پایان پیشنهاد
+            </label>
+
+            <input
+                type="datetime-local"
+                name="end_time"
+
+                {% if offer %}
+                    value="{{ offer.end_time|date:'Y-m-d\TH:i' }}"
+                {% endif %}
+
+                required
+            >
+
+        </div>
+
+
+        <!-- ==================================================
+             محصولات
+        ================================================== -->
+
+        <div class="form-group">
+
+            <label>
+                محصولات مشمول پیشنهاد
+            </label>
+
+
+            <div class="offer-select">
+
+                <button
+                    type="button"
+                    class="offer-select-button"
+                    id="productSelectButton"
+                >
+
+                    <span id="productSelectText">
+                        انتخاب محصولات
+                    </span>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </button>
+
+
+                <div
+                    class="offer-select-menu"
+                    id="productSelectMenu"
+                >
+
+                    <!-- جستجوی محصول -->
+
+                    <div class="offer-search">
+
+                        <i class="fa-solid fa-magnifying-glass"></i>
+
+                        <input
+                            type="text"
+                            id="productSearch"
+                            placeholder="جستجوی محصول..."
+                            autocomplete="off"
+                        >
+
+                    </div>
+
+
+                    <!-- لیست محصولات -->
+
+                    <div
+                        class="offer-items"
+                        id="productItems"
+                    >
+
+                        {% for product in products %}
+
+                        <label
+                            class="offer-item"
+                            data-search="{{ product.name|lower }}"
+                        >
+
+                            <input
+                                type="checkbox"
+                                name="products"
+                                value="{{ product.id }}"
+                                data-name="{{ product.name }}"
+
+                                {% if offer and product in offer.products.all %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            <span class="offer-item-check">
+
+                                <i class="fa-solid fa-check"></i>
+
+                            </span>
+
+                            <span class="offer-item-name">
+                                {{ product.name }}
+                            </span>
+
+                        </label>
+
+                        {% empty %}
+
+                        <div class="offer-empty">
+                            محصولی وجود ندارد.
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- محصولات انتخاب شده -->
+
+            <div
+                class="offer-selected"
+                id="selectedProducts"
+            ></div>
+
+        </div>
+
+
+        <!-- ==================================================
+             دوره‌ها
+        ================================================== -->
+
+        <div class="form-group">
+
+            <label>
+                دوره‌های مشمول پیشنهاد
+            </label>
+
+
+            <div class="offer-select">
+
+                <button
+                    type="button"
+                    class="offer-select-button"
+                    id="courseSelectButton"
+                >
+
+                    <span id="courseSelectText">
+                        انتخاب دوره‌ها
+                    </span>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </button>
+
+
+                <div
+                    class="offer-select-menu"
+                    id="courseSelectMenu"
+                >
+
+                    <!-- جستجوی دوره -->
+
+                    <div class="offer-search">
+
+                        <i class="fa-solid fa-magnifying-glass"></i>
+
+                        <input
+                            type="text"
+                            id="courseSearch"
+                            placeholder="جستجوی دوره..."
+                            autocomplete="off"
+                        >
+
+                    </div>
+
+
+                    <!-- لیست دوره‌ها -->
+
+                    <div
+                        class="offer-items"
+                        id="courseItems"
+                    >
+
+                        {% for course in courses %}
+
+                        <label
+                            class="offer-item"
+                            data-search="{{ course.title|lower }}"
+                        >
+
+                            <input
+                                type="checkbox"
+                                name="courses"
+                                value="{{ course.id }}"
+                                data-name="{{ course.title }}"
+
+                                {% if offer and course in offer.courses.all %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            <span class="offer-item-check">
+
+                                <i class="fa-solid fa-check"></i>
+
+                            </span>
+
+                            <span class="offer-item-name">
+                                {{ course.title }}
+                            </span>
+
+                        </label>
+
+                        {% empty %}
+
+                        <div class="offer-empty">
+                            دوره‌ای وجود ندارد.
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- دوره‌های انتخاب شده -->
+
+            <div
+                class="offer-selected"
+                id="selectedCourses"
+            ></div>
+
+        </div>
+
+
+        <!-- ==================================================
+             وضعیت پیشنهاد
+        ================================================== -->
+
+        <div class="form-group">
+
+            <label>
+
+                <input
+                    type="checkbox"
+                    name="is_active"
+
+                    {% if not offer or offer.is_active %}
+                        checked
+                    {% endif %}
+                >
+
+                پیشنهاد فعال باشد
+
+            </label>
+
+        </div>
+
+
+        <!-- ==================================================
+             دکمه‌ها
+        ================================================== -->
+
+        <div class="form-actions">
+
+            <button
+                type="submit"
+                class="btn"
+            >
+
+                <i class="fa-solid fa-check"></i>
+
+                ذخیره پیشنهاد
+
+            </button>
+
+
+            <a
+                href="{% url 'home_offers' %}"
+                class="btn"
+            >
+
+                انصراف
+
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
+
+
+<!-- ==================================================
+     JavaScript
+================================================== -->
+
+{% block extra_js %}
+
+{{ block.super }}
+
+<script src="{% static 'js/home_offer_form.js' %}"></script>
+
+{% endblock %}
