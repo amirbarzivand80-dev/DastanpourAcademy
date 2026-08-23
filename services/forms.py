@@ -1,6 +1,10 @@
 from django import forms
-
-from .models import Service, BarberServicePrice
+from .models import (
+    Service,
+    BarberServicePrice,
+    ServiceDetail,
+    BarberServiceDetailPrice,
+)
 from reservation.models import Barber
 
 
@@ -59,3 +63,31 @@ class ServiceForm(forms.ModelForm):
                 item.barber_id: item.price
                 for item in prices
             }
+
+class ServiceDetailForm(forms.ModelForm):
+
+    class Meta:
+        model = ServiceDetail
+
+        fields = [
+            "name",
+            "description",
+            "order",
+            "is_active",
+        ]
+
+        widgets = {
+
+            "description": forms.Textarea(
+                attrs={
+                    "rows": 3,
+                    "placeholder": "توضیحات جزئیات"
+                }
+            ),
+
+            "order": forms.NumberInput(
+                attrs={
+                    "min": 0
+                }
+            ),
+        }

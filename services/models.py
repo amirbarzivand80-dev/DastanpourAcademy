@@ -122,3 +122,66 @@ class ServiceImage(models.Model):
         return self.service.name
     
 
+class ServiceDetail(models.Model):
+
+    service = models.ForeignKey(
+        Service,
+        on_delete=models.CASCADE,
+        related_name="details"
+    )
+
+    name = models.CharField(
+        max_length=100
+    )
+
+    description = models.TextField(
+        blank=True
+    )
+
+    is_active = models.BooleanField(
+        default=True
+    )
+
+    order = models.PositiveIntegerField(
+        default=0
+    )
+
+    def __str__(self):
+        return f"{self.service.name} - {self.name}"
+
+
+class BarberServiceDetailPrice(models.Model):
+
+    detail = models.ForeignKey(
+        ServiceDetail,
+        on_delete=models.CASCADE,
+        related_name="barber_prices"
+    )
+
+    barber = models.ForeignKey(
+        "reservation.Barber",
+        on_delete=models.CASCADE,
+        related_name="service_detail_prices"
+    )
+
+    price = models.PositiveIntegerField(
+        default=0
+    )
+
+    duration = models.PositiveIntegerField(
+        default=10,
+        help_text="مدت جزئیات به دقیقه"
+    )
+
+    class Meta:
+        unique_together = (
+            "detail",
+            "barber",
+        )
+
+    def __str__(self):
+        return (
+            f"{self.barber} - "
+            f"{self.detail} - "
+            f"{self.price}"
+        )

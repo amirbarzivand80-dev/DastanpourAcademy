@@ -1,0 +1,235 @@
+
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+کدهای تخفیف
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>کدهای تخفیف</h1>
+        <p>مدیریت، ایجاد و ویرایش کدهای تخفیف</p>
+    </div>
+
+    <a href="{% url 'add_discount' %}" class="btn-primary">
+        <i class="fa-solid fa-plus"></i>
+        ساخت کد تخفیف
+    </a>
+
+</div>
+
+
+<div class="table-container">
+
+    {% if discount_codes %}
+
+    <table class="admin-table">
+
+        <thead>
+
+            <tr>
+
+                <th>کد</th>
+
+                <th>نوع تخفیف</th>
+
+                <th>مقدار</th>
+
+                <th>محدوده</th>
+
+                <th>وضعیت</th>
+
+                <th>استفاده</th>
+
+                <th>اعتبار</th>
+
+                <th>عملیات</th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            {% for discount in discount_codes %}
+
+            <tr>
+
+                <td>
+                    <strong>
+                        {{ discount.code }}
+                    </strong>
+                </td>
+
+
+                <td>
+
+                    {% if discount.discount_type == "percent" %}
+
+                        درصدی
+
+                    {% else %}
+
+                        مبلغ ثابت
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+
+                    {% if discount.discount_type == "percent" %}
+
+                        {{ discount.value }}٪
+
+                    {% else %}
+
+                        {{ discount.value|floatformat:0 }} تومان
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+
+                    {% if discount.target_type == "all" %}
+
+                        همه
+
+                    {% elif discount.target_type == "products" %}
+
+                        محصولات
+
+                    {% elif discount.target_type == "courses" %}
+
+                        دوره‌ها
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+
+                    {% if discount.is_valid_now %}
+
+                        <span class="status active">
+                            فعال
+                        </span>
+
+                    {% else %}
+
+                        <span class="status inactive">
+                            غیرفعال
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+
+                    {{ discount.used_count }}
+
+                    {% if discount.usage_limit %}
+
+                        / {{ discount.usage_limit }}
+
+                    {% else %}
+
+                        / نامحدود
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+
+                    {% if discount.start_date or discount.end_date %}
+
+                        {% if discount.start_date %}
+                            {{ discount.start_date|date:"Y/m/d H:i" }}
+                        {% else %}
+                            بدون شروع
+                        {% endif %}
+
+                        <br>
+
+                        {% if discount.end_date %}
+                            {{ discount.end_date|date:"Y/m/d H:i" }}
+                        {% else %}
+                            بدون پایان
+                        {% endif %}
+
+                    {% else %}
+
+                        بدون محدودیت
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+
+                    <a
+                        href="{% url 'edit_discount' discount.id %}"
+                        class="btn-edit"
+                    >
+
+                        <i class="fa-solid fa-pen"></i>
+
+                        ویرایش
+
+                    </a>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <i class="fa-solid fa-ticket"></i>
+
+            <h3>
+                هنوز کد تخفیفی ساخته نشده
+            </h3>
+
+            <p>
+                اولین کد تخفیف را ایجاد کنید.
+            </p>
+
+            <a
+                href="{% url 'add_discount' %}"
+                class="btn-primary"
+            >
+
+                <i class="fa-solid fa-plus"></i>
+
+                ساخت کد تخفیف
+
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

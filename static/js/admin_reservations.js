@@ -31,52 +31,34 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         if (search && search.value) {
-
-            params.set(
-                "search",
-                search.value
-            );
-
+            params.set("search", search.value);
         }
 
 
         if (barber && barber.value) {
-
-            params.set(
-                "barber",
-                barber.value
-            );
-
+            params.set("barber", barber.value);
         }
 
 
         if (date && date.value) {
-
-            params.set(
-                "date",
-                date.value
-            );
-
+            params.set("date", date.value);
         }
 
 
-       // =========================================
-// تشخیص حالت نمایش
-// =========================================
+        // =========================================
+        // تشخیص نوبت‌های گذشته
+        // =========================================
 
-const urlParams = new URLSearchParams(
-    window.location.search
-);
+        const urlParams = new URLSearchParams(
+            window.location.search
+        );
 
-if (urlParams.get("past") === "1") {
-
-    params.set("past", "1");
-
-}
+        if (urlParams.get("past") === "1") {
+            params.set("past", "1");
+        }
 
 
         return params;
-
     }
 
 
@@ -90,15 +72,12 @@ if (urlParams.get("past") === "1") {
 
             const params = getFilters();
 
-
             let url =
                 "/superadmin/reservations/live/";
 
 
             if (params.toString()) {
-
                 url += "?" + params.toString();
-
             }
 
 
@@ -153,9 +132,9 @@ if (urlParams.get("past") === "1") {
         tableBody.innerHTML = "";
 
 
-        // -----------------------------
-        // اگر نوبتی وجود نداشت
-        // -----------------------------
+        // =========================================
+        // بدون نوبت
+        // =========================================
 
         if (!reservations.length) {
 
@@ -163,7 +142,7 @@ if (urlParams.get("past") === "1") {
 
                 <tr>
 
-                    <td colspan="7">
+                   <td colspan="11">
 
                         هنوز هیچ نوبتی ثبت نشده است.
 
@@ -174,13 +153,12 @@ if (urlParams.get("past") === "1") {
             `;
 
             return;
-
         }
 
 
-        // -----------------------------
+        // =========================================
         // ساخت ردیف‌ها
-        // -----------------------------
+        // =========================================
 
         reservations.forEach(
             reservation => {
@@ -189,92 +167,130 @@ if (urlParams.get("past") === "1") {
                     document.createElement("tr");
 
 
+                // =========================================
+                // وضعیت
+                // =========================================
+
                 let pendingSelected = "";
-
                 let approvedSelected = "";
-
                 let doneSelected = "";
-
                 let cancelSelected = "";
 
 
                 if (
-                    reservation.status ===
-                    "pending"
+                    reservation.status === "pending"
                 ) {
 
-                    pendingSelected =
-                        "selected";
+                    pendingSelected = "selected";
 
                 }
 
                 else if (
-                    reservation.status ===
-                    "approved"
+                    reservation.status === "approved"
                 ) {
 
-                    approvedSelected =
-                        "selected";
+                    approvedSelected = "selected";
 
                 }
 
                 else if (
-                    reservation.status ===
-                    "done"
+                    reservation.status === "done"
                 ) {
 
-                    doneSelected =
-                        "selected";
+                    doneSelected = "selected";
 
                 }
 
                 else if (
-                    reservation.status ===
-                    "cancel"
+                    reservation.status === "cancel"
                 ) {
 
-                    cancelSelected =
-                        "selected";
+                    cancelSelected = "selected";
 
                 }
 
+
+                // =========================================
+                // HTML ردیف
+                // =========================================
 
                 row.innerHTML = `
 
-                    <td>
+                    <!-- مشتری -->
 
+                    <td>
                         ${reservation.customer_name}
-
                     </td>
 
 
-                    <td>
+                    <!-- خدمت -->
 
+                    <td>
                         ${reservation.service}
+                    </td>
+
+
+                    <!-- قیمت خدمت -->
+
+                    <td>
+
+                        ${Number(
+                            reservation.service_price || 0
+                        ).toLocaleString("fa-IR")}
+
+                        تومان
 
                     </td>
 
 
+                    <!-- پرداخت شده -->
+
                     <td>
 
+                        ${Number(
+                            reservation.paid_amount || 0
+                        ).toLocaleString("fa-IR")}
+
+                        تومان
+
+                    </td>
+
+
+                    <!-- باقی مانده -->
+
+                    <td>
+
+                        ${Number(
+                            reservation.remaining_amount || 0
+                        ).toLocaleString("fa-IR")}
+
+                        تومان
+
+                    </td>
+
+
+                    <!-- آرایشگر -->
+
+                    <td>
                         ${reservation.barber}
-
                     </td>
 
 
-                    <td>
+                    <!-- تاریخ -->
 
+                    <td>
                         ${reservation.date}
-
                     </td>
 
+
+                    <!-- ساعت -->
 
                     <td>
-
                         ${reservation.time}
-
                     </td>
 
+
+                    <!-- وضعیت -->
 
                     <td>
 
@@ -338,7 +354,22 @@ if (urlParams.get("past") === "1") {
                         </form>
 
                     </td>
+                    <!-- جزئیات -->
 
+<td>
+
+    <a
+       href="/superadmin/reservations/${reservation.id}/detail/"
+        class="btn-edit">
+
+        جزئیات
+
+    </a>
+
+</td>
+
+
+                    <!-- عملیات -->
 
                     <td>
 
@@ -387,9 +418,7 @@ if (urlParams.get("past") === "1") {
 
 
         if (!cookie) {
-
             return "";
-
         }
 
 

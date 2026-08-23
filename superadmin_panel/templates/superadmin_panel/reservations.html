@@ -103,14 +103,17 @@
         <thead>
 
             <tr>
-
-                <th>مشتری</th>
-                <th>خدمت</th>
-                <th>آرایشگر</th>
-                <th>تاریخ</th>
-                <th>ساعت</th>
-                <th>وضعیت</th>
-                <th>عملیات</th>
+<th>مشتری</th>
+<th>خدمت</th>
+<th>قیمت خدمت</th>
+<th>پرداخت شده</th>
+<th>باقی‌مانده</th>
+<th>آرایشگر</th>
+<th>تاریخ</th>
+<th>ساعت</th>
+<th>وضعیت</th>
+<th>جزئیات</th>
+<th>عملیات</th>
 
             </tr>
 
@@ -131,6 +134,20 @@
 </td>
 
                 <td>{{ reservation.service.name }}</td>
+                <td>
+    {{ reservation.service_price|default:0|floatformat:0 }}
+    تومان
+</td>
+
+<td>
+    {{ reservation.paid_amount|default:0|floatformat:0 }}
+    تومان
+</td>
+
+<td>
+    {{ reservation.remaining_amount|floatformat:0 }}
+    تومان
+</td>
 
                 <td>{{ reservation.barber.user.full_name }}</td>
 
@@ -181,29 +198,35 @@
                     </form>
 
                 </td>
+<td>
 
-                <td>
+    <a
+        href="{% url 'superadmin_reservation_detail' reservation.id %}"
+        class="btn-edit">
 
-                    <a
-                        href="{% url 'superadmin_reservation_delete' reservation.id %}"
-                        class="btn-delete"
-                        onclick="return confirm('از حذف این نوبت مطمئن هستید؟')">
+        جزئیات
 
-                        حذف
+    </a>
 
-                    </a>
+    <a
+        href="{% url 'superadmin_reservation_delete' reservation.id %}"
+        class="btn-delete"
+        onclick="return confirm('از حذف این نوبت مطمئن هستید؟')">
 
-                </td>
+        حذف
 
+    </a>
+
+</td>
             </tr>
 
         {% empty %}
 
             <tr>
 
-                <td colspan="7">
-                    هنوز هیچ نوبتی ثبت نشده است.
-                </td>
+              <td colspan="11">
+    هنوز هیچ نوبتی ثبت نشده است.
+</td>
 
             </tr>
 

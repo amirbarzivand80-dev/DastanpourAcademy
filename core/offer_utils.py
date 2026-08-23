@@ -81,3 +81,19 @@ def get_course_offer_price(course):
         "old_price": course.price,
         "new_price": new_price,
     }
+
+
+def get_final_product_price(product):
+
+    # تخفیف دستی محصول
+    if product.discount_price is not None:
+        return product.discount_price
+
+    # پیشنهاد ویژه
+    offer_price = get_product_offer_price(product)
+
+    if offer_price["has_offer"]:
+        return offer_price["new_price"]
+
+    # قیمت عادی
+    return product.price

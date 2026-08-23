@@ -137,8 +137,11 @@ path(
     name="superadmin_reservations_live",
 ),
 
-
-
+path(
+    "reservations/<int:reservation_id>/detail/",
+    views.reservation_detail,
+    name="superadmin_reservation_detail",
+),
 
 path(
     "reservations/<int:id>/status/",
@@ -427,6 +430,24 @@ path(
 ),
 
 path(
+    "discounts/",
+    views.superadmin_discounts,
+    name="superadmin_discounts"
+),
+
+path(
+    "discounts/add/",
+    views.add_discount,
+    name="add_discount"
+),
+
+path(
+    "discounts/<int:discount_id>/edit/",
+    views.edit_discount,
+    name="edit_discount"
+),
+
+path(
     "settings/",
     views.superadmin_settings,
     name="superadmin_settings"
@@ -486,4 +507,17 @@ path(
     views.delete_product_image,
     name="delete_product_image"
 ),
+
+path(
+    "sms/",
+    views.sms_management,
+    name="superadmin_sms"
+),
+path(
+    "sms/search-users/",
+    views.sms_search_users,
+    name="sms_search_users"
+),
 ]
+
+

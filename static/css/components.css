@@ -3247,16 +3247,14 @@
 
     object-fit: cover;
 }
-
-
 /* ================= CONSULTATION CARD ================= */
 
 .home-consultation-card {
-    width: min(100%, 1000px);
+    width: min(100%, 1100px);
 
-    margin: 28px auto 0;
+    margin: 35px auto 0;
 
-    padding: 30px 34px;
+    padding: 38px 42px;
 
     box-sizing: border-box;
 
@@ -3266,47 +3264,63 @@
 
     justify-content: space-between;
 
-    gap: 30px;
+    gap: 35px;
 
-    min-height: 115px;
+    min-height: 150px;
 
-    border-radius: 20px;
+    border-radius: 24px;
 
-    background: #151515;
+    background:
+        radial-gradient(
+            circle at 15% 50%,
+            rgba(201,162,39,.12),
+            transparent 45%
+        ),
+        linear-gradient(
+            135deg,
+            #111,
+            #1b1b1b
+        );
 
-    border: 1px solid rgba(201, 162, 39, .25);
+    border: 1px solid rgba(201, 162, 39, .4);
 
     box-shadow:
-        0 15px 40px rgba(0, 0, 0, .14);
+        0 20px 50px rgba(0,0,0,.22),
+        0 0 35px rgba(201,162,39,.06);
 
-    transition: .3s ease;
+    transition: .35s ease;
 }
 
 .home-consultation-card:hover {
-    border-color: rgba(201, 162, 39, .5);
 
-    transform: translateY(-3px);
+    transform: translateY(-5px);
+
+    border-color: rgba(201,162,39,.7);
 
     box-shadow:
-        0 20px 45px rgba(0, 0, 0, .2);
+        0 25px 60px rgba(0,0,0,.28),
+        0 0 35px rgba(201,162,39,.12);
 }
 
 
 /* ================= CONTENT ================= */
 
 .consultation-content {
+
     display: flex;
 
     align-items: center;
 
-    gap: 17px;
+    gap: 22px;
 
     text-align: right;
 }
 
+
 .consultation-icon {
-    width: 65px;
-    height: 65px;
+
+    width: 78px;
+    height: 78px;
 
     flex-shrink: 0;
 
@@ -3315,53 +3329,77 @@
     align-items: center;
     justify-content: center;
 
-    border-radius: 15px;
+    border-radius: 18px;
 
-    background: rgba(201, 162, 39, .12);
+    background:
+        rgba(201,162,39,.13);
 
-    border: 1px solid rgba(201, 162, 39, .25);
+    border: 1px solid rgba(201,162,39,.35);
 
     color: #C9A227;
 
-    font-size: 22px;
+    font-size: 28px;
+
+    box-shadow:
+        0 0 25px rgba(201,162,39,.08);
+
+    transition: .35s ease;
 }
 
+.home-consultation-card:hover .consultation-icon {
+
+    transform: scale(1.08) rotate(-3deg);
+
+    background: rgba(201,162,39,.2);
+
+}
+
+
+/* ================= TEXT ================= */
+
 .consultation-content h3 {
-    margin: 0 0 6px;
+
+    margin: 0 0 8px;
 
     color: #fff;
 
-    font-size: 21px;
+    font-size: 26px;
 
-    font-weight: 800;
+    font-weight: 900;
 }
 
+
 .consultation-content p {
+
     margin: 0;
 
     color: #aaa;
 
-    font-size: 13px;
+    font-size: 15px;
 
-    line-height: 1.8;
+    line-height: 2;
 }
 
 
 /* ================= BUTTON ================= */
 
 .consultation-btn {
+
     flex-shrink: 0;
 
     display: inline-flex;
 
     align-items: center;
+
     justify-content: center;
 
-    gap: 9px;
+    gap: 11px;
 
-    padding: 15px 27px;
+    min-width: 210px;
 
-    border-radius: 13px;
+    padding: 18px 32px;
+
+    border-radius: 15px;
 
     background: #C9A227;
 
@@ -3369,45 +3407,37 @@
 
     text-decoration: none;
 
-    font-size: 14px;
+    font-size: 17px;
 
-    font-weight: 800;
-
-    transition: .3s ease;
-}
-
-.consultation-btn:hover {
-    background: #dfbd4d;
-
-    transform: translateY(-2px);
+    font-weight: 900;
 
     box-shadow:
-        0 10px 25px rgba(201, 162, 39, .25);
+        0 10px 30px rgba(201,162,39,.2);
+
+    transition: .35s ease;
 }
 
 
-/* =====================================================
-   MOBILE
-===================================================== */
+.consultation-btn:hover {
+
+    background: #e5c45a;
+
+    transform: translateY(-4px) scale(1.03);
+
+    box-shadow:
+        0 15px 35px rgba(201,162,39,.35);
+}
+
+
+/* ================= MOBILE ================= */
 
 @media (max-width: 700px) {
 
-    .home-video-section {
-        padding: 20px 0 65px;
-    }
-
-    .home-video-wrapper {
-        width: 94%;
-
-        aspect-ratio: 16 / 10;
-
-        border-radius: 18px;
-    }
-
     .home-consultation-card {
+
         width: 94%;
 
-        padding: 20px;
+        padding: 25px 20px;
 
         min-height: auto;
 
@@ -3415,43 +3445,59 @@
 
         align-items: stretch;
 
-        gap: 15px;
+        gap: 20px;
 
-        border-radius: 17px;
+        border-radius: 20px;
     }
+
 
     .consultation-content {
-        gap: 12px;
+
+        gap: 14px;
+
     }
+
 
     .consultation-icon {
-        width: 45px;
-        height: 45px;
 
-        border-radius: 12px;
+        width: 58px;
+        height: 58px;
 
-        font-size: 18px;
+        border-radius: 14px;
+
+        font-size: 22px;
     }
+
 
     .consultation-content h3 {
-        font-size: 14px;
+
+        font-size: 19px;
+
     }
+
 
     .consultation-content p {
-        font-size: 11px;
-
-        line-height: 1.8;
-    }
-
-    .consultation-btn {
-        width: 100%;
-
-        padding: 11px;
 
         font-size: 12px;
-    }
-}
 
+        line-height: 1.9;
+    }
+
+
+    .consultation-btn {
+
+        width: 100%;
+
+        min-width: 0;
+
+        padding: 16px;
+
+        font-size: 15px;
+
+        border-radius: 13px;
+    }
+
+}
 
 
 /* =========================
@@ -4002,4 +4048,203 @@
     #homeOfferCountdown {
         font-size: 10px;
     }
+}
+
+
+/* =========================================
+   Booking CTA
+========================================= */
+
+.booking-cta {
+    width: 90%;
+    max-width: 1200px;
+    margin: 100px auto 80px;
+    padding: 70px 30px;
+    position: relative;
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(212, 175, 55, 0.12),
+            transparent 55%
+        ),
+        #111;
+
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    border-radius: 28px;
+
+    text-align: center;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+
+/* نور ظریف */
+
+.booking-cta::before {
+    content: "";
+    position: absolute;
+
+    width: 300px;
+    height: 300px;
+
+    top: -180px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    background: rgba(212, 175, 55, 0.12);
+
+    filter: blur(80px);
+
+    pointer-events: none;
+}
+
+
+/* محتوا */
+
+.booking-cta-content {
+    position: relative;
+    z-index: 2;
+}
+
+
+/* عنوان */
+
+.booking-cta h2 {
+    margin: 0 0 15px;
+
+    font-size: clamp(28px, 4vw, 48px);
+
+    font-weight: 800;
+
+    color: #f5f0e6;
+}
+
+
+/* متن */
+
+.booking-cta p {
+    margin: 0 0 30px;
+
+    font-size: 17px;
+
+    color: #cfc7b8;
+}
+
+
+/* دکمه */
+
+.booking-cta-btn {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 170px;
+
+    padding: 14px 30px;
+
+    border-radius: 12px;
+
+    background: #d4af37;
+
+    color: #111;
+
+    font-size: 16px;
+    font-weight: 800;
+
+    text-decoration: none;
+
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease,
+        background 0.3s ease;
+}
+/* متن */
+
+.booking-cta p {
+    margin: 0 0 35px;
+
+    font-size: 21px;
+
+    color: #cfc7b8;
+}
+
+
+/* دکمه */
+
+.booking-cta-btn {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 220px;
+
+    padding: 18px 38px;
+
+    border-radius: 14px;
+
+    background: #d4af37;
+
+    color: #111;
+
+    font-size: 19px;
+    font-weight: 800;
+
+    text-decoration: none;
+
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease,
+        background 0.3s ease;
+}
+
+/* Hover */
+
+.booking-cta-btn:hover {
+
+    transform: translateY(-4px);
+
+    background: #e5c45a;
+
+    box-shadow:
+        0 10px 30px rgba(212, 175, 55, 0.25);
+}
+
+
+/* موبایل */
+
+@media (max-width: 600px) {
+
+    .booking-cta {
+
+        width: calc(100% - 30px);
+
+        margin: 70px auto 50px;
+
+        padding: 50px 20px;
+
+        border-radius: 22px;
+    }
+
+
+    .booking-cta p {
+
+        font-size: 15px;
+
+    }
+
+
+    .booking-cta-btn {
+
+        width: 100%;
+
+        max-width: 250px;
+
+    }
+
 }

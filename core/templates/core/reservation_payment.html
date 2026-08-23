@@ -358,45 +358,124 @@
     </div>
 
 
-    <!-- =========================================
-         خلاصه مبلغ
-    ========================================== -->
+   <!-- =========================================
+     خلاصه مبلغ
+========================================= -->
 
-    <div class="summary-box">
+<div class="summary-box">
 
+    <div class="summary-row">
 
-        <div class="summary-row">
+        <span class="summary-label">
+            مجموع خدمات
+        </span>
 
-            <span class="summary-label">
-                مجموع خدمات
-            </span>
+        <span class="summary-value">
 
-            <span class="summary-value">
+            {% if discount_amount > 0 %}
 
-               {{ total_price|price_format }}
-تومان
-            </span>
+                <del class="old-price">
+                    {{ base_total_price|price_format }}
+                </del>
 
-        </div>
+                <strong class="final-price">
+                    {{ total_price|price_format }}
+                    تومان
+                </strong>
 
+            {% else %}
 
-        <div class="summary-row">
+                {{ total_price|price_format }}
+                تومان
 
-            <span class="summary-label">
-                مجموع بیعانه
-            </span>
+            {% endif %}
 
-            <span class="summary-value deposit-value">
-
-                {{ total_deposit|price_format }}
-تومان
-            </span>
-
-        </div>
-
+        </span>
 
     </div>
 
+
+    {% if discount_amount > 0 %}
+
+    <div class="summary-row">
+
+        <span class="summary-label">
+            تخفیف
+        </span>
+
+        <span class="summary-value discount-value">
+
+            {{ discount_amount|price_format }}
+            تومان
+
+        </span>
+
+    </div>
+
+    {% endif %}
+
+
+    <div class="summary-row">
+
+        <span class="summary-label">
+            مجموع بیعانه
+        </span>
+
+        <span class="summary-value deposit-value">
+
+            {{ total_deposit|price_format }}
+            تومان
+
+        </span>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     کد تخفیف
+========================================= -->
+
+<div class="discount-box">
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <input
+            type="text"
+            name="discount_code"
+            value="{{ discount_code|default:'' }}"
+            placeholder="کد تخفیف"
+            autocomplete="off"
+        >
+
+        <button type="submit">
+            اعمال
+        </button>
+
+    </form>
+
+
+    {% if discount_error %}
+
+        <div class="discount-error">
+            {{ discount_error }}
+        </div>
+
+    {% endif %}
+
+
+    {% if discount_success %}
+
+        <div class="discount-success">
+            {{ discount_success }}
+        </div>
+
+    {% endif %}
+
+</div>
 
     <!-- =========================================
          انتخاب نوع پرداخت

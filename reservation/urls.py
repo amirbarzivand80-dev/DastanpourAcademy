@@ -29,10 +29,10 @@ urlpatterns = [
         name="barber_working_hours",
     ),
 
-    path(
-        "payment/<int:reservation_id>/",
-        views.reservation_payment,
-        name="reservation_payment",
-    ),
+   path(
+    "payment/",
+    views.reservation_payment,
+    name="reservation_payment",
+),
 
 ]

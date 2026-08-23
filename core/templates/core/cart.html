@@ -35,14 +35,12 @@
 </a>
 <div class="cart-price">
 
-    <span 
-        class="item-price"
-        data-price="{{ item.total_price|price_format }}"
-    >
-
-        {{ item.total_price|price_format }}
-
-    </span>
+   <span 
+    class="item-price"
+    data-price="{{ item.total_price }}"
+>
+    {{ item.total_price|price_format }}
+</span>
 
     <small>تومان</small>
 
@@ -115,17 +113,64 @@ data-id="{{ item.id }}">
         <span>هزینه ارسال</span>
         <span>رایگان</span>
     </div>
-   <div class="summary-row">
+  <div class="summary-row">
     <span>قیمت نهایی</span>
+
     <span class="subtotal-price">
 
-    {{ total_price|price_format }} تومان
+        {% if discount_amount > 0 %}
 
-</span>
+            <del>
+                {{ total_price|price_format }}
+            </del>
+
+            <strong>
+                {{ final_price|price_format }}
+                تومان
+            </strong>
+
+        {% else %}
+
+            {{ total_price|price_format }}
+            تومان
+
+        {% endif %}
+
+    </span>
 </div>
     <div class="discount-box">
-        <input type="text" placeholder="کد تخفیف">
-    </div>
+
+    <form method="POST" action="{% url 'cart' %}">
+
+        {% csrf_token %}
+
+        <input
+            type="text"
+            name="discount_code"
+            placeholder="کد تخفیف"
+            value="{{ discount_code|default:'' }}"
+            autocomplete="off"
+        >
+
+        <button type="submit">
+            اعمال
+        </button>
+
+    </form>
+
+    {% if discount_error %}
+        <div class="discount-error">
+            {{ discount_error }}
+        </div>
+    {% endif %}
+
+    {% if discount_success %}
+        <div class="discount-success">
+            {{ discount_success }}
+        </div>
+    {% endif %}
+
+</div>
    <a href="{% url 'checkout' %}" class="checkout-btn">
     ادامه فرایند خرید
 </a>

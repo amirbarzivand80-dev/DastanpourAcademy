@@ -4072,3 +4072,1404 @@ Mobile
     text-align: center;
     color: #777 !important;
 }
+
+
+
+
+/* =====================================================
+   RESERVATION DETAIL
+   Black / Cream / Gold Theme
+===================================================== */
+
+.reservation-detail-page {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 25px;
+    color: #f5f0e8;
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.reservation-detail-page .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.reservation-detail-page .page-title {
+    margin: 0;
+    color: #f5f0e8;
+    font-size: 26px;
+    font-weight: 800;
+}
+
+.reservation-detail-page .page-subtitle {
+    margin: 8px 0 0;
+    color: #aaa39a;
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   CARDS
+===================================================== */
+
+.reservation-detail-page .detail-card {
+    background: #151515;
+    border: 1px solid rgba(212, 175, 55, 0.22);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+
+/* =====================================================
+   CARD TITLE
+===================================================== */
+
+.reservation-detail-page .detail-card-title {
+    color: #d4af37;
+    font-size: 17px;
+    font-weight: 800;
+
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+
+    border-bottom: 1px solid
+        rgba(212, 175, 55, 0.18);
+}
+
+
+/* =====================================================
+   GRID
+===================================================== */
+
+.reservation-detail-page .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+
+/* =====================================================
+   ITEM
+===================================================== */
+
+.reservation-detail-page .detail-item {
+    background: #1d1d1d;
+
+    border: 1px solid
+        rgba(255, 255, 255, 0.05);
+
+    border-radius: 12px;
+
+    padding: 16px 18px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    transition: 0.2s ease;
+}
+
+.reservation-detail-page .detail-item:hover {
+    border-color:
+        rgba(212, 175, 55, 0.35);
+
+    transform: translateY(-1px);
+}
+
+.reservation-detail-page .detail-label {
+    color: #918b83;
+    font-size: 12px;
+}
+
+.reservation-detail-page .detail-item strong {
+    color: #f5f0e8;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+
+/* =====================================================
+   SELECTED DETAILS
+===================================================== */
+
+.reservation-detail-page .selected-details-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.reservation-detail-page .selected-detail {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    background: #1d1d1d;
+
+    border: 1px solid
+        rgba(255, 255, 255, 0.05);
+
+    border-radius: 12px;
+
+    padding: 16px 18px;
+
+    transition: 0.2s ease;
+}
+
+.reservation-detail-page .selected-detail:hover {
+    border-color:
+        rgba(212, 175, 55, 0.3);
+}
+
+.reservation-detail-page .selected-detail > div {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.reservation-detail-page .selected-detail strong {
+    color: #f5f0e8;
+}
+
+.reservation-detail-page .selected-detail span {
+    color: #918b83;
+    font-size: 12px;
+}
+
+.reservation-detail-page .selected-detail > strong {
+    color: #d4af37;
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   EMPTY
+===================================================== */
+
+.reservation-detail-page .empty-detail {
+    color: #918b83;
+    margin: 0;
+}
+
+
+/* =====================================================
+   ACTIONS
+===================================================== */
+
+.reservation-detail-page .detail-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-top: 25px;
+}
+
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+.reservation-detail-page .btn-edit,
+.reservation-detail-page .btn-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 42px;
+
+    padding: 9px 18px;
+
+    border-radius: 9px;
+
+    text-decoration: none;
+
+    font-family: inherit;
+    font-weight: 700;
+
+    transition: 0.2s ease;
+}
+
+.reservation-detail-page .btn-edit {
+    background: #d4af37;
+    color: #111;
+    border: 1px solid #d4af37;
+}
+
+.reservation-detail-page .btn-edit:hover {
+    background: #e3c35c;
+    border-color: #e3c35c;
+    transform: translateY(-1px);
+}
+
+.reservation-detail-page .btn-delete {
+    background: transparent;
+    color: #d96c6c;
+
+    border: 1px solid
+        rgba(217, 108, 108, 0.35);
+}
+
+.reservation-detail-page .btn-delete:hover {
+    background: rgba(217, 108, 108, 0.1);
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 700px) {
+
+    .reservation-detail-page {
+        padding: 15px;
+    }
+
+    .reservation-detail-page .page-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .reservation-detail-page .page-title {
+        font-size: 21px;
+    }
+
+    .reservation-detail-page .detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .reservation-detail-page .detail-card {
+        padding: 17px;
+    }
+
+    .reservation-detail-page .selected-detail {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .reservation-detail-page .selected-detail > div {
+        flex-wrap: wrap;
+    }
+
+    .reservation-detail-page .detail-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .reservation-detail-page .detail-actions a {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+}
+
+
+
+/* =========================================
+   SMS MANAGEMENT
+========================================= */
+
+.sms-management-box {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+
+/* =========================================
+   عنوان و توضیحات
+========================================= */
+
+.sms-management-box h3 {
+    margin-bottom: 10px;
+    font-size: 22px;
+}
+
+.sms-management-box > p {
+    margin-bottom: 25px;
+    opacity: 0.7;
+}
+
+
+/* =========================================
+   نوع گیرندگان
+========================================= */
+
+.sms-recipient-types {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.sms-recipient-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 18px;
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+
+    background: rgba(255, 255, 255, 0.03);
+
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+
+.sms-recipient-option:hover {
+    transform: translateY(-2px);
+    border-color: rgba(201, 164, 92, 0.6);
+}
+
+.sms-recipient-option:has(input:checked) {
+    border-color: #c9a45c;
+    background: rgba(201, 164, 92, 0.08);
+}
+
+.sms-recipient-option input {
+    width: 18px;
+    height: 18px;
+
+    accent-color: #c9a45c;
+}
+
+.sms-recipient-option div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.sms-recipient-option strong {
+    font-size: 15px;
+}
+
+.sms-recipient-option span {
+    font-size: 13px;
+    opacity: 0.6;
+}
+
+
+/* =========================================
+   تعداد گیرندگان
+========================================= */
+
+.sms-recipient-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 10px 16px;
+
+    margin-bottom: 25px;
+
+    border-radius: 10px;
+
+    background: rgba(201, 164, 92, 0.08);
+
+    border: 1px solid rgba(201, 164, 92, 0.2);
+}
+
+.sms-recipient-count strong {
+    color: #c9a45c;
+}
+
+
+/* =========================================
+   انتخاب دستی
+========================================= */
+
+#manual-recipient-box {
+    margin-bottom: 25px;
+}
+
+#manual-recipient-search {
+    width: 100%;
+
+    padding: 13px 16px;
+
+    border-radius: 10px;
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    background: rgba(255, 255, 255, 0.04);
+
+    color: inherit;
+
+    outline: none;
+
+    transition: 0.2s ease;
+}
+
+#manual-recipient-search:focus {
+    border-color: #c9a45c;
+}
+
+
+/* =========================================
+   لیست کاربران
+========================================= */
+
+#manual-recipient-list {
+    max-height: 350px;
+
+    overflow-y: auto;
+
+    margin-top: 12px;
+
+    padding: 5px;
+}
+
+#manual-recipient-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+#manual-recipient-list::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: rgba(201, 164, 92, 0.5);
+}
+
+
+/* =========================================
+   کاربر
+========================================= */
+
+.sms-user-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 13px 15px;
+
+    margin-bottom: 8px;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+    border-radius: 10px;
+
+    background: rgba(255, 255, 255, 0.03);
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.sms-user-option:hover {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.sms-user-option input {
+    width: 18px;
+    height: 18px;
+
+    accent-color: #c9a45c;
+
+    cursor: pointer;
+}
+
+.sms-user-option span {
+    font-weight: 600;
+}
+
+.sms-user-option small {
+    margin-right: auto;
+
+    direction: ltr;
+
+    opacity: 0.6;
+}
+
+
+/* =========================================
+   متن پیام
+========================================= */
+
+.sms-message-box {
+    margin-top: 20px;
+}
+
+.sms-message-box label {
+    display: block;
+
+    margin-bottom: 10px;
+
+    font-weight: 600;
+}
+
+#sms-message {
+    width: 100%;
+
+    min-height: 170px;
+
+    padding: 15px;
+
+    resize: vertical;
+
+    border-radius: 12px;
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    background: rgba(255, 255, 255, 0.04);
+
+    color: inherit;
+
+    font-family: inherit;
+
+    line-height: 1.8;
+
+    outline: none;
+
+    transition: 0.2s ease;
+}
+
+#sms-message:focus {
+    border-color: #c9a45c;
+}
+
+.sms-message-box > div {
+    margin-top: 8px;
+
+    font-size: 13px;
+
+    opacity: 0.65;
+}
+
+#sms-character-count {
+    color: #c9a45c;
+}
+
+
+/* =========================================
+   دکمه ارسال
+========================================= */
+
+#sms-form .btn-add {
+    margin-top: 25px;
+
+    padding: 12px 28px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    font-family: inherit;
+
+    transition: 0.2s ease;
+}
+
+#sms-form .btn-add:hover {
+    transform: translateY(-2px);
+}
+
+
+/* =========================================
+   موبایل
+========================================= */
+
+@media (max-width: 768px) {
+
+    .sms-recipient-types {
+        grid-template-columns: 1fr;
+    }
+
+    .sms-management-box {
+        width: 100%;
+    }
+
+    .sms-user-option {
+        flex-wrap: wrap;
+    }
+
+}
+
+.sms-alert {
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.sms-alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.sms-alert-warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+.sms-alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+
+/* =====================================================
+   DISCOUNTS PAGE
+===================================================== */
+
+.discounts-page {
+    padding: 10px 0;
+}
+
+.discounts-page .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.discounts-page .page-header h1 {
+    margin: 0 0 8px;
+    font-size: 28px;
+}
+
+.discounts-page .page-header p {
+    margin: 0;
+    color: #777;
+}
+
+.discount-header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.discount-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    transition: .2s;
+}
+
+.discount-btn-primary {
+    background: #b89b5e;
+    color: #fff;
+}
+
+.discount-btn-primary:hover {
+    background: #a88b4e;
+}
+
+.discount-btn-secondary {
+    background: #eee;
+    color: #333;
+}
+
+.discount-btn-secondary:hover {
+    background: #ddd;
+}
+
+
+/* کارت آمار */
+
+.discount-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.discount-stat-card {
+    background: #fff;
+    border-radius: 15px;
+    padding: 22px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 4px 18px rgba(0,0,0,.05);
+}
+
+.discount-stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: #f5efe3;
+    color: #b89b5e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.discount-stat-card h3 {
+    margin: 0 0 5px;
+    font-size: 23px;
+}
+
+.discount-stat-card span {
+    color: #777;
+    font-size: 13px;
+}
+
+
+/* جدول */
+
+.discount-table-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 4px 18px rgba(0,0,0,.05);
+    overflow-x: auto;
+}
+
+.discount-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.discount-table th {
+    text-align: right;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    color: #777;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.discount-table td {
+    padding: 16px 15px;
+    border-bottom: 1px solid #f1f1f1;
+    vertical-align: middle;
+}
+
+.discount-table tr:last-child td {
+    border-bottom: none;
+}
+
+.discount-code {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: #f7f2e8;
+    color: #8f753e;
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    direction: ltr;
+}
+
+.discount-value {
+    font-weight: 700;
+}
+
+.discount-status {
+    display: inline-flex;
+    padding: 6px 11px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.discount-status.active {
+    background: #e8f7ee;
+    color: #21864b;
+}
+
+.discount-status.inactive {
+    background: #fbeaea;
+    color: #b33a3a;
+}
+
+.discount-actions {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.discount-action {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.discount-action.edit {
+    background: #f5efe3;
+    color: #a38343;
+}
+
+.discount-action.delete {
+    background: #fbeaea;
+    color: #c0392b;
+}
+
+.discount-action:hover {
+    transform: translateY(-1px);
+}
+
+.discount-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #888;
+}
+
+.discount-empty i {
+    font-size: 45px;
+    margin-bottom: 15px;
+    color: #c7b58e;
+}
+
+
+/* موبایل */
+
+@media (max-width: 900px) {
+
+    .discount-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+@media (max-width: 650px) {
+
+    .discounts-page .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .discount-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .discount-table-card {
+        padding: 15px;
+    }
+
+}
+
+/* =====================================================
+   DISCOUNT MULTI SELECT
+   Black / Cream / Gold Theme
+===================================================== */
+
+.discount-multi-select {
+    position: relative;
+    width: 100%;
+    margin-top: 10px;
+}
+
+
+/* =====================================================
+   دکمه اصلی
+===================================================== */
+
+.discount-multi-select-button {
+    width: 100%;
+    min-height: 52px;
+
+    padding: 0 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    border: 1px solid rgba(201, 169, 105, 0.35);
+    border-radius: 12px;
+
+    background: #171717;
+    color: #f3ead8;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.discount-multi-select-button:hover {
+    background: #1d1d1d;
+
+    border-color: #c9a969;
+}
+
+
+.discount-multi-select.open
+.discount-multi-select-button {
+
+    border-color: #c9a969;
+
+    box-shadow:
+        0 0 0 3px rgba(201, 169, 105, 0.10);
+}
+
+
+.discount-multi-select-button i {
+
+    color: #c9a969;
+
+    font-size: 13px;
+
+    transition:
+        transform 0.2s ease;
+}
+
+
+.discount-multi-select.open
+.discount-multi-select-button i {
+
+    transform: rotate(180deg);
+}
+
+
+/* =====================================================
+   متن دکمه
+===================================================== */
+
+.discount-multi-select-text {
+
+    overflow: hidden;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+
+    text-align: right;
+
+    flex: 1;
+}
+
+
+/* =====================================================
+   منوی Dropdown
+===================================================== */
+
+.discount-multi-select-menu {
+
+    position: absolute;
+
+    top: calc(100% + 8px);
+    right: 0;
+    left: 0;
+
+    z-index: 9999;
+
+    max-height: 280px;
+
+    overflow-y: auto;
+
+    padding: 8px;
+
+    background: #171717;
+
+    border: 1px solid rgba(201, 169, 105, 0.35);
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 15px 35px rgba(0, 0, 0, 0.45);
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transform:
+        translateY(-6px);
+
+    pointer-events: none;
+
+    transition:
+        opacity 0.18s ease,
+        transform 0.18s ease,
+        visibility 0.18s ease;
+}
+
+
+/* باز شدن */
+
+.discount-multi-select.open
+.discount-multi-select-menu {
+
+    opacity: 1;
+
+    visibility: visible;
+
+    transform: translateY(0);
+
+    pointer-events: auto;
+}
+
+
+/* =====================================================
+   گزینه‌ها
+===================================================== */
+
+.discount-multi-select-item {
+
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    width: 100%;
+
+    min-height: 46px;
+
+    padding: 10px 12px;
+
+    margin: 2px 0;
+
+    border-radius: 9px;
+
+    background: transparent;
+
+    color: #f3ead8;
+
+    cursor: pointer;
+
+    user-select: none;
+
+    transition:
+        background 0.15s ease,
+        color 0.15s ease;
+}
+
+
+.discount-multi-select-item:hover {
+
+    background: rgba(201, 169, 105, 0.10);
+
+    color: #ffffff;
+}
+
+
+/* =====================================================
+   Checkbox واقعی
+===================================================== */
+
+.discount-multi-select-item input {
+
+    position: absolute;
+
+    opacity: 0;
+
+    pointer-events: none;
+}
+
+
+/* =====================================================
+   تیک سفارشی
+===================================================== */
+
+.discount-multi-select-check {
+
+    width: 19px;
+    height: 19px;
+
+    flex: 0 0 19px;
+
+    border: 1px solid rgba(201, 169, 105, 0.55);
+
+    border-radius: 5px;
+
+    background: #111111;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease;
+}
+
+
+/* =====================================================
+   حالت انتخاب شده
+===================================================== */
+
+.discount-multi-select-item
+input:checked
++ .discount-multi-select-check {
+
+    background: #c9a969;
+
+    border-color: #c9a969;
+}
+
+
+.discount-multi-select-item
+input:checked
++ .discount-multi-select-check::after {
+
+    content: "✓";
+
+    color: #111111;
+
+    font-size: 13px;
+
+    font-weight: 900;
+
+    line-height: 1;
+}
+
+
+/* متن گزینه */
+
+.discount-multi-select-label {
+
+    flex: 1;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+
+    text-align: right;
+}
+
+
+/* =====================================================
+   Scrollbar
+===================================================== */
+
+.discount-multi-select-menu::-webkit-scrollbar {
+
+    width: 6px;
+}
+
+
+.discount-multi-select-menu::-webkit-scrollbar-track {
+
+    background: #111111;
+
+    border-radius: 10px;
+}
+
+
+.discount-multi-select-menu::-webkit-scrollbar-thumb {
+
+    background: #6f5a32;
+
+    border-radius: 10px;
+}
+
+
+.discount-multi-select-menu::-webkit-scrollbar-thumb:hover {
+
+    background: #c9a969;
+}
+
+
+/* =====================================================
+   موبایل
+===================================================== */
+
+@media (max-width: 768px) {
+
+    .discount-multi-select-button {
+
+        min-height: 50px;
+
+        padding: 0 14px;
+
+        font-size: 14px;
+    }
+
+
+    .discount-multi-select-menu {
+
+        max-height: 300px;
+
+        padding: 7px;
+    }
+
+
+    .discount-multi-select-item {
+
+        min-height: 50px;
+
+        padding: 11px 10px;
+
+        gap: 11px;
+    }
+
+
+    .discount-multi-select-check {
+
+        width: 21px;
+        height: 21px;
+
+        flex-basis: 21px;
+    }
+
+
+    .discount-multi-select-label {
+
+        font-size: 14px;
+    }
+
+}
+
+/* =====================================================
+   Discount Page - Back Button
+===================================================== */
+
+.discount-page .page-header .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    min-height: 44px;
+
+    padding: 0 18px;
+
+    border: 1px solid rgba(201, 169, 105, 0.35);
+    border-radius: 10px;
+
+    background: #171717;
+    color: #f3ead8;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.discount-page .page-header .btn-secondary:hover {
+    background: #c9a969;
+    border-color: #c9a969;
+    color: #111111;
+
+    transform: translateY(-1px);
+}
+
+.discount-page .page-header .btn-secondary i {
+    color: #c9a969;
+    font-size: 13px;
+
+    transition: color 0.2s ease;
+}
+
+.discount-page .page-header .btn-secondary:hover i {
+    color: #111111;
+}
+
+
+/* موبایل */
+
+@media (max-width: 768px) {
+
+    .discount-page .page-header .btn-secondary {
+        min-height: 42px;
+
+        padding: 0 14px;
+
+        font-size: 13px;
+    }
+
+}
+
+/* =====================================================
+   Discount Page - Cancel Button
+===================================================== */
+
+.discount-page .form-actions .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 44px;
+
+    padding: 0 20px;
+
+    border: 1px solid rgba(201, 169, 105, 0.35);
+    border-radius: 10px;
+
+    background: #171717;
+    color: #f3ead8;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.discount-page .form-actions .btn-secondary:hover {
+    background: #c9a969;
+
+    border-color: #c9a969;
+
+    color: #111111;
+
+    transform: translateY(-1px);
+}
+
+
+/* موبایل */
+
+@media (max-width: 768px) {
+
+    .discount-page .form-actions .btn-secondary {
+        min-height: 42px;
+
+        padding: 0 16px;
+
+        font-size: 13px;
+    }
+
+}

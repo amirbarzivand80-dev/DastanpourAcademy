@@ -103,7 +103,12 @@
     </a>
 </li>
 {% endif %}
-
+<li>
+    <a href="{% url 'superadmin_sms' %}">
+        <i class="fa-solid fa-comment-sms"></i>
+        <span>مدیریت پیامک</span>
+    </a>
+</li>
 {% if request.user.is_super_admin or request.user.admin_permission.shop_access %}
 <li>
     <a href="{% url 'products' %}">
@@ -143,6 +148,15 @@
     <a href="{% url 'reports' %}">
         <i class="fa-solid fa-chart-column"></i>
         گزارشات
+    </a>
+</li>
+{% endif %}
+
+{% if request.user.is_super_admin %}
+<li>
+    <a href="{% url 'superadmin_discounts' %}">
+        <i class="fa-solid fa-ticket"></i>
+        کدهای تخفیف
     </a>
 </li>
 {% endif %}

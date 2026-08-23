@@ -5,15 +5,17 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import redirect, render, get_object_or_404
 from django.http import JsonResponse
+from discounts.models import DiscountCode, DiscountUsage
 
 from services.models import Service, BarberServicePrice
 from .models import Barber, Reservation
 from reservation.models import BarberBlockedTime
-
+from users.sms import send_appointment_confirmation_sms
 
 # =========================================================
 # صفحه رزرو
 # =========================================================
+
 @login_required(login_url="/login/")
 def reservation_view(request):
 
@@ -23,7 +25,8 @@ def reservation_view(request):
         .order_by("order")
         .prefetch_related(
             "barbers",
-            "barber_prices"
+            "barber_prices",
+            "details__barber_prices",
         )
     )
 
@@ -32,7 +35,7 @@ def reservation_view(request):
     )
 
     # =====================================================
-    # ثبت رزرو
+    # ثبت اطلاعات رزرو
     # =====================================================
 
     if request.method == "POST":
@@ -48,7 +51,9 @@ def reservation_view(request):
 
             return redirect("reservation")
 
-        service_ids = list(dict.fromkeys(service_ids))
+        service_ids = list(
+            dict.fromkeys(service_ids)
+        )
 
         reservations_data = []
 
@@ -164,7 +169,96 @@ def reservation_view(request):
             appointment_duration = barber_price.duration
 
             # =================================================
-            # محاسبه زمان پایان
+            # جزئیات انتخاب‌شده خدمت
+            # =================================================
+
+            selected_detail_ids = request.POST.getlist(
+                f"details_{service_id}"
+            )
+
+            selected_details = []
+
+            details_price = 0
+
+            details_duration = 0
+
+            for detail_id in selected_detail_ids:
+
+                detail = (
+                    service.details
+                    .filter(
+                        id=detail_id,
+                        is_active=True
+                    )
+                    .first()
+                )
+
+                if not detail:
+
+                    messages.error(
+                        request,
+                        "یکی از جزئیات انتخاب‌شده معتبر نیست."
+                    )
+
+                    return redirect("reservation")
+
+                barber_detail_price = (
+                    detail.barber_prices
+                    .filter(
+                        barber=barber
+                    )
+                    .first()
+                )
+
+                if not barber_detail_price:
+
+                    messages.error(
+                        request,
+                        f"جزئیات «{detail.name}» برای این آرایشگر ثبت نشده است."
+                    )
+
+                    return redirect("reservation")
+
+                details_price += (
+                    barber_detail_price.price
+                )
+
+                details_duration += (
+                    barber_detail_price.duration
+                )
+
+                selected_details.append({
+
+                    "id": detail.id,
+
+                    "name": detail.name,
+
+                    "price": int(
+                        barber_detail_price.price
+                    ),
+
+                    "duration": int(
+                        barber_detail_price.duration
+                    ),
+
+                })
+
+            # =================================================
+            # مبلغ و مدت نهایی
+            # =================================================
+
+            total_service_price = (
+                service_price
+                + details_price
+            )
+
+            total_duration = (
+                appointment_duration
+                + details_duration
+            )
+
+            # =================================================
+            # زمان شروع و پایان
             # =================================================
 
             start_datetime = datetime.combine(
@@ -175,12 +269,12 @@ def reservation_view(request):
             end_datetime = (
                 start_datetime
                 + timedelta(
-                    minutes=appointment_duration
+                    minutes=total_duration
                 )
             )
 
             # =================================================
-            # بررسی ساعت کاری آرایشگر
+            # بررسی ساعت کاری
             # =================================================
 
             work_start = datetime.combine(
@@ -207,15 +301,21 @@ def reservation_view(request):
                 return redirect("reservation")
 
             # =================================================
-            # بررسی روز کاری آرایشگر
+            # بررسی روز کاری
             # =================================================
 
-            weekday = (date.weekday() + 2) % 7
+            weekday = (
+                date.weekday() + 2
+            ) % 7
 
-            working_day = barber.working_days.filter(
-                day=weekday,
-                is_working=True
-            ).exists()
+            working_day = (
+                barber.working_days
+                .filter(
+                    day=weekday,
+                    is_working=True
+                )
+                .exists()
+            )
 
             if not working_day:
 
@@ -227,7 +327,7 @@ def reservation_view(request):
                 return redirect("reservation")
 
             # =================================================
-            # بررسی روز تعطیل آرایشگر
+            # بررسی روز تعطیل
             # =================================================
 
             if barber.days_off.filter(
@@ -242,7 +342,7 @@ def reservation_view(request):
                 return redirect("reservation")
 
             # =================================================
-            # بررسی تداخل با رزروهای قبلی
+            # بررسی تداخل با رزروهای واقعی قبلی
             # =================================================
 
             existing_reservations = (
@@ -252,10 +352,10 @@ def reservation_view(request):
                     date=date
                 )
                 .exclude(
-                    status="cancel"
-                )
-                .select_related(
-                    "service"
+                    status__in=[
+                        "cancel",
+                        "draft"
+                    ]
                 )
             )
 
@@ -268,22 +368,11 @@ def reservation_view(request):
                     existing.time
                 )
 
-                existing_price = (
-                    BarberServicePrice.objects
-                    .filter(
-                        barber=barber,
-                        service=existing.service
-                    )
-                    .first()
+                existing_duration = (
+                    existing.total_duration
                 )
 
-                if existing_price:
-
-                    existing_duration = (
-                        existing_price.duration
-                    )
-
-                else:
+                if not existing_duration:
 
                     existing_duration = (
                         barber.appointment_duration
@@ -302,6 +391,7 @@ def reservation_view(request):
                 ):
 
                     reservation_conflict = True
+
                     break
 
             if reservation_conflict:
@@ -347,6 +437,7 @@ def reservation_view(request):
                 ):
 
                     blocked_conflict = True
+
                     break
 
             if blocked_conflict:
@@ -361,7 +452,7 @@ def reservation_view(request):
                 return redirect("reservation")
 
             # =================================================
-            # بررسی تداخل خدمات همین فرم
+            # بررسی تداخل خدمات انتخاب‌شده همین فرم
             # =================================================
 
             for item in reservations_data:
@@ -379,7 +470,7 @@ def reservation_view(request):
                     selected_end = (
                         selected_start
                         + timedelta(
-                            minutes=item["appointment_duration"]
+                            minutes=item["total_duration"]
                         )
                     )
 
@@ -402,11 +493,11 @@ def reservation_view(request):
             # =================================================
 
             deposit_amount = int(
-                service_price * 10 / 100
+                total_service_price * 10 / 100
             )
 
             # =================================================
-            # ذخیره اطلاعات خدمت
+            # ذخیره موقت در حافظه
             # =================================================
 
             reservations_data.append({
@@ -420,86 +511,83 @@ def reservation_view(request):
                 "time": time,
 
                 "appointment_duration":
-                    appointment_duration,
+                    total_duration,
 
                 "service_price":
-                    service_price,
+                    total_service_price,
 
                 "deposit_amount":
                     deposit_amount,
 
+                "selected_details":
+                    selected_details,
+
+                "total_duration":
+                    total_duration,
+
             })
 
         # =====================================================
-        # ساخت تمام رزروها
+        # ذخیره موقت اطلاعات در Session
         # =====================================================
 
-        created_reservation_ids = []
+        pending_reservations = []
 
-        try:
+        for item in reservations_data:
 
-            with transaction.atomic():
+            pending_reservations.append({
 
-                for item in reservations_data:
+                "service_id":
+                    item["service"].id,
 
-                    reservation = Reservation.objects.create(
+                "barber_id":
+                    item["barber"].id,
 
-                        user=request.user,
+                "date":
+                    item["date"].isoformat(),
 
-                        customer_name=request.user.full_name,
+                "time":
+                    item["time"].strftime("%H:%M"),
 
-                        customer_phone=request.user.phone,
+                "service_price":
+                    int(item["service_price"]),
 
-                        service=item["service"],
+                "deposit_amount":
+                    int(item["deposit_amount"]),
 
-                        barber=item["barber"],
+                "selected_details":
+                    item["selected_details"],
 
-                        date=item["date"],
+                "total_duration":
+                    int(item["total_duration"]),
 
-                        time=item["time"],
-
-                        service_price=item["service_price"],
-
-                        deposit_amount=item["deposit_amount"],
-
-                        status="pending",
-
-                        payment_status="pending",
-                    )
-
-                    created_reservation_ids.append(
-                        reservation.id
-                    )
-
-        except Exception as e:
-
-            print(
-                "RESERVATION CREATE ERROR:",
-                e
-            )
-
-            messages.error(
-                request,
-                "ثبت رزروها با خطا مواجه شد. دوباره تلاش کنید."
-            )
-
-            return redirect("reservation")
-
-        # =====================================================
-        # ذخیره رزروهای این فرآیند
-        # =====================================================
+            })
 
         request.session[
-            "pending_reservation_ids"
-        ] = created_reservation_ids
+            "pending_reservations"
+        ] = pending_reservations
+
+        # =====================================================
+        # پاک کردن انتخاب‌های قبلی
+        # =====================================================
 
         request.session.pop(
-            "pending_payment_type",
+            "reservation_discount_code",
             None
         )
 
         request.session.pop(
-            "pending_payment_amount",
+            "reservation_discount_amount",
+            None
+        )
+
+        request.session.pop(
+            "selected_payment_type",
+            None
+        )
+
+        request.session.pop(
+            "selected_payment_amount",
             None
         )
 
@@ -510,8 +598,7 @@ def reservation_view(request):
         # =====================================================
 
         return redirect(
-            "reservation_payment",
-            reservation_id=created_reservation_ids[-1]
+            "reservation_payment"
         )
 
     # =====================================================
@@ -526,7 +613,6 @@ def reservation_view(request):
             "barbers": barbers,
         }
     )
-
 # =========================================================
 # API ساعت‌های مسدود / رزرو شده
 # =========================================================
@@ -554,7 +640,7 @@ def blocked_times_api(request):
             date=date
         )
         .exclude(
-            status="cancel"
+              status__in=["cancel", "draft"]
         )
         .select_related(
             "service"
@@ -611,27 +697,10 @@ def blocked_times_api(request):
             + item.time.minute
         )
 
-        # مدت اختصاصی همین خدمت
-        barber_service_price = (
-            BarberServicePrice.objects
-            .filter(
-                barber=barber,
-                service=item.service
-            )
-            .first()
-        )
+        reservation_duration = item.total_duration
 
-        if barber_service_price:
-
-            reservation_duration = (
-                barber_service_price.duration
-            )
-
-        else:
-
-            reservation_duration = (
-                barber.appointment_duration
-            )
+        if not reservation_duration:
+             reservation_duration = barber.appointment_duration
 
         end_minutes = (
             start_minutes
@@ -738,160 +807,603 @@ def cancel_reservation(request, id):
 
     return redirect("/profile/")
 
-
 # =========================================================
 # صفحه پرداخت
 # =========================================================
+
 @login_required(login_url="/login/")
-def reservation_payment(request, reservation_id):
+def reservation_payment(request):
 
     # =====================================================
-    # رزرو اصلی
+    # دریافت اطلاعات موقت از Session
     # =====================================================
 
-    reservation = get_object_or_404(
-        Reservation,
-        id=reservation_id,
-        user=request.user
+    pending_reservations = request.session.get(
+        "pending_reservations"
     )
 
-    # =====================================================
-    # دریافت تمام رزروهای این فرآیند
-    # =====================================================
-
-    reservation_ids = request.session.get(
-        "pending_reservation_ids"
-    )
-
-    if not reservation_ids:
-        reservation_ids = [reservation.id]
-
-    reservations = (
-        Reservation.objects
-        .filter(
-            id__in=reservation_ids,
-            user=request.user
-        )
-        .exclude(
-            status="cancel"
-        )
-        .order_by(
-            "date",
-            "time"
-        )
-    )
-
-    # =====================================================
-    # بررسی وجود رزرو
-    # =====================================================
-
-    if not reservations.exists():
+    if not pending_reservations:
 
         messages.error(
             request,
-            "هیچ رزرو فعالی برای پرداخت وجود ندارد."
+            "اطلاعات رزرو پیدا نشد. دوباره تلاش کنید."
         )
 
-        request.session.pop(
-            "pending_reservation_ids",
-            None
+        return redirect("reservation")
+
+    # =====================================================
+    # ساخت اطلاعات رزرو برای نمایش صفحه
+    # =====================================================
+
+    reservations_data = []
+
+    base_total_price = 0
+
+    for item in pending_reservations:
+
+        try:
+
+            service = Service.objects.get(
+                id=item["service_id"],
+                is_active=True
+            )
+
+            barber = Barber.objects.get(
+                id=item["barber_id"],
+                is_active=True
+            )
+
+            date = datetime.strptime(
+                item["date"],
+                "%Y-%m-%d"
+            ).date()
+
+            time = datetime.strptime(
+                item["time"],
+                "%H:%M"
+            ).time()
+
+        except (
+            Service.DoesNotExist,
+            Barber.DoesNotExist,
+            ValueError
+        ):
+
+            messages.error(
+                request,
+                "اطلاعات یکی از رزروها دیگر معتبر نیست."
+            )
+
+            request.session.pop(
+                "pending_reservations",
+                None
+            )
+
+            request.session.modified = True
+
+            return redirect("reservation")
+
+        reservations_data.append({
+
+            "service": service,
+
+            "barber": barber,
+
+            "date": date,
+
+            "time": time,
+
+            "service_price":
+                int(item["service_price"]),
+
+            "deposit_amount":
+                int(item["deposit_amount"]),
+
+            "selected_details":
+                item.get(
+                    "selected_details",
+                    []
+                ),
+
+            "total_duration":
+                int(
+                    item["total_duration"]
+                ),
+
+        })
+
+        base_total_price += int(
+            item["service_price"]
         )
 
-        return redirect("/profile/")
-
     # =====================================================
-    # محاسبه مبالغ
+    # اطلاعات تخفیف
     # =====================================================
 
-    total_price = sum(
-        item.service_price
-        for item in reservations
+    discount_code = request.session.get(
+        "reservation_discount_code"
     )
 
-    total_deposit = sum(
-        item.deposit_amount
-        for item in reservations
+    discount_amount = int(
+        request.session.get(
+            "reservation_discount_amount",
+            0
+        )
     )
 
+    discount_error = None
+    discount_success = None
+
+    total_price = base_total_price
+
     # =====================================================
-    # اگر فرم پرداخت ارسال شده
+    # POST
     # =====================================================
 
     if request.method == "POST":
 
-        payment_type = request.POST.get(
-            "payment_type"
+        # =================================================
+        # اعمال کد تخفیف
+        # =================================================
+
+        code = request.POST.get(
+            "discount_code"
         )
 
-        # -------------------------------------------------
-        # اعتبارسنجی نوع پرداخت
-        # -------------------------------------------------
+        if code is not None:
 
-        if payment_type not in [
-            "deposit",
-            "full"
-        ]:
+            code = code.strip().upper()
 
-            messages.error(
-                request,
-                "نوع پرداخت نامعتبر است."
+            request.session.pop(
+                "reservation_discount_code",
+                None
             )
 
-            return redirect(
-                "reservation_payment",
-                reservation_id=reservation.id
+            request.session.pop(
+                "reservation_discount_amount",
+                None
             )
 
-        # -------------------------------------------------
-        # تعیین مبلغ قابل پرداخت
-        # -------------------------------------------------
+            discount_code = None
+            discount_amount = 0
 
-        if payment_type == "deposit":
+            if not code:
 
-            payable_amount = total_deposit
+                discount_error = (
+                    "کد تخفیف را وارد کنید."
+                )
+
+            else:
+
+                try:
+
+                    discount = DiscountCode.objects.get(
+                        code=code
+                    )
+
+                except DiscountCode.DoesNotExist:
+
+                    discount_error = (
+                        "کد تخفیف وارد شده معتبر نیست."
+                    )
+
+                else:
+
+                    if not discount.is_valid_now():
+
+                        discount_error = (
+                            "این کد تخفیف فعال یا معتبر نیست."
+                        )
+
+                    else:
+
+                        user_usage_count = (
+                            DiscountUsage.objects
+                            .filter(
+                                discount=discount,
+                                user=request.user
+                            )
+                            .count()
+                        )
+
+                        if (
+                            discount.per_user_limit is not None
+                            and user_usage_count
+                            >= discount.per_user_limit
+                        ):
+
+                            discount_error = (
+                                "شما قبلاً به تعداد مجاز "
+                                "از این کد استفاده کرده‌اید."
+                            )
+
+                        elif (
+                            discount.users.exists()
+                            and not discount.users.filter(
+                                id=request.user.id
+                            ).exists()
+                        ):
+
+                            discount_error = (
+                                "این کد تخفیف برای حساب "
+                                "شما قابل استفاده نیست."
+                            )
+
+                        elif (
+                            discount.minimum_purchase
+                            and base_total_price
+                            < discount.minimum_purchase
+                        ):
+
+                            discount_error = (
+                                f"حداقل مبلغ خرید برای این کد "
+                                f"{discount.minimum_purchase:,} تومان است."
+                            )
+
+                        else:
+
+                            eligible_reservations = []
+
+                            if discount.services_all:
+
+                                eligible_reservations = (
+                                    reservations_data
+                                )
+
+                            else:
+
+                                for item in reservations_data:
+
+                                    if discount.services.filter(
+                                        id=item["service"].id
+                                    ).exists():
+
+                                        eligible_reservations.append(
+                                            item
+                                        )
+
+                            if not eligible_reservations:
+
+                                discount_error = (
+                                    "این کد تخفیف برای "
+                                    "خدمات انتخاب‌شده قابل استفاده نیست."
+                                )
+
+                            else:
+
+                                eligible_amount = sum(
+                                    item["service_price"]
+                                    for item
+                                    in eligible_reservations
+                                )
+
+                                if (
+                                    discount.discount_type
+                                    == "percent"
+                                ):
+
+                                    discount_amount = (
+                                        eligible_amount
+                                        * discount.value
+                                        // 100
+                                    )
+
+                                else:
+
+                                    discount_amount = min(
+                                        discount.value,
+                                        eligible_amount
+                                    )
+
+                                total_price = max(
+                                    base_total_price
+                                    - discount_amount,
+                                    0
+                                )
+
+                                request.session[
+                                    "reservation_discount_code"
+                                ] = discount.code
+
+                                request.session[
+                                    "reservation_discount_amount"
+                                ] = int(
+                                    discount_amount
+                                )
+
+                                discount_code = discount.code
+
+                                discount_success = (
+                                    "کد تخفیف با موفقیت اعمال شد."
+                                )
+
+                                request.session.modified = True
+
+        # =================================================
+        # پرداخت
+        # =================================================
 
         else:
 
-            payable_amount = total_price
-
-        # =================================================
-        # فعلاً درگاه نداریم
-        #
-        # بنابراین انتخاب کاربر را در Session نگه می‌داریم.
-        # بعداً همین payable_amount را می‌دهیم به درگاه.
-        # =================================================
-
-        request.session[
-            "selected_payment_type"
-        ] = payment_type
-
-        request.session[
-            "selected_payment_amount"
-        ] = payable_amount
-
-        request.session.modified = True
-
-        # -------------------------------------------------
-        # فعلاً برگرد به همین صفحه
-        # -------------------------------------------------
-
-        messages.success(
-            request,
-            (
-                "پرداخت بیعانه انتخاب شد."
-                if payment_type == "deposit"
-                else
-                "پرداخت کامل انتخاب شد."
+            payment_type = request.POST.get(
+                "payment_type"
             )
-        )
 
-        return redirect(
-            "reservation_payment",
-            reservation_id=reservation.id
-        )
+            if payment_type not in [
+                "deposit",
+                "full"
+            ]:
+
+                messages.error(
+                    request,
+                    "نوع پرداخت نامعتبر است."
+                )
+
+                return redirect(
+                    "reservation_payment"
+                )
+
+            # =================================================
+            # محاسبه مبلغ
+            # =================================================
+
+            total_deposit = int(
+                total_price * 10 / 100
+            )
+
+            if payment_type == "deposit":
+
+                payable_amount = total_deposit
+
+            else:
+
+                payable_amount = total_price
+
+            # =================================================
+            # جلوگیری از دوباره ساخته شدن رزرو
+            # =================================================
+
+            existing_ids = request.session.get(
+                "created_reservation_ids"
+            )
+
+            if existing_ids:
+
+                existing_count = (
+                    Reservation.objects
+                    .filter(
+                        id__in=existing_ids,
+                        user=request.user
+                    )
+                    .count()
+                )
+
+                if existing_count == len(existing_ids):
+
+                    request.session[
+                        "selected_payment_type"
+                    ] = payment_type
+
+                    request.session[
+                        "selected_payment_amount"
+                    ] = payable_amount
+
+                    request.session.modified = True
+
+                    return redirect(
+                        "reservation_payment"
+                    )
+
+            # =================================================
+            # ساخت واقعی رزروها
+            # =================================================
+
+            created_reservation_ids = []
+
+            try:
+
+                with transaction.atomic():
+
+                    for item in reservations_data:
+
+                        reservation = (
+                            Reservation.objects.create(
+
+                                user=request.user,
+
+                                customer_name=(
+                                    request.user.full_name
+                                ),
+
+                                customer_phone=(
+                                    request.user.phone
+                                ),
+
+                                service=item["service"],
+
+                                barber=item["barber"],
+
+                                date=item["date"],
+
+                                time=item["time"],
+
+                                service_price=(
+                                    item["service_price"]
+                                ),
+
+                                deposit_amount=int(
+                                    total_price * 10 / 100
+                                ),
+
+                                selected_details=(
+                                    item["selected_details"]
+                                ),
+
+                                total_duration=(
+                                    item["total_duration"]
+                                ),
+
+                                status="pending",
+
+                                payment_status="pending",
+                            )
+                        )
+
+                        created_reservation_ids.append(
+                            reservation.id
+                        )
+
+                        # =====================================
+                        # پیامک فقط بعد از ایجاد رزرو
+                        # =====================================
+
+                        send_appointment_confirmation_sms(
+
+                            phone=request.user.phone,
+
+                            name=request.user.full_name,
+
+                            barber=(
+                                reservation
+                                .barber
+                                .user
+                                .full_name
+                            ),
+
+                            date=reservation.date,
+
+                            appointment_time=(
+                                reservation.time
+                            ),
+
+                        )
+
+            except Exception as e:
+
+                print(
+                    "RESERVATION CREATE ERROR:",
+                    e
+                )
+
+                messages.error(
+                    request,
+                    "ثبت رزروها با خطا مواجه شد. دوباره تلاش کنید."
+                )
+
+                return redirect(
+                    "reservation_payment"
+                )
+
+            # =================================================
+            # ذخیره ID رزروهای واقعی
+            # =================================================
+
+            request.session[
+                "created_reservation_ids"
+            ] = created_reservation_ids
+
+            request.session[
+                "selected_payment_type"
+            ] = payment_type
+
+            request.session[
+                "selected_payment_amount"
+            ] = payable_amount
+
+            # اطلاعات موقت دیگر لازم نیست
+
+            request.session.pop(
+                "pending_reservations",
+                None
+            )
+
+            request.session.modified = True
+
+            # =================================================
+            # اینجا بعداً اتصال درگاه پرداخت
+            # =================================================
+
+            messages.success(
+                request,
+                (
+                    "رزرو با موفقیت ثبت شد. "
+                    "در حال انتقال به پرداخت..."
+                )
+            )
+
+            return redirect(
+                "reservation_payment"
+            )
 
     # =====================================================
-    # انتخاب قبلی کاربر
+    # تخفیف قبلی Session
+    # =====================================================
+
+    elif discount_code:
+
+        try:
+
+            discount = DiscountCode.objects.get(
+                code=discount_code
+            )
+
+            if discount.is_valid_now():
+
+                discount_amount = min(
+                    discount_amount,
+                    base_total_price
+                )
+
+                total_price = max(
+                    base_total_price
+                    - discount_amount,
+                    0
+                )
+
+            else:
+
+                request.session.pop(
+                    "reservation_discount_code",
+                    None
+                )
+
+                request.session.pop(
+                    "reservation_discount_amount",
+                    None
+                )
+
+                discount_code = None
+                discount_amount = 0
+
+                request.session.modified = True
+
+        except DiscountCode.DoesNotExist:
+
+            request.session.pop(
+                "reservation_discount_code",
+                None
+            )
+
+            request.session.pop(
+                "reservation_discount_amount",
+                None
+            )
+
+            discount_code = None
+            discount_amount = 0
+
+            request.session.modified = True
+
+    # =====================================================
+    # بیعانه
+    # =====================================================
+
+    total_deposit = int(
+        total_price * 10 / 100
+    )
+
+    # =====================================================
+    # انتخاب قبلی پرداخت
     # =====================================================
 
     selected_payment_type = request.session.get(
@@ -905,6 +1417,28 @@ def reservation_payment(request, reservation_id):
     )
 
     # =====================================================
+    # رزروهای واقعی ساخته‌شده
+    # برای نمایش در صفحه
+    # =====================================================
+
+    created_reservation_ids = request.session.get(
+        "created_reservation_ids",
+        []
+    )
+
+    real_reservations = (
+        Reservation.objects
+        .filter(
+            id__in=created_reservation_ids,
+            user=request.user
+        )
+        .order_by(
+            "date",
+            "time"
+        )
+    )
+
+    # =====================================================
     # نمایش صفحه
     # =====================================================
 
@@ -912,13 +1446,35 @@ def reservation_payment(request, reservation_id):
         request,
         "core/reservation_payment.html",
         {
-            "reservation": reservation,
+            "reservation":
+                real_reservations.first(),
 
-            "reservations": reservations,
+            "reservations":
+                real_reservations,
 
-            "total_price": total_price,
+            "reservations_data":
+                reservations_data,
 
-            "total_deposit": total_deposit,
+            "base_total_price":
+                base_total_price,
+
+            "total_price":
+                total_price,
+
+            "total_deposit":
+                total_deposit,
+
+            "discount_code":
+                discount_code,
+
+            "discount_amount":
+                discount_amount,
+
+            "discount_error":
+                discount_error,
+
+            "discount_success":
+                discount_success,
 
             "selected_payment_type":
                 selected_payment_type,

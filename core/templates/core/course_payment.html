@@ -24,10 +24,12 @@
         <div class="course-payment-info">
 
             {% if course.image %}
-            <img 
-                src="{{ course.image.url }}" 
+
+            <img
+                src="{{ course.image.url }}"
                 alt="{{ course.title }}"
             >
+
             {% endif %}
 
 
@@ -41,13 +43,73 @@
             </p>
 
 
-            <span>
-                {{ course.price|price_format }} تومان
-            </span>
+            {% if discount_amount > 0 %}
 
+                <del>
+                    {{ base_price|price_format }}
+                    تومان
+                </del>
+
+                <span>
+                    {{ final_price|price_format }}
+                    تومان
+                </span>
+
+            {% else %}
+
+                <span>
+                    {{ final_price|price_format }}
+                    تومان
+                </span>
+
+            {% endif %}
 
         </div>
 
+
+        <!-- ========================================= -->
+        <!-- کد تخفیف -->
+        <!-- ========================================= -->
+
+        <div class="course-discount-box">
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <input
+                    type="text"
+                    name="discount_code"
+                    placeholder="کد تخفیف"
+                    value="{{ discount_code|default:'' }}"
+                    autocomplete="off"
+                >
+
+                <button type="submit">
+                    اعمال
+                </button>
+
+            </form>
+
+
+            {% if discount_error %}
+
+                <div class="discount-error">
+                    {{ discount_error }}
+                </div>
+
+            {% endif %}
+
+
+            {% if discount_success %}
+
+                <div class="discount-success">
+                    {{ discount_success }}
+                </div>
+
+            {% endif %}
+
+        </div>
 
 
         <div class="payment-warning">
@@ -59,11 +121,11 @@
 
 
 
-        <a 
-        href="{% url 'course_payment_success' course.id %}"
-        class="payment-btn"
+        <a
+            href="{% url 'course_payment_success' course.id %}"
+            class="payment-btn"
         >
-            پرداخت موفق
+            پرداخت 
         </a>
 
 
@@ -71,8 +133,13 @@
 
 
 </section>
+
+
 {% load static %}
 
-<link rel="stylesheet" href="{% static 'css/course_payment.css' %}">
+<link
+    rel="stylesheet"
+    href="{% static 'css/course_payment.css' %}"
+>
 
 {% endblock %}

@@ -12,11 +12,10 @@
         پیشنهادات صفحه اصلی
     </h1>
 
-    <a href="{% url 'home_offer_add' %}" class="btn">
+    <a href="{% url 'home_offer_add' %}" class="btn-add">
         <i class="fa-solid fa-plus"></i>
         افزودن پیشنهاد
     </a>
-
 </div>
 
 
@@ -65,29 +64,34 @@
                         {% endif %}
 
                     </td>
+<td>
 
-                    <td>
+    <a
+        href="{% url 'home_offer_edit' offer.id %}"
+        class="btn-edit"
+    >
+        ویرایش
+    </a>
 
-                        <a href="{% url 'home_offer_edit' offer.id %}">
-                            ویرایش
-                        </a>
+    <form
+        method="post"
+        action="{% url 'home_offer_delete' offer.id %}"
+        style="display:inline;"
+    >
 
-                        <form
-                            method="post"
-                            action="{% url 'home_offer_delete' offer.id %}"
-                            style="display:inline;"
-                        >
+        {% csrf_token %}
 
-                            {% csrf_token %}
+       <button
+    type="submit"
+    class="btn-delete"
+    onclick="return confirm('آیا مطمئن هستید که می‌خواهید این پیشنهاد را حذف کنید؟');"
+>
+    حذف
+</button>
 
-                            <button type="submit">
-                                حذف
-                            </button>
+    </form>
 
-                        </form>
-
-                    </td>
-
+</td>
                 </tr>
 
                 {% endfor %}

@@ -45,6 +45,8 @@ from services.models import (
     Service,
     ServiceImage,
     BarberServicePrice,
+    ServiceDetail,
+    BarberServiceDetailPrice,
 )
 from .forms import BarberForm, BarberEditForm
 @login_required
@@ -646,9 +648,9 @@ def reservations_live(request):
         "service"
     )
 
-    # -----------------------------
-    # آرایشگر فقط نوبت‌های خودش
-    # -----------------------------
+    # ---------------------------------
+    # اگر آرایشگر باشد فقط نوبت‌های خودش
+    # ---------------------------------
 
     if request.user.is_barber:
 
@@ -656,16 +658,14 @@ def reservations_live(request):
             barber__user=request.user
         )
 
-    # -----------------------------
-    # فیلتر جستجو
-    # -----------------------------
+    # ---------------------------------
+    # فیلترهای ادمین
+    # ---------------------------------
 
     else:
 
         search = request.GET.get("search")
-
         barber = request.GET.get("barber")
-
         date = request.GET.get("date")
 
         if search:
@@ -687,29 +687,25 @@ def reservations_live(request):
                 date=date
             )
 
-    # -----------------------------
+    # ---------------------------------
     # پیش‌رو / گذشته
-    # -----------------------------
+    # ---------------------------------
 
     show_past = request.GET.get("past") == "1"
 
     now = timezone.localtime()
 
     today = now.date()
-
     current_time = now.time()
 
     if show_past:
 
         reservations = reservations.filter(
-
             Q(date__lt=today) |
-
             Q(
                 date=today,
                 time__lt=current_time
             )
-
         ).order_by(
             "-date",
             "-time"
@@ -718,33 +714,27 @@ def reservations_live(request):
     else:
 
         reservations = reservations.filter(
-
             Q(date__gt=today) |
-
             Q(
                 date=today,
                 time__gte=current_time
             )
-
         ).order_by(
             "date",
             "time"
         )
 
-    # -----------------------------
-    # تبدیل اطلاعات به JSON
-    # -----------------------------
+    # ---------------------------------
+    # تبدیل به JSON
+    # ---------------------------------
 
     data = []
 
     for reservation in reservations:
 
         if reservation.user:
-
             customer_name = reservation.user.full_name
-
         else:
-
             customer_name = reservation.customer_name
 
         jalali_date = jdatetime.date.fromgregorian(
@@ -759,6 +749,12 @@ def reservations_live(request):
 
             "service": reservation.service.name,
 
+            "service_price": reservation.service_price or 0,
+
+            "paid_amount": reservation.paid_amount or 0,
+
+            "remaining_amount": reservation.remaining_amount or 0,
+
             "barber": reservation.barber.user.full_name,
 
             "date": jalali_date,
@@ -767,12 +763,12 @@ def reservations_live(request):
 
             "status": reservation.status,
 
+            "status_display": reservation.get_status_display(),
+
         })
 
     return JsonResponse({
-
         "reservations": data
-
     })
 
 @login_required
@@ -829,6 +825,10 @@ def service_add(request):
 
             service = form.save()
 
+            # ==========================================
+            # قیمت و زمان اصلی هر آرایشگر
+            # ==========================================
+
             for barber in service.barbers.all():
 
                 price = request.POST.get(
@@ -850,6 +850,89 @@ def service_add(request):
                         }
                     )
 
+            # ==========================================
+            # جزئیات خدمت
+            # ==========================================
+
+            detail_indexes = request.POST.getlist(
+                "detail_indexes"
+            )
+
+            for index in detail_indexes:
+
+                name = request.POST.get(
+                    f"detail_name_{index}",
+                    ""
+                ).strip()
+
+                if not name:
+                    continue
+
+                detail = ServiceDetail.objects.create(
+                    service=service,
+
+                    name=name,
+
+                    description=request.POST.get(
+                        f"detail_description_{index}",
+                        ""
+                    ).strip(),
+
+                    order=int(
+                        request.POST.get(
+                            f"detail_order_{index}",
+                            0
+                        ) or 0
+                    ),
+
+                    is_active=(
+                        request.POST.get(
+                            f"detail_active_{index}"
+                        ) == "on"
+                    ),
+                )
+
+                # ======================================
+                # قیمت و زمان جزئیات برای هر آرایشگر
+                # ======================================
+
+                for barber in service.barbers.all():
+
+                    selected = request.POST.get(
+                        f"detail_barber_{index}_{barber.id}"
+                    )
+
+                    if not selected:
+                        continue
+
+                    price = request.POST.get(
+                        f"detail_price_{index}_{barber.id}"
+                    )
+
+                    duration = request.POST.get(
+                        f"detail_duration_{index}_{barber.id}"
+                    )
+
+                    if price:
+
+                        BarberServiceDetailPrice.objects.create(
+
+                            detail=detail,
+
+                            barber=barber,
+
+                            price=int(price),
+
+                            duration=int(
+                                duration or 10
+                            )
+                        )
+
+            messages.success(
+                request,
+                "خدمت با موفقیت اضافه شد."
+            )
+
             return redirect(
                 "superadmin_services"
             )
@@ -857,6 +940,10 @@ def service_add(request):
     else:
 
         form = ServiceForm()
+
+        # ==========================================
+    # اطلاعات آرایشگرها برای HTML و JavaScript
+    # ==========================================
 
     barber_rows = []
 
@@ -866,28 +953,45 @@ def service_add(request):
 
             "barber": barber,
 
-            "selected": (
-                barber in form.instance.barbers.all()
-                if form.instance.pk
-                else False
-            ),
+            "selected": False,
 
-            "price": form.barber_prices.get(
-                barber.id,
-                ""
-            ),
+            "price": "",
 
             "duration": 30,
 
         })
+
+
+    # ==========================================
+    # اطلاعات JSON-safe برای JavaScript
+    # ==========================================
+
+    barber_data = []
+
+    for barber in form.fields["barbers"].queryset:
+
+        barber_data.append({
+
+            "id": barber.id,
+
+            "full_name": barber.user.full_name,
+
+        })
+
 
     return render(
         request,
         "superadmin_panel/service_form.html",
         {
             "form": form,
+
             "title": "افزودن خدمت",
+
             "barber_rows": barber_rows,
+
+            "barber_data": barber_data,
+
+            "detail_rows": [],
         }
     )
 
@@ -990,6 +1094,10 @@ def service_edit(request, id):
 
             service = form.save()
 
+            # ==========================================
+            # بروزرسانی قیمت و زمان اصلی آرایشگرها
+            # ==========================================
+
             BarberServicePrice.objects.filter(
                 service=service
             ).delete()
@@ -1007,11 +1115,109 @@ def service_edit(request, id):
                 if price:
 
                     BarberServicePrice.objects.create(
+
                         service=service,
+
                         barber=barber,
+
                         price=int(price),
-                        duration=int(duration or 30)
+
+                        duration=int(
+                            duration or 30
+                        )
                     )
+
+            # ==========================================
+            # حذف جزئیات قبلی
+            # ==========================================
+
+            ServiceDetail.objects.filter(
+                service=service
+            ).delete()
+
+            # ==========================================
+            # ساخت جزئیات جدید
+            # ==========================================
+
+            detail_indexes = request.POST.getlist(
+                "detail_indexes"
+            )
+
+            for index in detail_indexes:
+
+                name = request.POST.get(
+                    f"detail_name_{index}",
+                    ""
+                ).strip()
+
+                if not name:
+                    continue
+
+                detail = ServiceDetail.objects.create(
+
+                    service=service,
+
+                    name=name,
+
+                    description=request.POST.get(
+                        f"detail_description_{index}",
+                        ""
+                    ).strip(),
+
+                    order=int(
+                        request.POST.get(
+                            f"detail_order_{index}",
+                            0
+                        ) or 0
+                    ),
+
+                    is_active=(
+                        request.POST.get(
+                            f"detail_active_{index}"
+                        ) == "on"
+                    ),
+                )
+
+                # ======================================
+                # قیمت و زمان هر آرایشگر
+                # ======================================
+
+                for barber in service.barbers.all():
+
+                    selected = request.POST.get(
+                        f"detail_barber_{index}_{barber.id}"
+                    )
+
+                    if not selected:
+                        continue
+
+                    price = request.POST.get(
+                        f"detail_price_{index}_{barber.id}"
+                    )
+
+                    duration = request.POST.get(
+                        f"detail_duration_{index}_{barber.id}"
+                    )
+
+                    if price:
+
+                        BarberServiceDetailPrice.objects.create(
+
+                            detail=detail,
+
+                            barber=barber,
+
+                            price=int(price),
+
+                            duration=int(
+                                duration or 10
+                            )
+                        )
+
+            messages.success(
+                request,
+                "خدمت با موفقیت ویرایش شد."
+            )
 
             return redirect(
                 "superadmin_services"
@@ -1022,6 +1228,10 @@ def service_edit(request, id):
         form = ServiceForm(
             instance=service
         )
+
+    # ==========================================
+    # آرایشگرهای اصلی
+    # ==========================================
 
     barber_rows = []
 
@@ -1056,6 +1266,66 @@ def service_edit(request, id):
 
         })
 
+    # ==========================================
+    # جزئیات قبلی برای ویرایش
+    # ==========================================
+
+    detail_rows = []
+
+    details = service.details.all().order_by(
+        "order",
+        "id"
+    )
+
+    for detail in details:
+
+        barber_rows_for_detail = []
+
+        for barber in service.barbers.all():
+
+            detail_price = (
+                BarberServiceDetailPrice.objects.filter(
+                    detail=detail,
+                    barber=barber
+                ).first()
+            )
+
+            barber_rows_for_detail.append({
+
+                "barber": barber,
+
+                "selected": (
+                    detail_price is not None
+                ),
+
+                "price": (
+                    detail_price.price
+                    if detail_price
+                    else ""
+                ),
+
+                "duration": (
+                    detail_price.duration
+                    if detail_price
+                    else 10
+                ),
+
+            })
+
+        detail_rows.append({
+
+            "name": detail.name,
+
+            "description": detail.description,
+
+            "order": detail.order,
+
+            "is_active": detail.is_active,
+
+            "barbers": barber_rows_for_detail,
+
+        })
+
     return render(
         request,
         "superadmin_panel/service_form.html",
@@ -1063,6 +1333,7 @@ def service_edit(request, id):
             "form": form,
             "title": "ویرایش خدمت",
             "barber_rows": barber_rows,
+            "detail_rows": detail_rows,
         }
     )
 
@@ -1608,6 +1879,8 @@ def barber_walkin_reservation(request):
             date = form.cleaned_data["date"]
             time = form.cleaned_data["time"]
 
+            service = form.cleaned_data["service"]
+
             # =========================
             # بررسی نوبت موجود
             # =========================
@@ -1638,46 +1911,76 @@ def barber_walkin_reservation(request):
 
             else:
 
-                Reservation.objects.create(
+                # =========================
+                # پیدا کردن قیمت خدمت
+                # =========================
 
-                    user=None,
-
-                    customer_name=form.cleaned_data[
-                        "customer_name"
-                    ],
-
-                    customer_phone=form.cleaned_data[
-                        "customer_phone"
-                    ],
-
+                barber_service_price = BarberServicePrice.objects.filter(
                     barber=barber,
+                    service=service
+                ).first()
 
-                    service=form.cleaned_data[
-                        "service"
-                    ],
+                if not barber_service_price:
 
-                    date=date,
+                    messages.error(
+                        request,
+                        "قیمت این خدمت برای آرایشگر انتخاب‌شده ثبت نشده است."
+                    )
 
-                    time=time,
+                else:
 
-                    status="approved"
+                    service_price = barber_service_price.price
 
-                )
+                    # =========================
+                    # ثبت نوبت حضوری
+                    # =========================
 
-                messages.success(
-                    request,
-                    "نوبت حضوری با موفقیت ثبت شد."
-                )
+                    Reservation.objects.create(
 
-                if is_admin:
+                        user=None,
+
+                        customer_name=form.cleaned_data[
+                            "customer_name"
+                        ],
+
+                        customer_phone=form.cleaned_data[
+                            "customer_phone"
+                        ],
+
+                        barber=barber,
+
+                        service=service,
+
+                        date=date,
+
+                        time=time,
+
+                        service_price=service_price,
+
+                        deposit_amount=0,
+
+                        paid_amount=service_price,
+
+                        payment_status="paid",
+
+                        status="approved"
+
+                    )
+
+                    messages.success(
+                        request,
+                        "نوبت حضوری با موفقیت ثبت شد."
+                    )
+
+                    if is_admin:
+
+                        return redirect(
+                            "barber_walkin_reservation"
+                        )
 
                     return redirect(
                         "barber_walkin_reservation"
                     )
-
-                return redirect(
-                    "barber_walkin_reservation"
-                )
 
     else:
 
@@ -1714,7 +2017,6 @@ def barber_walkin_reservation(request):
             "is_admin": is_admin,
         }
     )
-
 @login_required
 def barber_walkin_busy_times(request):
 
@@ -2643,16 +2945,29 @@ def product_features(request, product_id):
     )
 
 from shop.models import Order
-
 def orders(request):
 
-    orders = Order.objects.all().order_by("-created_at")
+    search = request.GET.get(
+        "search",
+        ""
+    ).strip()
+
+    orders = Order.objects.all()
+
+    if search:
+
+        orders = orders.filter(
+            tracking_code__iexact=search
+        )
+
+    orders = orders.order_by("-created_at")
 
     return render(
         request,
         "superadmin_panel/orders.html",
         {
             "orders": orders,
+            "search": search,
         }
     )
 def order_detail(request, id):
@@ -2701,7 +3016,7 @@ def update_order_status(request, id):
             response = send_order_confirmation_sms(
                 phone=order.phone,
                 name=order.full_name,
-                order_number=order.id,
+                order_number=order.tracking_code,
                 price=order.total_price,
             )
 
@@ -3426,4 +3741,425 @@ def home_offer_delete(request, pk):
 
     return redirect(
         "home_offers"
+    )
+
+@login_required
+def reservation_detail(request, reservation_id):
+
+    reservation = get_object_or_404(
+        Reservation.objects.select_related(
+            "user",
+            "service",
+            "barber__user",
+        ),
+        id=reservation_id
+    )
+
+    # تبدیل تاریخ میلادی به جلالی
+    import jdatetime
+
+    jalali_date = jdatetime.date.fromgregorian(
+        date=reservation.date
+    )
+
+    jalali_date = (
+        f"{jalali_date.year}/"
+        f"{jalali_date.month:02d}/"
+        f"{jalali_date.day:02d}"
+    )
+
+    return render(
+        request,
+        "superadmin_panel/reservation_detail.html",
+        {
+            "reservation": reservation,
+            "jalali_date": jalali_date,
+        }
+    )
+@login_required
+def sms_management(request):
+
+    from users.models import CustomUser
+    from users.sms import send_simple_sms
+
+    users_count = (
+        CustomUser.objects
+        .filter(is_active=True)
+        .exclude(phone__isnull=True)
+        .exclude(phone="")
+        .count()
+    )
+
+    reservation_users_count = (
+        Reservation.objects
+        .filter(
+            user__isnull=False,
+            user__is_active=True
+        )
+        .exclude(user__phone__isnull=True)
+        .exclude(user__phone="")
+        .values("user")
+        .distinct()
+        .count()
+    )
+
+    # =========================================
+    # ارسال پیامک
+    # =========================================
+
+    if request.method == "POST":
+
+        message = request.POST.get(
+            "message",
+            ""
+        ).strip()
+
+        recipient_type = request.POST.get(
+            "recipient_type",
+            ""
+        )
+
+        # =====================================
+        # بررسی متن
+        # =====================================
+
+        if not message:
+
+            return redirect(
+                "/superadmin/sms/?sms_error=متن پیامک را وارد کنید."
+            )
+
+        # =====================================
+        # همه کاربران
+        # =====================================
+
+        if recipient_type == "all":
+
+            users = (
+                CustomUser.objects
+                .filter(is_active=True)
+                .exclude(phone__isnull=True)
+                .exclude(phone="")
+            )
+
+        # =====================================
+        # مشتریان دارای نوبت
+        # =====================================
+
+        elif recipient_type == "reservation":
+
+            user_ids = (
+                Reservation.objects
+                .filter(
+                    user__isnull=False,
+                    user__is_active=True
+                )
+                .exclude(user__phone__isnull=True)
+                .exclude(user__phone="")
+                .values_list(
+                    "user_id",
+                    flat=True
+                )
+                .distinct()
+            )
+
+            users = (
+                CustomUser.objects
+                .filter(
+                    id__in=user_ids,
+                    is_active=True
+                )
+                .exclude(phone__isnull=True)
+                .exclude(phone="")
+            )
+
+        # =====================================
+        # انتخاب دستی
+        # =====================================
+
+        elif recipient_type == "manual":
+
+            user_ids = request.POST.getlist(
+                "manual_users"
+            )
+
+            users = (
+                CustomUser.objects
+                .filter(
+                    id__in=user_ids,
+                    is_active=True
+                )
+                .exclude(phone__isnull=True)
+                .exclude(phone="")
+            )
+
+        # =====================================
+        # نوع نامعتبر
+        # =====================================
+
+        else:
+
+            return redirect(
+                "/superadmin/sms/?sms_error=نوع گیرندگان نامعتبر است."
+            )
+
+        # =====================================
+        # گرفتن شماره‌ها
+        # =====================================
+
+        recipients = list(
+            users.values_list(
+                "phone",
+                flat=True
+            )
+        )
+
+        # =====================================
+        # بررسی گیرنده
+        # =====================================
+
+        if not recipients:
+
+            return redirect(
+                "/superadmin/sms/?sms_error=هیچ گیرنده‌ای برای ارسال پیدا نشد."
+            )
+
+        # =====================================
+        # ارسال پیامک
+        # =====================================
+
+        try:
+
+            success_count = 0
+
+            for phone in recipients:
+
+                response = send_simple_sms(
+                    phone,
+                    message
+                )
+
+                if (
+                    response
+                    and response.status_code == 201
+                ):
+                    success_count += 1
+
+            # =================================
+            # نتیجه
+            # =================================
+
+            if success_count == len(recipients):
+
+                return redirect(
+                    f"/superadmin/sms/?sms_success="
+                    f"پیامک با موفقیت برای {success_count} نفر ارسال شد."
+                )
+
+            elif success_count > 0:
+
+                return redirect(
+                    f"/superadmin/sms/?sms_warning="
+                    f"پیامک برای {success_count} نفر از "
+                    f"{len(recipients)} نفر ارسال شد."
+                )
+
+            else:
+
+                return redirect(
+                    "/superadmin/sms/?sms_error="
+                    "ارسال پیامک برای هیچ‌کدام از گیرندگان موفق نبود."
+                )
+
+        except Exception as e:
+
+            print(
+                "SMS MANAGEMENT ERROR:",
+                repr(e)
+            )
+
+            return redirect(
+                "/superadmin/sms/?sms_error="
+                "هنگام ارسال پیامک خطایی رخ داد."
+            )
+
+    # =========================================
+    # نتیجه ارسال
+    # =========================================
+
+    sms_success = request.GET.get(
+        "sms_success"
+    )
+
+    sms_warning = request.GET.get(
+        "sms_warning"
+    )
+
+    sms_error = request.GET.get(
+        "sms_error"
+    )
+
+    # =========================================
+    # نمایش صفحه
+    # =========================================
+
+    return render(
+        request,
+        "superadmin_panel/sms_management.html",
+        {
+            "users_count": users_count,
+            "reservation_users_count": reservation_users_count,
+
+            "sms_success": sms_success,
+            "sms_warning": sms_warning,
+            "sms_error": sms_error,
+        }
+    )
+
+@login_required
+def sms_search_users(request):
+
+    search = request.GET.get(
+        "search",
+        ""
+    ).strip()
+
+    users = CustomUser.objects.filter(
+        is_active=True
+    )
+
+    if search:
+
+        users = users.filter(
+            Q(full_name__icontains=search) |
+            Q(phone__icontains=search)
+        )
+
+    users = users.order_by(
+        "full_name"
+    )[:50]
+
+    data = []
+
+    for user in users:
+
+        data.append({
+            "id": user.id,
+            "name": user.full_name,
+            "phone": user.phone,
+        })
+
+    return JsonResponse({
+        "users": data
+    })
+
+
+
+from django.shortcuts import (
+    render,
+    redirect,
+    get_object_or_404,
+)
+
+from discounts.models import DiscountCode
+from discounts.forms import DiscountCodeForm
+
+
+# =========================================================
+# لیست کدهای تخفیف
+# =========================================================
+
+def superadmin_discounts(request):
+
+    discount_codes = (
+        DiscountCode.objects
+        .all()
+        .order_by("-created_at")
+    )
+
+    context = {
+        "discount_codes": discount_codes,
+    }
+
+    return render(
+        request,
+        "superadmin_panel/discounts.html",
+        context,
+    )
+
+
+# =========================================================
+# ایجاد کد تخفیف
+# =========================================================
+
+def add_discount(request):
+
+    if request.method == "POST":
+
+        form = DiscountCodeForm(request.POST)
+
+        if form.is_valid():
+
+            discount = form.save()
+
+            return redirect(
+                "superadmin_discounts"
+            )
+
+    else:
+
+        form = DiscountCodeForm()
+
+    context = {
+        "form": form,
+    }
+
+    return render(
+        request,
+        "superadmin_panel/discount_form.html",
+        context,
+    )
+
+
+# =========================================================
+# ویرایش کد تخفیف
+# =========================================================
+
+def edit_discount(request, discount_id):
+
+    discount = get_object_or_404(
+        DiscountCode,
+        id=discount_id
+    )
+
+    if request.method == "POST":
+
+        form = DiscountCodeForm(
+            request.POST,
+            instance=discount
+        )
+
+        if form.is_valid():
+
+            discount = form.save()
+
+            return redirect(
+                "superadmin_discounts"
+            )
+
+    else:
+
+        form = DiscountCodeForm(
+            instance=discount
+        )
+
+    context = {
+        "form": form,
+        "discount": discount,
+    }
+
+    return render(
+        request,
+        "superadmin_panel/discount_form.html",
+        context,
     )

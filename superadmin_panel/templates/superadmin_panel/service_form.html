@@ -1,5 +1,6 @@
-
 {% extends "superadmin_panel/base.html" %}
+
+{% load static %}
 
 {% block title %}
 {{ title }}
@@ -19,7 +20,9 @@
     {{ form.non_field_errors }}
 
 
-    <!-- نام خدمت -->
+    <!-- =====================================================
+         نام خدمت
+    ====================================================== -->
 
     <div>
         {{ form.name.label_tag }}
@@ -28,7 +31,9 @@
     </div>
 
 
-    <!-- دسته بندی -->
+    <!-- =====================================================
+         دسته بندی
+    ====================================================== -->
 
     <div>
         {{ form.category.label_tag }}
@@ -37,7 +42,9 @@
     </div>
 
 
-    <!-- قیمت پایه -->
+    <!-- =====================================================
+         قیمت پایه
+    ====================================================== -->
 
     <div style="margin-top:20px;">
 
@@ -56,7 +63,9 @@
     </div>
 
 
-    <!-- آرایشگرها -->
+    <!-- =====================================================
+         آرایشگرهای اصلی خدمت
+    ====================================================== -->
 
     <div style="margin-top:25px;">
 
@@ -76,7 +85,6 @@
                 border-radius:8px;
                 flex-wrap:wrap;
             ">
-
 
                 <!-- انتخاب آرایشگر -->
 
@@ -158,7 +166,238 @@
     </div>
 
 
-    <!-- توضیحات -->
+    <!-- =====================================================
+         جزئیات خدمت
+    ====================================================== -->
+
+    <div style="margin-top:30px;">
+
+        <h3>
+            جزئیات خدمت
+        </h3>
+
+
+        <div id="service-details">
+
+            {% for detail in detail_rows %}
+
+                <div
+                    class="detail-row"
+                    style="
+                        border:1px solid #ddd;
+                        border-radius:8px;
+                        padding:15px;
+                        margin:10px 0;
+                    "
+                >
+
+                    <!-- شناسه جزئیات -->
+
+                    <input
+                        type="hidden"
+                        name="detail_indexes"
+                        value="{{ forloop.counter }}"
+                    >
+
+
+                    <!-- نام جزئیات -->
+
+                    <div>
+
+                        <label>
+                            نام جزئیات:
+                        </label>
+
+                        <input
+                            type="text"
+                            name="detail_name_{{ forloop.counter }}"
+                            value="{{ detail.name }}"
+                            placeholder="مثلاً اصلاح ریش"
+                            style="
+                                width:200px;
+                                padding:8px;
+                            "
+                        >
+
+                    </div>
+
+
+                    <!-- توضیحات -->
+
+                    <div style="margin-top:10px;">
+
+                        <label>
+                            توضیحات:
+                        </label>
+
+                        <input
+                            type="text"
+                            name="detail_description_{{ forloop.counter }}"
+                            value="{{ detail.description }}"
+                            placeholder="توضیح کوتاه"
+                            style="
+                                width:300px;
+                                padding:8px;
+                            "
+                        >
+
+                    </div>
+
+
+                    <!-- ترتیب -->
+
+                    <div style="margin-top:10px;">
+
+                        <label>
+                            ترتیب:
+                        </label>
+
+                        <input
+                            type="number"
+                            name="detail_order_{{ forloop.counter }}"
+                            value="{{ detail.order }}"
+                            min="0"
+                            style="
+                                width:100px;
+                                padding:8px;
+                            "
+                        >
+
+                    </div>
+
+
+                    <!-- فعال -->
+
+                    <div style="margin-top:10px;">
+
+                        <label>
+
+                            <input
+                                type="checkbox"
+                                name="detail_active_{{ forloop.counter }}"
+
+                                {% if detail.is_active %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            فعال
+
+                        </label>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         آرایشگرهای این جزئیات
+                    ================================================== -->
+
+                    <div style="margin-top:20px;">
+
+                        <strong>
+                            آرایشگر، قیمت و زمان این جزئیات
+                        </strong>
+
+
+                        {% for barber in detail.barbers %}
+
+                            <div style="
+                                display:flex;
+                                gap:15px;
+                                align-items:center;
+                                margin-top:10px;
+                                flex-wrap:wrap;
+                            ">
+
+                                <!-- آرایشگر -->
+
+                                <label>
+
+                                    <input
+                                        type="checkbox"
+                                        name="detail_barber_{{ forloop.parentloop.counter }}_{{ barber.barber.id }}"
+
+                                        {% if barber.selected %}
+                                            checked
+                                        {% endif %}
+                                    >
+
+                                    {{ barber.barber.user.full_name }}
+
+                                </label>
+
+
+                                <!-- قیمت -->
+
+                                <input
+                                    type="number"
+                                    name="detail_price_{{ forloop.parentloop.counter }}_{{ barber.barber.id }}"
+                                    value="{{ barber.price }}"
+                                    placeholder="قیمت"
+                                    min="0"
+                                    style="
+                                        width:120px;
+                                        padding:7px;
+                                    "
+                                >
+
+                                <span>
+                                    تومان
+                                </span>
+
+
+                                <!-- مدت -->
+
+                                <input
+                                    type="number"
+                                    name="detail_duration_{{ forloop.parentloop.counter }}_{{ barber.barber.id }}"
+                                    value="{{ barber.duration }}"
+                                    placeholder="مدت"
+                                    min="1"
+                                    style="
+                                        width:100px;
+                                        padding:7px;
+                                    "
+                                >
+
+                                <span>
+                                    دقیقه
+                                </span>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        <!-- =====================================================
+             دکمه افزودن جزئیات
+        ====================================================== -->
+
+        <button
+            type="button"
+            id="add-detail-btn"
+            style="
+                margin-top:15px;
+                padding:10px 18px;
+            "
+        >
+            + افزودن جزئیات
+        </button>
+
+    </div>
+
+
+    <!-- =====================================================
+         توضیحات اصلی خدمت
+    ====================================================== -->
 
     <div style="margin-top:20px;">
 
@@ -171,7 +410,9 @@
     </div>
 
 
-    <!-- ترتیب -->
+    <!-- =====================================================
+         ترتیب اصلی خدمت
+    ====================================================== -->
 
     <div style="margin-top:20px;">
 
@@ -184,7 +425,9 @@
     </div>
 
 
-    <!-- عکس -->
+    <!-- =====================================================
+         عکس اصلی خدمت
+    ====================================================== -->
 
     <div style="margin-top:20px;">
 
@@ -197,7 +440,9 @@
     </div>
 
 
-    <!-- وضعیت -->
+    <!-- =====================================================
+         وضعیت
+    ====================================================== -->
 
     <div style="margin-top:20px;">
 
@@ -210,29 +455,36 @@
     </div>
 
 
-    <!-- دکمه‌ها -->
+    <!-- =====================================================
+         دکمه‌ها
+    ====================================================== -->
 
     <div style="margin-top:25px;">
 
         <button
             type="submit"
-            class="btn-edit">
-
+            class="btn-edit"
+        >
             ذخیره
-
         </button>
 
 
         <a
             href="{% url 'superadmin_services' %}"
-            class="btn-delete">
-
+            class="btn-delete"
+        >
             انصراف
-
         </a>
 
     </div>
 
 </form>
+
+
+<!-- =====================================================
+     JavaScript
+====================================================== -->
+
+<script src="{% static 'js/service_form.js' %}"></script>
 
 {% endblock %}

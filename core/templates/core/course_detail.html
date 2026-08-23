@@ -124,7 +124,25 @@
                 {% if course.course_type == "free" %}
 <strong>رایگان</strong>
 {% else %}
-<strong>{{ course.price|price_format }} تومان</strong>
+
+    {% if offer_price.has_offer %}
+
+        <strong>
+            <del>
+                {{ offer_price.old_price|price_format }}
+            </del>
+
+            {{ offer_price.new_price|price_format }} تومان
+        </strong>
+
+    {% else %}
+
+        <strong>
+            {{ course.price|price_format }} تومان
+        </strong>
+
+    {% endif %}
+
 {% endif %}
             </div>
 

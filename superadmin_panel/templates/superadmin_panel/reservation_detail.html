@@ -1,0 +1,360 @@
+
+{% extends "superadmin_panel/base.html" %}
+
+{% block title %}
+جزئیات نوبت
+{% endblock %}
+
+{% block content %}
+
+<div class="reservation-detail-page">
+
+    <div class="page-header">
+
+        <div>
+            <h2 class="page-title">
+                جزئیات نوبت
+            </h2>
+
+            <p class="page-subtitle">
+                اطلاعات کامل این نوبت
+            </p>
+        </div>
+
+        <a
+            href="{% url 'superadmin_reservations' %}"
+            class="btn-edit">
+
+            ← بازگشت به نوبت‌ها
+
+        </a>
+
+    </div>
+
+
+    <!-- ============================= -->
+    <!-- اطلاعات مشتری -->
+    <!-- ============================= -->
+
+    <div class="detail-card">
+
+        <div class="detail-card-title">
+            👤 اطلاعات مشتری
+        </div>
+
+        <div class="detail-grid">
+
+            <div class="detail-item">
+
+                <span class="detail-label">
+                    نام مشتری
+                </span>
+
+                <strong>
+                    {% if reservation.user %}
+                        {{ reservation.user.full_name }}
+                    {% else %}
+                        {{ reservation.customer_name }}
+                    {% endif %}
+                </strong>
+
+            </div>
+
+
+            <div class="detail-item">
+
+                <span class="detail-label">
+                    شماره تماس
+                </span>
+
+                <strong>
+                    {{ reservation.customer_phone|default:"-" }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================= -->
+    <!-- اطلاعات نوبت -->
+    <!-- ============================= -->
+
+    <div class="detail-card">
+
+        <div class="detail-card-title">
+            📅 اطلاعات نوبت
+        </div>
+
+        <div class="detail-grid">
+
+            <div class="detail-item">
+
+                <span class="detail-label">
+                    خدمت
+                </span>
+
+                <strong>
+                    {{ reservation.service.name }}
+                </strong>
+
+            </div>
+
+
+            <div class="detail-item">
+
+                <span class="detail-label">
+                    آرایشگر
+                </span>
+
+                <strong>
+                    {{ reservation.barber.user.full_name }}
+                </strong>
+
+            </div>
+
+
+            <div class="detail-item">
+
+                <span class="detail-label">
+                    تاریخ
+                </span>
+
+                <strong>
+                  {{ jalali_date }}
+                </strong>
+
+            </div>
+
+
+            <div class="detail-item">
+
+                <span class="detail-label">
+                    ساعت
+                </span>
+
+                <strong>
+                    {{ reservation.time }}
+                </strong>
+
+            </div>
+
+
+            <div class="detail-item">
+
+                <span class="detail-label">
+                    مدت نوبت
+                </span>
+
+                <strong>
+                    {{ reservation.total_duration|default:"0" }}
+                    دقیقه
+                </strong>
+
+            </div>
+
+
+            <div class="detail-item">
+
+                <span class="detail-label">
+                    وضعیت نوبت
+                </span>
+
+                <strong>
+
+                    {% if reservation.status == "pending" %}
+                        در انتظار
+                    {% elif reservation.status == "approved" %}
+                        تایید شده
+                    {% elif reservation.status == "done" %}
+                        انجام شده
+                    {% elif reservation.status == "cancel" %}
+                        لغو شده
+                    {% else %}
+                        {{ reservation.status }}
+                    {% endif %}
+
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================= -->
+    <!-- جزئیات انتخاب‌شده -->
+    <!-- ============================= -->
+
+    <div class="detail-card">
+
+        <div class="detail-card-title">
+            ✂️ جزئیات خدمات انتخاب‌شده
+        </div>
+
+
+        {% if reservation.selected_details %}
+
+            <div class="selected-details-list">
+
+                {% for detail in reservation.selected_details %}
+
+                    <div class="selected-detail">
+
+                        <div>
+
+                            <strong>
+                                {{ detail.name }}
+                            </strong>
+
+                            {% if detail.duration %}
+                                <span>
+                                    {{ detail.duration }} دقیقه
+                                </span>
+                            {% endif %}
+
+                        </div>
+
+
+                        <strong>
+
+                            {{ detail.price|default:0|floatformat:0 }}
+
+                            تومان
+
+                        </strong>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <p class="empty-detail">
+                برای این خدمت جزئیات اضافه‌ای انتخاب نشده است.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- ============================= -->
+    <!-- اطلاعات مالی -->
+    <!-- ============================= -->
+
+    <div class="detail-card">
+
+        <div class="detail-card-title">
+            💰 اطلاعات مالی
+        </div>
+
+        <div class="detail-grid">
+
+            <div class="detail-item">
+
+                <span class="detail-label">
+                    قیمت کل خدمت
+                </span>
+
+                <strong>
+                    {{ reservation.service_price|default:0|floatformat:0 }}
+                    تومان
+                </strong>
+
+            </div>
+
+
+            <div class="detail-item">
+
+                <span class="detail-label">
+                    مبلغ بیعانه
+                </span>
+
+                <strong>
+                    {{ reservation.deposit_amount|default:0|floatformat:0 }}
+                    تومان
+                </strong>
+
+            </div>
+
+
+            <div class="detail-item">
+
+                <span class="detail-label">
+                    پرداخت شده
+                </span>
+
+                <strong>
+                    {{ reservation.paid_amount|default:0|floatformat:0 }}
+                    تومان
+                </strong>
+
+            </div>
+
+
+            <div class="detail-item">
+
+                <span class="detail-label">
+                    باقی‌مانده
+                </span>
+
+                <strong>
+                    {{ reservation.remaining_amount|default:0|floatformat:0 }}
+                    تومان
+                </strong>
+
+            </div>
+
+
+            <div class="detail-item">
+
+                <span class="detail-label">
+                    وضعیت پرداخت
+                </span>
+
+                <strong>
+                    {{ reservation.payment_status|default:"-" }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================= -->
+    <!-- عملیات -->
+    <!-- ============================= -->
+
+    <div class="detail-actions">
+
+        <a
+            href="{% url 'superadmin_reservations' %}"
+            class="btn-edit">
+
+            بازگشت
+
+        </a>
+
+
+        <a
+            href="{% url 'superadmin_reservation_delete' reservation.id %}"
+            class="btn-delete"
+            onclick="return confirm('از حذف این نوبت مطمئن هستید؟')">
+
+            حذف نوبت
+
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

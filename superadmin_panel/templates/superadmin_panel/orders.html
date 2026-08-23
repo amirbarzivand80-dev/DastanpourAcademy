@@ -15,6 +15,60 @@
     </div>
 
 
+    <!-- ==========================================
+         جستجوی سفارش
+    =========================================== -->
+
+    <div style="
+        margin:20px 0;
+        display:flex;
+        gap:10px;
+        align-items:center;
+    ">
+
+        <form method="GET" style="
+            display:flex;
+            gap:10px;
+            align-items:center;
+        ">
+
+            <input
+                type="text"
+                name="search"
+                value="{{ search }}"
+                placeholder="جستجو با کد سفارش..."
+                style="
+                    width:280px;
+                    padding:10px 14px;
+                    border:1px solid #ddd;
+                    border-radius:8px;
+                "
+            >
+
+            <button
+                type="submit"
+                class="btn-edit"
+            >
+                جستجو
+            </button>
+
+        </form>
+
+
+        {% if search %}
+
+            <a
+                href="{% url 'orders' %}"
+                class="btn-delete"
+            >
+                نمایش همه
+            </a>
+
+        {% endif %}
+
+    </div>
+
+
     <div class="table-box">
 
 
@@ -26,7 +80,7 @@
                 <tr>
 
                     <th>
-                        شماره سفارش
+                        کد سفارش
                     </th>
 
 
@@ -65,7 +119,7 @@
 
 
                     <td>
-                        #{{ order.id }}
+                        {{ order.tracking_code }}
                     </td>
 
 
@@ -92,9 +146,14 @@
 
 
                     <td>
-<a href="{% url 'order_detail' order.id %}" class="btn-edit">
-    مشاهده
-</a>
+
+                        <a
+                            href="{% url 'order_detail' order.id %}"
+                            class="btn-edit"
+                        >
+                            مشاهده
+                        </a>
+
                     </td>
 
 
@@ -109,7 +168,15 @@
 
                     <td colspan="5">
 
-                        سفارشی وجود ندارد
+                        {% if search %}
+
+                            سفارشی با این کد پیدا نشد.
+
+                        {% else %}
+
+                            سفارشی وجود ندارد
+
+                        {% endif %}
 
                     </td>
 

@@ -1,0 +1,227 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% load static %}
+
+{% block title %}
+مدیریت پیامک
+{% endblock %}
+
+{% block content %}
+
+<h2 class="page-title">
+    مدیریت پیامک
+</h2>
+{% if sms_success %}
+    <div class="sms-alert sms-alert-success">
+        {{ sms_success }}
+    </div>
+{% endif %}
+
+{% if sms_warning %}
+    <div class="sms-alert sms-alert-warning">
+        {{ sms_warning }}
+    </div>
+{% endif %}
+
+{% if sms_error %}
+    <div class="sms-alert sms-alert-error">
+        {{ sms_error }}
+    </div>
+{% endif %}
+<div class="table-box sms-management-box">
+    <h3>
+        ارسال پیامک جدید
+    </h3>
+
+    <p>
+        ابتدا گیرندگان پیامک را انتخاب کنید.
+    </p>
+
+
+    <form method="POST" id="sms-form">
+
+        {% csrf_token %}
+
+
+        <!-- ===================================== -->
+        <!-- نوع گیرندگان -->
+        <!-- ===================================== -->
+
+        <div class="sms-recipient-types">
+
+            <label class="sms-recipient-option">
+
+                <input
+                    type="radio"
+                    name="recipient_type"
+                    value="all"
+                    checked
+                >
+
+                <div>
+
+                    <strong>
+                        همه کاربران
+                    </strong>
+
+                    <span>
+                        {{ users_count }} نفر
+                    </span>
+
+                </div>
+
+            </label>
+
+
+            <label class="sms-recipient-option">
+
+                <input
+                    type="radio"
+                    name="recipient_type"
+                    value="reservation"
+                >
+
+                <div>
+
+                    <strong>
+                        مشتریان دارای نوبت
+                    </strong>
+
+                    <span>
+                        {{ reservation_users_count }} نفر
+                    </span>
+
+                </div>
+
+            </label>
+
+
+            <label class="sms-recipient-option">
+
+                <input
+                    type="radio"
+                    name="recipient_type"
+                    value="manual"
+                >
+
+                <div>
+
+                    <strong>
+                        انتخاب دستی
+                    </strong>
+
+                    <span>
+                        انتخاب مشتریان
+                    </span>
+
+                </div>
+
+            </label>
+
+        </div>
+
+
+        <!-- ===================================== -->
+        <!-- انتخاب دستی -->
+        <!-- ===================================== -->
+
+        <div
+            id="manual-recipient-box"
+            style="display: none; margin-top: 20px;"
+        >
+
+            <div style="margin-bottom: 15px;">
+
+                <input
+                    type="text"
+                    id="manual-recipient-search"
+                    placeholder="جستجو با نام یا شماره موبایل..."
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <div id="manual-recipient-list">
+
+                <p>
+                    برای نمایش کاربران، جستجو کنید.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- ===================================== -->
+        <!-- تعداد گیرندگان -->
+        <!-- ===================================== -->
+
+        <div class="sms-recipient-count">
+
+            تعداد گیرندگان:
+
+            <strong id="recipient-count">
+                {{ users_count }}
+            </strong>
+
+            نفر
+
+        </div>
+
+
+        <!-- ===================================== -->
+        <!-- متن پیام -->
+        <!-- ===================================== -->
+
+        <div class="sms-message-box">
+
+            <label for="sms-message">
+                متن پیام
+            </label>
+
+            <textarea
+                id="sms-message"
+                name="message"
+                rows="7"
+                maxlength="1000"
+                placeholder="متن پیامک خود را وارد کنید..."
+            ></textarea>
+
+
+            <div>
+
+                تعداد کاراکتر:
+
+                <strong id="sms-character-count">
+                    0
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- ===================================== -->
+        <!-- ارسال -->
+        <!-- ===================================== -->
+
+        <button
+            type="submit"
+            class="btn-add"
+        >
+            ارسال پیامک
+        </button>
+
+    </form>
+
+</div>
+
+
+<!-- ========================================= -->
+<!-- JavaScript -->
+<!-- ========================================= -->
+
+<script src="{% static 'js/superadmin_sms.js' %}"></script>
+
+{% endblock %}

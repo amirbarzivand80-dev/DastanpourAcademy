@@ -1,6 +1,8 @@
+
 {% load jalali %}
+
 <h2 class="page-title">
-    جزئیات سفارش #{{ order.id }}
+    جزئیات سفارش {{ order.tracking_code }}
 </h2>
 
 
@@ -16,8 +18,15 @@
             </h3>
 
             <p>
+                کد سفارش:
+                <strong>
+                    {{ order.tracking_code }}
+                </strong>
+            </p>
+
+            <p>
                 تاریخ:
-               {{ order.created_at|to_jalali }}
+                {{ order.created_at|to_jalali }}
             </p>
 
         </div>
@@ -77,6 +86,21 @@
     <div class="detail-row">
 
         <span>
+            🧾 کد سفارش
+        </span>
+
+
+        <strong>
+            {{ order.tracking_code }}
+        </strong>
+
+    </div>
+
+
+
+    <div class="detail-row">
+
+        <span>
             💰 مبلغ نهایی
         </span>
 
@@ -122,9 +146,9 @@
 
 
 
-    <button 
-    class="back-btn"
-    onclick="loadOrders()">
+    <button
+        class="back-btn"
+        onclick="loadOrders()">
 
         ← بازگشت به سفارش‌ها
 

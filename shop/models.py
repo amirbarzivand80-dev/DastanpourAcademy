@@ -1,5 +1,6 @@
 from django.db import models
-
+import secrets
+import string
 
 class Category(models.Model):
 
@@ -153,13 +154,11 @@ class CartItem(models.Model):
 
     def total_price(self):
 
-        if self.product.discount_price:
-            price = self.product.discount_price
-        else:
-            price = self.product.price
+        from core.offer_utils import get_final_product_price
+
+        price = get_final_product_price(self.product)
 
         return price * self.quantity
-
 
     def __str__(self):
         return self.product.name
@@ -240,24 +239,62 @@ class Order(models.Model):
         choices=STATUS_CHOICES,
         default="pending"
     )
+
     confirmation_sms_sent = models.BooleanField(
-    default=False
-)
-    
+        default=False
+    )
+
+    # -----------------------------
+    # کد سفارش
+    # -----------------------------
+
     tracking_code = models.CharField(
-    max_length=20,
-    unique=True,
-    blank=True,
-    null=True
-)
+        max_length=20,
+        unique=True,
+        blank=True,
+        null=True
+    )
 
     created_at = models.DateTimeField(
         auto_now_add=True
     )
 
+    # -----------------------------
+    # ساخت خودکار کد سفارش
+    # -----------------------------
+
+    def save(self, *args, **kwargs):
+
+        if not self.tracking_code:
+
+            alphabet = (
+                string.ascii_uppercase
+                + string.digits
+            )
+
+            while True:
+
+                code = (
+                    "AD-"
+                    + "".join(
+                        secrets.choice(alphabet)
+                        for _ in range(8)
+                    )
+                )
+
+                if not Order.objects.filter(
+                    tracking_code=code
+                ).exists():
+
+                    self.tracking_code = code
+
+                    break
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
 
-        return f"Order {self.id} - {self.user}"
+        return f"Order {self.tracking_code} - {self.user}"
 class OrderItem(models.Model):
 
     order = models.ForeignKey(

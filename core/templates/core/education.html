@@ -162,11 +162,23 @@
                             {% else %}
 
 
+{% if course.offer_has_discount %}
 
-                                <h3>
-                                    {{ course.price|price_format }} تومان
-                                </h3>
+    <h3>
+        <del>
+            {{ course.offer_old_price|price_format }}
+        </del>
 
+        {{ course.offer_new_price|price_format }} تومان
+    </h3>
+
+{% else %}
+
+    <h3>
+        {{ course.price|price_format }} تومان
+    </h3>
+
+{% endif %}
 
                                 <a href="{% url 'course_detail' course.slug %}">
                                     ثبت‌نام

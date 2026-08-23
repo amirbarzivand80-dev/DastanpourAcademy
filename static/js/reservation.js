@@ -14,14 +14,14 @@ document.addEventListener("DOMContentLoaded", function () {
     // آکاردئون خدمات
     // =====================================================
 
-    document.querySelectorAll(".accordion").forEach(button => {
+    document.querySelectorAll(".accordion").forEach(function (button) {
 
         button.addEventListener("click", function () {
 
-            const content = this.nextElementSibling;
+            var content = this.nextElementSibling;
 
             document.querySelectorAll(".accordion-content")
-                .forEach(item => {
+                .forEach(function (item) {
 
                     if (item !== content) {
                         item.style.display = "none";
@@ -29,10 +29,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 });
 
-            content.style.display =
-                content.style.display === "block"
-                    ? "none"
-                    : "block";
+            if (content) {
+                content.style.display =
+                    content.style.display === "block"
+                        ? "none"
+                        : "block";
+            }
 
         });
 
@@ -43,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // نام ماه‌های شمسی
     // =====================================================
 
-    const monthNames = [
+    var monthNames = [
         "",
         "فروردین",
         "اردیبهشت",
@@ -64,9 +66,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // تاریخ امروز
     // =====================================================
 
-    const now = new Date();
+    var now = new Date();
 
-    const todayJalali = jalaali.toJalaali(
+    var todayJalali = jalaali.toJalaali(
         now.getFullYear(),
         now.getMonth() + 1,
         now.getDate()
@@ -83,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return 0;
         }
 
-        const parts = time.split(":");
+        var parts = time.split(":");
 
         return (
             parseInt(parts[0], 10) * 60 +
@@ -99,11 +101,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function minutesToTime(minutes) {
 
-        const hour =
-            Math.floor(minutes / 60);
+        var hour = Math.floor(minutes / 60);
 
-        const minute =
-            minutes % 60;
+        var minute = minutes % 60;
 
         return (
             String(hour).padStart(2, "0") +
@@ -114,149 +114,245 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-  function createTimes(
-    timeGrid,
-    hiddenTime,
-    blocked = [],
-    workStart = "09:00",
-    workEnd = "18:00",
-    appointmentDuration = 30
-) {
+    // =====================================================
+    // جزئیات خدمت
+    // نمایش قیمت و مدت مخصوص آرایشگر
+    // =====================================================
 
-    timeGrid.innerHTML = "";
-    hiddenTime.value = "";
+    function updateServiceDetails(serviceItem, barberId) {
 
-    const startMinutes = timeToMinutes(workStart);
-    const endMinutes = timeToMinutes(workEnd);
-
-    const duration =
-        parseInt(appointmentDuration, 10) || 30;
+        var detailItems =
+            serviceItem.querySelectorAll(
+                ".service-detail-item"
+            );
 
 
-    if (startMinutes >= endMinutes) {
+        detailItems.forEach(function (detailItem) {
 
-        timeGrid.innerHTML =
-            "<p>ساعت کاری آرایشگر صحیح نیست.</p>";
+            var checkbox =
+                detailItem.querySelector(
+                    ".service-detail-checkbox"
+                );
 
-        return;
+
+            var priceValue =
+                detailItem.querySelector(
+                    ".detail-price-value"
+                );
+
+
+            // =================================================
+            // پیدا کردن اطلاعات آرایشگر
+            // بدون Template Literal
+            // =================================================
+
+            var barberData = null;
+
+            var barberDataItems =
+                detailItem.querySelectorAll(
+                    ".detail-barber-data"
+                );
+
+
+            barberDataItems.forEach(function (item) {
+
+                if (
+                    String(item.getAttribute("data-barber")) ===
+                    String(barberId)
+                ) {
+
+                    barberData = item;
+
+                }
+
+            });
+
+
+            // =================================================
+            // اطلاعات برای این آرایشگر وجود دارد
+            // =================================================
+
+            if (barberData) {
+
+                var price =
+                    barberData.getAttribute("data-price");
+
+                var duration =
+                    barberData.getAttribute("data-duration");
+
+
+                if (priceValue) {
+
+                    var text =
+                        Number(price || 0)
+                            .toLocaleString("fa-IR");
+
+                    text += " تومان";
+
+
+                    if (duration) {
+
+                        text +=
+                            " - " +
+                            duration +
+                            " دقیقه";
+
+                    }
+
+
+                    priceValue.innerText = text;
+
+                }
+
+
+                if (checkbox) {
+
+                    checkbox.disabled = false;
+
+                }
+
+
+                detailItem.style.opacity = "1";
+
+            }
+
+
+            // =================================================
+            // برای این آرایشگر ثبت نشده
+            // =================================================
+
+            else {
+
+                if (priceValue) {
+
+                    priceValue.innerText =
+                        "برای این آرایشگر ثبت نشده";
+
+                }
+
+
+                if (checkbox) {
+
+                    checkbox.checked = false;
+
+                    checkbox.disabled = true;
+
+                }
+
+
+                detailItem.style.opacity = "0.45";
+
+            }
+
+        });
+
     }
 
 
-    // =================================================
-    // بررسی امروز
-    // =================================================
+    // =====================================================
+    // ریست جزئیات خدمت
+    // =====================================================
 
-    const currentDate = new Date();
+    function resetServiceDetails(serviceItem) {
 
-    const today =
-        currentDate.getFullYear() +
-        "-" +
-        String(currentDate.getMonth() + 1).padStart(2, "0") +
-        "-" +
-        String(currentDate.getDate()).padStart(2, "0");
+        var detailItems =
+            serviceItem.querySelectorAll(
+                ".service-detail-item"
+            );
 
 
-    const serviceSchedule =
-        hiddenTime.closest(".service-schedule");
+        detailItems.forEach(function (detailItem) {
+
+            var checkbox =
+                detailItem.querySelector(
+                    ".service-detail-checkbox"
+                );
 
 
-    const hiddenDate =
-        serviceSchedule
-            ? serviceSchedule.querySelector(".service-hidden-date")
-            : null;
+            var priceValue =
+                detailItem.querySelector(
+                    ".detail-price-value"
+                );
 
 
-    const selectedDate =
-        hiddenDate ? hiddenDate.value : "";
+            if (checkbox) {
+
+                checkbox.checked = false;
+
+                checkbox.disabled = false;
+
+            }
 
 
-    const isToday =
-        selectedDate === today;
+            if (priceValue) {
+
+                priceValue.innerText =
+                    "ابتدا آرایشگر را انتخاب کنید";
+
+            }
 
 
-    const currentMinutes =
-        currentDate.getHours() * 60 +
-        currentDate.getMinutes();
+            detailItem.style.opacity = "1";
+
+        });
+
+    }
 
 
-    // =================================================
-    // ساخت ساعت‌های پایه
-    // همیشه 30 دقیقه‌ای
-    // =================================================
+    // =====================================================
+    // ساخت ساعت‌ها
+    // =====================================================
 
-    const slots = new Set();
-
-    for (
-        let minutes = startMinutes;
-        minutes < endMinutes;
-        minutes += 30
+    function createTimes(
+        timeGrid,
+        hiddenTime,
+        blocked,
+        workStart,
+        workEnd,
+        appointmentDuration
     ) {
 
-        if (minutes + duration <= endMinutes) {
-
-            slots.add(minutes);
-
+        if (!blocked) {
+            blocked = [];
         }
 
-    }
-
-
-    // =================================================
-    // پایان رزروهای قبلی را هم اضافه می‌کنیم
-    // =================================================
-
-    blocked.forEach(item => {
-
-        const blockedEnd =
-            timeToMinutes(item.end);
-
-
-        if (
-            blockedEnd >= startMinutes &&
-            blockedEnd < endMinutes &&
-            blockedEnd + duration <= endMinutes
-        ) {
-
-            slots.add(blockedEnd);
-
+        if (!workStart) {
+            workStart = "09:00";
         }
 
-    });
+        if (!workEnd) {
+            workEnd = "18:00";
+        }
+
+        if (!appointmentDuration) {
+            appointmentDuration = 30;
+        }
 
 
-    // مرتب‌سازی ساعت‌ها
+        timeGrid.innerHTML = "";
 
-    const sortedSlots =
-        Array.from(slots).sort(
-            (a, b) => a - b
-        );
+        hiddenTime.value = "";
 
 
-    let hasTime = false;
+        var startMinutes =
+            timeToMinutes(workStart);
 
 
-    // =================================================
-    // ساخت ساعت‌ها
-    // =================================================
-
-    sortedSlots.forEach(minutes => {
-
-        const time =
-            minutesToTime(minutes);
+        var endMinutes =
+            timeToMinutes(workEnd);
 
 
-        const slotEnd =
-            minutes + duration;
+        var duration =
+            parseInt(
+                appointmentDuration,
+                10
+            ) || 30;
 
 
-        // =================================================
-        // ساعت گذشته
-        // =================================================
+        if (startMinutes >= endMinutes) {
 
-        if (
-            isToday &&
-            minutes <= currentMinutes
-        ) {
+            timeGrid.innerHTML =
+                "<p>ساعت کاری آرایشگر صحیح نیست.</p>";
 
             return;
 
@@ -264,159 +360,316 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         // =================================================
-        // بررسی تداخل با رزرو
+        // بررسی امروز
         // =================================================
 
-        let isBlocked = false;
+        var currentDate = new Date();
 
 
-        blocked.forEach(item => {
+        var today =
+            currentDate.getFullYear() +
+            "-" +
+            String(
+                currentDate.getMonth() + 1
+            ).padStart(2, "0") +
+            "-" +
+            String(
+                currentDate.getDate()
+            ).padStart(2, "0");
 
-            const blockedStart =
-                timeToMinutes(item.start);
 
-            const blockedEnd =
-                timeToMinutes(item.end);
+        var serviceSchedule =
+            hiddenTime.closest(
+                ".service-schedule"
+            );
+
+
+        var hiddenDate =
+            serviceSchedule
+                ? serviceSchedule.querySelector(
+                    ".service-hidden-date"
+                )
+                : null;
+
+
+        var selectedDate =
+            hiddenDate
+                ? hiddenDate.value
+                : "";
+
+
+        var isToday =
+            selectedDate === today;
+
+
+        var currentMinutes =
+            currentDate.getHours() * 60 +
+            currentDate.getMinutes();
+
+
+        // =================================================
+        // ساخت ساعت‌های پایه
+        // =================================================
+
+        var slots = new Set();
+
+
+        for (
+            var minutes = startMinutes;
+            minutes < endMinutes;
+            minutes += 30
+        ) {
+
+            if (
+                minutes + duration <=
+                endMinutes
+            ) {
+
+                slots.add(minutes);
+
+            }
+
+        }
+
+
+        // =================================================
+        // پایان رزروهای قبلی
+        // =================================================
+
+        blocked.forEach(function (item) {
+
+            var blockedEnd =
+                timeToMinutes(
+                    item.end
+                );
 
 
             if (
-                minutes < blockedEnd &&
-                slotEnd > blockedStart
+                blockedEnd >= startMinutes &&
+                blockedEnd < endMinutes &&
+                blockedEnd + duration <= endMinutes
             ) {
 
-                isBlocked = true;
+                slots.add(blockedEnd);
 
             }
 
         });
 
 
-        hasTime = true;
+        // =================================================
+        // مرتب‌سازی
+        // =================================================
+
+        var sortedSlots =
+            Array.from(slots).sort(
+                function (a, b) {
+                    return a - b;
+                }
+            );
+
+
+        var hasTime = false;
 
 
         // =================================================
-        // ساخت دکمه
+        // ساخت ساعت‌ها
         // =================================================
 
-        const button =
-            document.createElement("button");
+        sortedSlots.forEach(function (minutes) {
+
+            var time =
+                minutesToTime(minutes);
 
 
-        button.type = "button";
-
-        button.className = "time-btn";
-
-        button.innerText = time;
+            var slotEnd =
+                minutes + duration;
 
 
-        // =================================================
-        // ساعت پر
-        // =================================================
+            // =================================================
+            // ساعت گذشته
+            // =================================================
 
-        if (isBlocked) {
+            if (
+                isToday &&
+                minutes <= currentMinutes
+            ) {
 
-            button.classList.add("booked");
+                return;
 
-            button.disabled = true;
-
-            button.title =
-                "این ساعت قبلاً رزرو شده است.";
-
-        }
+            }
 
 
-        // =================================================
-        // ساعت آزاد
-        // =================================================
+            // =================================================
+            // بررسی تداخل
+            // =================================================
 
-        else {
-
-            button.addEventListener(
-                "click",
-                function () {
-
-                    timeGrid
-                        .querySelectorAll(".time-btn")
-                        .forEach(btn => {
-
-                            btn.classList.remove("active");
-
-                        });
+            var isBlocked = false;
 
 
-                    button.classList.add("active");
+            blocked.forEach(function (item) {
+
+                var blockedStart =
+                    timeToMinutes(
+                        item.start
+                    );
 
 
-                    hiddenTime.value =
-                        time;
+                var blockedEnd =
+                    timeToMinutes(
+                        item.end
+                    );
 
 
-                    const schedule =
-                        hiddenTime.closest(
-                            ".service-schedule"
+                if (
+                    minutes < blockedEnd &&
+                    slotEnd > blockedStart
+                ) {
+
+                    isBlocked = true;
+
+                }
+
+            });
+
+
+            hasTime = true;
+
+
+            // =================================================
+            // ساخت دکمه
+            // =================================================
+
+            var button =
+                document.createElement(
+                    "button"
+                );
+
+
+            button.type = "button";
+
+            button.className = "time-btn";
+
+            button.innerText = time;
+
+
+            // =================================================
+            // ساعت پر
+            // =================================================
+
+            if (isBlocked) {
+
+                button.classList.add("booked");
+
+                button.disabled = true;
+
+                button.title =
+                    "این ساعت قبلاً رزرو شده است.";
+
+            }
+
+
+            // =================================================
+            // ساعت آزاد
+            // =================================================
+
+            else {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        timeGrid
+                            .querySelectorAll(
+                                ".time-btn"
+                            )
+                            .forEach(function (btn) {
+
+                                btn.classList.remove(
+                                    "active"
+                                );
+
+                            });
+
+
+                        button.classList.add(
+                            "active"
                         );
 
 
-                    if (schedule) {
+                        hiddenTime.value =
+                            time;
 
-                        const timeButton =
-                            schedule.querySelector(
-                                ".selected-service-time span"
+
+                        var schedule =
+                            hiddenTime.closest(
+                                ".service-schedule"
                             );
 
 
-                        if (timeButton) {
+                        if (schedule) {
 
-                            timeButton.innerText =
-                                "ساعت انتخاب شده: " +
-                                time;
+                            var timeButton =
+                                schedule.querySelector(
+                                    ".selected-service-time span"
+                                );
+
+
+                            if (timeButton) {
+
+                                timeButton.innerText =
+                                    "ساعت انتخاب شده: " +
+                                    time;
+
+                            }
+
+                        }
+
+
+                        console.log(
+                            "SELECTED TIME:",
+                            time
+                        );
+
+
+                        var modal =
+                            document.querySelector(
+                                ".service-time-modal"
+                            );
+
+
+                        if (modal) {
+
+                            modal.remove();
 
                         }
 
                     }
+                );
+
+            }
 
 
-                    console.log(
-                        "SELECTED TIME:",
-                        time
-                    );
-
-
-                    const modal =
-                        document.querySelector(
-                            ".service-time-modal"
-                        );
-
-
-                    if (modal) {
-
-                        modal.remove();
-
-                    }
-
-                }
+            timeGrid.appendChild(
+                button
             );
+
+        });
+
+
+        // =================================================
+        // هیچ ساعتی وجود ندارد
+        // =================================================
+
+        if (!hasTime) {
+
+            timeGrid.innerHTML =
+                "<p>برای این تاریخ ساعت کاری باقی نمانده است.</p>";
 
         }
 
-
-        timeGrid.appendChild(button);
-
-    });
-
-
-    // =================================================
-    // هیچ ساعتی وجود ندارد
-    // =================================================
-
-    if (!hasTime) {
-
-        timeGrid.innerHTML =
-            "<p>برای این تاریخ ساعت کاری باقی نمانده است.</p>";
-
     }
 
-}
 
     // =====================================================
     // Popup ساعت
@@ -424,33 +677,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function openTimeModal(serviceItem) {
 
-        const originalGrid =
+        var originalGrid =
             serviceItem.querySelector(
                 ".service-time-grid"
             );
 
 
-        const hiddenTime =
+        var hiddenTime =
             serviceItem.querySelector(
                 ".service-hidden-time"
             );
 
 
-        const selectedTimeBox =
+        var selectedTimeBox =
             serviceItem.querySelector(
                 ".selected-service-time"
             );
 
 
-        if (!originalGrid || !hiddenTime) {
+        if (
+            !originalGrid ||
+            !hiddenTime
+        ) {
+
             return;
+
         }
 
 
-        // اگر ساعت هنوز ساخته نشده
+        // =================================================
+        // بررسی وجود ساعت
+        // =================================================
 
         if (
-            !originalGrid.querySelector(".time-btn")
+            !originalGrid.querySelector(
+                ".time-btn"
+            )
         ) {
 
             alert(
@@ -462,16 +724,20 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        // اگر Popup قبلی وجود دارد
+        // =================================================
+        // حذف Popup قبلی
+        // =================================================
 
-        const oldModal =
+        var oldModal =
             document.querySelector(
                 ".service-time-modal"
             );
 
 
         if (oldModal) {
+
             oldModal.remove();
+
         }
 
 
@@ -479,74 +745,106 @@ document.addEventListener("DOMContentLoaded", function () {
         // ساخت Popup
         // =================================================
 
-        const modal =
-            document.createElement("div");
+        var modal =
+            document.createElement(
+                "div"
+            );
 
 
         modal.className =
             "service-time-modal";
 
 
-        modal.innerHTML = `
+        // =================================================
+        // به جای innerHTML با Template Literal
+        // از ساخت مستقیم DOM استفاده می‌کنیم
+        // =================================================
 
-            <div class="service-time-modal-content">
+        var modalContent =
+            document.createElement("div");
 
-                <div class="service-time-modal-header">
-
-                    <h3>
-                        انتخاب ساعت
-                    </h3>
-
-                    <button
-                        type="button"
-                        class="close-service-time"
-                    >
-                        ✕
-                    </button>
-
-                </div>
+        modalContent.className =
+            "service-time-modal-content";
 
 
-                <p style="
-                    color:#aaa;
-                    margin-bottom:15px;
-                    text-align:center;
-                ">
-                    ساعت مورد نظر خود را انتخاب کنید
-                </p>
+        var header =
+            document.createElement("div");
+
+        header.className =
+            "service-time-modal-header";
 
 
-                <div
-                    class="service-time-slider"
-                ></div>
+        var title =
+            document.createElement("h3");
 
-            </div>
+        title.innerText =
+            "انتخاب ساعت";
 
-        `;
 
+        var closeButton =
+            document.createElement("button");
+
+        closeButton.type = "button";
+
+        closeButton.className =
+            "close-service-time";
+
+        closeButton.innerText = "✕";
+
+
+        header.appendChild(title);
+
+        header.appendChild(closeButton);
+
+
+        var description =
+            document.createElement("p");
+
+        description.innerText =
+            "ساعت مورد نظر خود را انتخاب کنید";
+
+        description.style.color = "#aaa";
+
+        description.style.marginBottom = "15px";
+
+        description.style.textAlign = "center";
+
+
+        var slider =
+            document.createElement("div");
+
+        slider.className =
+            "service-time-slider";
+
+
+        modalContent.appendChild(header);
+
+        modalContent.appendChild(description);
+
+        modalContent.appendChild(slider);
+
+        modal.appendChild(modalContent);
 
         document.body.appendChild(modal);
 
 
-        const slider =
-            modal.querySelector(
-                ".service-time-slider"
-            );
+        // =================================================
+        // دریافت دکمه‌های ساعت
+        // =================================================
 
-
-        const buttons =
+        var buttons =
             originalGrid.querySelectorAll(
                 ".time-btn"
             );
 
 
         // =================================================
-        // انتقال دکمه‌ها به ریل
+        // انتقال دکمه‌ها به Popup
         // =================================================
 
-        buttons.forEach(button => {
+        buttons.forEach(function (button) {
 
-            const clone =
+            var clone =
                 button.cloneNode(true);
 
 
@@ -562,58 +860,79 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
 
-            clone.addEventListener(
-                "click",
-                function () {
+            // اگر ساعت رزرو شده است
+            // دوباره کلیک‌پذیر نشود
 
-                    const selectedTime =
-                        clone.innerText;
+            if (clone.disabled) {
+
+                clone.disabled = true;
+
+            }
+
+            else {
+
+                clone.addEventListener(
+                    "click",
+                    function () {
+
+                        var selectedTime =
+                            clone.innerText;
 
 
-                    hiddenTime.value =
-                        selectedTime;
+                        hiddenTime.value =
+                            selectedTime;
 
 
-                    buttons.forEach(btn => {
+                        buttons.forEach(
+                            function (btn) {
 
-                        btn.classList.remove(
+                                btn.classList.remove(
+                                    "active"
+                                );
+
+                            }
+                        );
+
+
+                        clone.classList.add(
                             "active"
                         );
 
-                    });
+
+                        var text = null;
 
 
-                    clone.classList.add(
-                        "active"
-                    );
+                        if (selectedTimeBox) {
+
+                            text =
+                                selectedTimeBox.querySelector(
+                                    "span"
+                                );
+
+                        }
 
 
-                    const text =
-                        selectedTimeBox
-                            ?.querySelector(
-                                "span"
-                            );
+                        if (text) {
+
+                            text.innerText =
+                                "ساعت انتخاب شده: " +
+                                selectedTime;
+
+                        }
 
 
-                    if (text) {
+                        console.log(
+                            "SELECTED TIME:",
+                            selectedTime
+                        );
 
-                        text.innerText =
-                            "ساعت انتخاب شده: " +
-                            selectedTime;
+
+                        modal.remove();
 
                     }
+                );
 
-
-                    console.log(
-                        "SELECTED TIME:",
-                        selectedTime
-                    );
-
-
-                    modal.remove();
-
-                }
-            );
+            }
 
 
             slider.appendChild(
@@ -626,12 +945,6 @@ document.addEventListener("DOMContentLoaded", function () {
         // =================================================
         // بستن Popup
         // =================================================
-
-        const closeButton =
-            modal.querySelector(
-                ".close-service-time"
-            );
-
 
         closeButton.addEventListener(
             "click",
@@ -663,11 +976,11 @@ document.addEventListener("DOMContentLoaded", function () {
         // ریل با موس
         // =================================================
 
-        let isDown = false;
+        var isDown = false;
 
-        let startX;
+        var startX = 0;
 
-        let scrollLeft;
+        var scrollLeft = 0;
 
 
         slider.addEventListener(
@@ -721,19 +1034,21 @@ document.addEventListener("DOMContentLoaded", function () {
             function (event) {
 
                 if (!isDown) {
+
                     return;
+
                 }
 
 
                 event.preventDefault();
 
 
-                const x =
+                var x =
                     event.pageX -
                     slider.offsetLeft;
 
 
-                const walk =
+                var walk =
                     (x - startX) * 1.5;
 
 
@@ -748,9 +1063,9 @@ document.addEventListener("DOMContentLoaded", function () {
         // لمس موبایل
         // =================================================
 
-        let touchStartX = 0;
+        var touchStartX = 0;
 
-        let touchScrollLeft = 0;
+        var touchScrollLeft = 0;
 
 
         slider.addEventListener(
@@ -764,7 +1079,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     slider.scrollLeft;
 
             },
-            { passive: true }
+            {
+                passive: true
+            }
         );
 
 
@@ -772,11 +1089,11 @@ document.addEventListener("DOMContentLoaded", function () {
             "touchmove",
             function (event) {
 
-                const currentX =
+                var currentX =
                     event.touches[0].pageX;
 
 
-                const distance =
+                var distance =
                     currentX -
                     touchStartX;
 
@@ -786,7 +1103,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     distance;
 
             },
-            { passive: true }
+            {
+                passive: true
+            }
         );
 
     }
@@ -802,13 +1121,13 @@ document.addEventListener("DOMContentLoaded", function () {
         date
     ) {
 
-        const timeGrid =
+        var timeGrid =
             serviceItem.querySelector(
                 ".service-time-grid"
             );
 
 
-        const hiddenTime =
+        var hiddenTime =
             serviceItem.querySelector(
                 ".service-hidden-time"
             );
@@ -832,19 +1151,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
         try {
 
-            const url =
+            var url =
                 "/reservation/blocked-times/" +
                 "?barber=" +
-                encodeURIComponent(
-                    barberId
-                ) +
+                encodeURIComponent(barberId) +
                 "&date=" +
-                encodeURIComponent(
-                    date
-                );
+                encodeURIComponent(date);
 
 
-            const response =
+            var response =
                 await fetch(url);
 
 
@@ -858,7 +1173,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
 
-            const data =
+            var data =
                 await response.json();
 
 
@@ -867,77 +1182,91 @@ document.addEventListener("DOMContentLoaded", function () {
                 data
             );
 
-const workingHours =
-    data.find(
-        item =>
-            item.type ===
-            "working_hours"
-    );
 
-if (!workingHours) {
+            var workingHours =
+                data.find(function (item) {
 
-    timeGrid.innerHTML =
-        "<p>ساعت کاری آرایشگر پیدا نشد.</p>";
+                    return item.type ===
+                        "working_hours";
 
-    return;
+                });
 
-}
 
-const blocked =
-    data.filter(
-        item =>
-            item.type ===
-            "blocked"
-    );
+            if (!workingHours) {
 
-const selectedBarberCard =
-    serviceItem.querySelector(
-        ".service-barber-card input:checked"
-    );
+                timeGrid.innerHTML =
+                    "<p>ساعت کاری آرایشگر پیدا نشد.</p>";
 
-let duration =
-    workingHours.duration;
+                return;
 
-if (selectedBarberCard) {
+            }
 
-    const barberCard =
-        selectedBarberCard.closest(
-            ".service-barber-card"
-        );
 
-    if (barberCard) {
+            var blocked =
+                data.filter(function (item) {
 
-        const barberDuration =
-            barberCard.dataset.duration;
+                    return item.type ===
+                        "blocked";
 
-        if (barberDuration) {
+                });
 
-            duration =
-                parseInt(
-                    barberDuration,
-                    10
+
+            var selectedBarberCard =
+                serviceItem.querySelector(
+                    ".service-barber-card input:checked"
                 );
 
-        }
 
-    }
+            var duration =
+                workingHours.duration;
 
-}
 
-createTimes(
-    timeGrid,
-    hiddenTime,
-    blocked,
-    workingHours.start,
-    workingHours.end,
-    duration
-);
+            if (selectedBarberCard) {
+
+                var barberCard =
+                    selectedBarberCard.closest(
+                        ".service-barber-card"
+                    );
+
+
+                if (barberCard) {
+
+                    var barberDuration =
+                        barberCard.getAttribute(
+                            "data-duration"
+                        );
+
+
+                    if (barberDuration) {
+
+                        duration =
+                            parseInt(
+                                barberDuration,
+                                10
+                            );
+
+                    }
+
+                }
+
+            }
+
+
+            createTimes(
+                timeGrid,
+                hiddenTime,
+                blocked,
+                workingHours.start,
+                workingHours.end,
+                duration
+            );
+
 
             // =================================================
             // ساعت‌ها آماده شدند
             // =================================================
 
-            const selectedTimeBox =
+            var selectedTimeBox =
                 serviceItem.querySelector(
                     ".selected-service-time"
                 );
@@ -949,7 +1278,7 @@ createTimes(
                     "flex";
 
 
-                const text =
+                var text =
                     selectedTimeBox.querySelector(
                         "span"
                     );
@@ -962,8 +1291,6 @@ createTimes(
 
                 }
 
-
-                // باز کردن Popup با کلیک
 
                 selectedTimeBox.onclick =
                     function () {
@@ -1000,52 +1327,51 @@ createTimes(
 
     document
         .querySelectorAll(".service-item")
-        .forEach(serviceItem => {
+        .forEach(function (serviceItem) {
 
-
-            const serviceCheckbox =
+            var serviceCheckbox =
                 serviceItem.querySelector(
                     'input[name="services"]'
                 );
 
 
-            const schedule =
+            var schedule =
                 serviceItem.querySelector(
                     ".service-schedule"
                 );
 
 
-            const barberInputs =
+            var barberInputs =
                 serviceItem.querySelectorAll(
                     ".service-barber-card input"
                 );
 
 
-            const dateInput =
+            var dateInput =
                 serviceItem.querySelector(
                     ".service-date-input"
                 );
 
 
-            const selectedDate =
+            var selectedDate =
                 serviceItem.querySelector(
                     ".service-selected-date"
                 );
 
 
-            const hiddenDate =
+            var hiddenDate =
                 serviceItem.querySelector(
                     ".service-hidden-date"
                 );
 
 
-            const hiddenTime =
+            var hiddenTime =
                 serviceItem.querySelector(
                     ".service-hidden-time"
                 );
 
 
-            const timeGrid =
+            var timeGrid =
                 serviceItem.querySelector(
                     ".service-time-grid"
                 );
@@ -1083,7 +1409,7 @@ createTimes(
 
 
                             barberInputs.forEach(
-                                input => {
+                                function (input) {
 
                                     input.checked =
                                         false;
@@ -1094,8 +1420,7 @@ createTimes(
 
                             if (hiddenDate) {
 
-                                hiddenDate.value =
-                                    "";
+                                hiddenDate.value = "";
 
                             }
 
@@ -1110,18 +1435,21 @@ createTimes(
 
                             if (hiddenTime) {
 
-                                hiddenTime.value =
-                                    "";
+                                hiddenTime.value = "";
 
                             }
 
 
                             if (timeGrid) {
 
-                                timeGrid.innerHTML =
-                                    "";
+                                timeGrid.innerHTML = "";
 
                             }
+
+
+                            resetServiceDetails(
+                                serviceItem
+                            );
 
                         }
 
@@ -1136,7 +1464,7 @@ createTimes(
             // =================================================
 
             barberInputs.forEach(
-                barberInput => {
+                function (barberInput) {
 
                     barberInput.addEventListener(
                         "change",
@@ -1146,60 +1474,87 @@ createTimes(
                                 "SELECTED BARBER:",
                                 this.value
                             );
-// =================================================
-// نمایش قیمت آرایشگر انتخاب شده
-// =================================================
-
-const selectedBarberCard =
-    this.closest(".service-barber-card");
-
-const selectedBarberPrice =
-    serviceItem.querySelector(
-        ".selected-barber-price"
-    );
-
-const barberPriceValue =
-    serviceItem.querySelector(
-        ".barber-price-value"
-    );
 
 
-if (
-    selectedBarberCard &&
-    selectedBarberPrice &&
-    barberPriceValue
-) {
+                            // =================================================
+                            // نمایش قیمت
+                            // =================================================
 
-    const price =
-        selectedBarberCard.dataset.price;
+                            var selectedBarberCard =
+                                this.closest(
+                                    ".service-barber-card"
+                                );
 
 
-    if (price) {
+                            var selectedBarberPrice =
+                                serviceItem.querySelector(
+                                    ".selected-barber-price"
+                                );
 
-        barberPriceValue.innerText =
-            Number(price).toLocaleString("fa-IR");
 
-        selectedBarberPrice.style.display =
-            "flex";
+                            var barberPriceValue =
+                                serviceItem.querySelector(
+                                    ".barber-price-value"
+                                );
 
-    }
 
-    else {
+                            if (
+                                selectedBarberCard &&
+                                selectedBarberPrice &&
+                                barberPriceValue
+                            ) {
 
-        barberPriceValue.innerText =
-            "ثبت نشده";
+                                var price =
+                                    selectedBarberCard.getAttribute(
+                                        "data-price"
+                                    );
 
-        selectedBarberPrice.style.display =
-            "flex";
 
-    }
+                                if (price) {
 
-}
+                                    barberPriceValue.innerText =
+                                        Number(price)
+                                            .toLocaleString(
+                                                "fa-IR"
+                                            );
+
+
+                                    selectedBarberPrice.style.display =
+                                        "flex";
+
+                                }
+
+                                else {
+
+                                    barberPriceValue.innerText =
+                                        "ثبت نشده";
+
+
+                                    selectedBarberPrice.style.display =
+                                        "flex";
+
+                                }
+
+                            }
+
+
+                            // =================================================
+                            // جزئیات مخصوص آرایشگر
+                            // =================================================
+
+                            updateServiceDetails(
+                                serviceItem,
+                                this.value
+                            );
+
+
+                            // =================================================
+                            // ریست تاریخ و ساعت
+                            // =================================================
 
                             if (hiddenDate) {
 
-                                hiddenDate.value =
-                                    "";
+                                hiddenDate.value = "";
 
                             }
 
@@ -1214,21 +1569,19 @@ if (
 
                             if (hiddenTime) {
 
-                                hiddenTime.value =
-                                    "";
+                                hiddenTime.value = "";
 
                             }
 
 
                             if (timeGrid) {
 
-                                timeGrid.innerHTML =
-                                    "";
+                                timeGrid.innerHTML = "";
 
                             }
 
 
-                            const selectedTimeBox =
+                            var selectedTimeBox =
                                 serviceItem.querySelector(
                                     ".selected-service-time"
                                 );
@@ -1240,7 +1593,7 @@ if (
                                     "flex";
 
 
-                                const text =
+                                var text =
                                     selectedTimeBox.querySelector(
                                         "span"
                                     );
@@ -1262,9 +1615,9 @@ if (
             );
 
 
-            // =================================================
+            // =====================================================
             // تقویم خدمت
-            // =================================================
+            // =====================================================
 
             if (dateInput) {
 
@@ -1272,8 +1625,7 @@ if (
                     "click",
                     function () {
 
-
-                        const selectedBarber =
+                        var selectedBarber =
                             serviceItem.querySelector(
                                 ".service-barber-card input:checked"
                             );
@@ -1290,14 +1642,15 @@ if (
                         }
 
 
-                        let viewYear =
+                        var viewYear =
                             todayJalali.jy;
 
-                        let viewMonth =
+
+                        var viewMonth =
                             todayJalali.jm;
 
 
-                        const modal =
+                        var modal =
                             document.createElement(
                                 "div"
                             );
@@ -1311,53 +1664,122 @@ if (
                             "flex";
 
 
-                        modal.innerHTML = `
+                        // =================================================
+                        // ساخت تقویم بدون Template Literal
+                        // =================================================
 
-                            <div class="calendar-content">
+                        var calendarContent =
+                            document.createElement("div");
 
-                                <button
-                                    type="button"
-                                    class="service-prev-month"
-                                >
-                                    ❮
-                                </button>
+                        calendarContent.className =
+                            "calendar-content";
 
-                                <h3
-                                    class="service-calendar-title"
-                                ></h3>
 
-                                <button
-                                    type="button"
-                                    class="service-next-month"
-                                >
-                                    ❯
-                                </button>
+                        var prev =
+                            document.createElement("button");
 
-                                <button
-                                    type="button"
-                                    class="service-close-calendar"
-                                >
-                                    ✕
-                                </button>
+                        prev.type = "button";
 
-                                <div class="week-days">
+                        prev.className =
+                            "service-prev-month";
 
-                                    <span>ش</span>
-                                    <span>ی</span>
-                                    <span>د</span>
-                                    <span>س</span>
-                                    <span>چ</span>
-                                    <span>پ</span>
-                                    <span>ج</span>
+                        prev.innerText = "❮";
 
-                                </div>
 
-                                <div
-                                    class="calendar-days service-calendar-days"
-                                ></div>
+                        var calendarTitle =
+                            document.createElement("h3");
 
-                            </div>
-                        `;
+                        calendarTitle.className =
+                            "service-calendar-title";
+
+
+                        var next =
+                            document.createElement("button");
+
+                        next.type = "button";
+
+                        next.className =
+                            "service-next-month";
+
+                        next.innerText = "❯";
+
+
+                        var close =
+                            document.createElement("button");
+
+                        close.type = "button";
+
+                        close.className =
+                            "service-close-calendar";
+
+                        close.innerText = "✕";
+
+
+                        var weekDays =
+                            document.createElement("div");
+
+                        weekDays.className =
+                            "week-days";
+
+
+                        var weekNames = [
+                            "ش",
+                            "ی",
+                            "د",
+                            "س",
+                            "چ",
+                            "پ",
+                            "ج"
+                        ];
+
+
+                        weekNames.forEach(
+                            function (name) {
+
+                                var span =
+                                    document.createElement(
+                                        "span"
+                                    );
+
+                                span.innerText =
+                                    name;
+
+                                weekDays.appendChild(
+                                    span
+                                );
+
+                            }
+                        );
+
+
+                        var calendar =
+                            document.createElement("div");
+
+                        calendar.className =
+                            "calendar-days service-calendar-days";
+
+
+                        calendarContent.appendChild(prev);
+
+                        calendarContent.appendChild(
+                            calendarTitle
+                        );
+
+                        calendarContent.appendChild(next);
+
+                        calendarContent.appendChild(close);
+
+                        calendarContent.appendChild(
+                            weekDays
+                        );
+
+                        calendarContent.appendChild(
+                            calendar
+                        );
+
+                        modal.appendChild(
+                            calendarContent
+                        );
 
 
                         document.body.appendChild(
@@ -1365,40 +1787,13 @@ if (
                         );
 
 
-                        const calendar =
-                            modal.querySelector(
-                                ".service-calendar-days"
-                            );
-
-
-                        const calendarTitle =
-                            modal.querySelector(
-                                ".service-calendar-title"
-                            );
-
-
-                        const prev =
-                            modal.querySelector(
-                                ".service-prev-month"
-                            );
-
-
-                        const next =
-                            modal.querySelector(
-                                ".service-next-month"
-                            );
-
-
-                        const close =
-                            modal.querySelector(
-                                ".service-close-calendar"
-                            );
-
+                        // =================================================
+                        // نمایش تقویم
+                        // =================================================
 
                         function renderServiceCalendar() {
 
-                            calendar.innerHTML =
-                                "";
+                            calendar.innerHTML = "";
 
 
                             calendarTitle.innerText =
@@ -1407,14 +1802,14 @@ if (
                                 viewYear;
 
 
-                            const monthDays =
+                            var monthDays =
                                 jalaali.jalaaliMonthLength(
                                     viewYear,
                                     viewMonth
                                 );
 
 
-                            const firstGregorian =
+                            var firstGregorian =
                                 jalaali.toGregorian(
                                     viewYear,
                                     viewMonth,
@@ -1422,7 +1817,7 @@ if (
                                 );
 
 
-                            const firstDate =
+                            var firstDate =
                                 new Date(
                                     firstGregorian.gy,
                                     firstGregorian.gm - 1,
@@ -1430,7 +1825,7 @@ if (
                                 );
 
 
-                            let startDay =
+                            var startDay =
                                 firstDate.getDay();
 
 
@@ -1438,19 +1833,25 @@ if (
                                 (startDay + 1) % 7;
 
 
+                            // =================================================
+                            // خانه‌های خالی
+                            // =================================================
+
                             for (
-                                let i = 0;
+                                var i = 0;
                                 i < startDay;
                                 i++
                             ) {
 
-                                const empty =
+                                var empty =
                                     document.createElement(
                                         "div"
                                     );
 
+
                                 empty.className =
                                     "calendar-day empty";
+
 
                                 calendar.appendChild(
                                     empty
@@ -1459,13 +1860,17 @@ if (
                             }
 
 
+                            // =================================================
+                            // روزهای ماه
+                            // =================================================
+
                             for (
-                                let day = 1;
+                                var day = 1;
                                 day <= monthDays;
                                 day++
                             ) {
 
-                                const dayBox =
+                                var dayBox =
                                     document.createElement(
                                         "div"
                                     );
@@ -1479,45 +1884,47 @@ if (
                                     day;
 
 
-                                const gregorian =
-                                    jalaali.toGregorian(
-                                        viewYear,
-                                        viewMonth,
-                                        day
-                                    );
+                               let gregorian =
+    jalaali.toGregorian(
+        viewYear,
+        viewMonth,
+        day
+    );
 
+let selected =
+    new Date(
+        gregorian.gy,
+        gregorian.gm - 1,
+        gregorian.gd
+    );
 
-                                const selected =
-                                    new Date(
-                                        gregorian.gy,
-                                        gregorian.gm - 1,
-                                        gregorian.gd
-                                    );
+selected.setHours(
+    0,
+    0,
+    0,
+    0
+);
 
+let today =
+    new Date();
 
-                                selected.setHours(
-                                    0,
-                                    0,
-                                    0,
-                                    0
-                                );
+today.setHours(
+    0,
+    0,
+    0,
+    0
+);
 
+// =================================================
+// روز گذشته
+// =================================================
 
-                                const today =
-                                    new Date();
+if (
+    selected < today
+) {
 
-                                today.setHours(
-                                    0,
-                                    0,
-                                    0,
-                                    0
-                                );
-
-
-                                if (selected < today) {
-
-    // روز گذشته نمایش داده نشود
-    dayBox.style.visibility = "hidden";
+    dayBox.style.visibility =
+        "hidden";
 
 }
 
@@ -1527,38 +1934,75 @@ else {
         "click",
         function () {
 
-            selectedDate.innerText =
+            var selectedDay =
+                this.innerText;
+
+            var selectedJalaliDate =
                 viewYear +
                 "/" +
-                String(viewMonth).padStart(2, "0") +
+                String(
+                    viewMonth
+                ).padStart(
+                    2,
+                    "0"
+                ) +
                 "/" +
-                String(day).padStart(2, "0");
+                String(
+                    selectedDay
+                ).padStart(
+                    2,
+                    "0"
+                );
 
 
-            hiddenDate.value =
-                gregorian.gy +
-                "-" +
-                String(gregorian.gm).padStart(2, "0") +
-                "-" +
-                String(gregorian.gd).padStart(2, "0");
+            if (selectedDate) {
+
+                selectedDate.innerText =
+                    selectedJalaliDate;
+
+            }
+
+
+            if (hiddenDate) {
+
+                hiddenDate.value =
+                    gregorian.gy +
+                    "-" +
+                    String(
+                        gregorian.gm
+                    ).padStart(
+                        2,
+                        "0"
+                    ) +
+                    "-" +
+                    String(
+                        gregorian.gd
+                    ).padStart(
+                        2,
+                        "0"
+                    );
+
+            }
 
 
             modal.remove();
 
 
-            const selectedTimeBox =
+            var selectedTimeBox =
                 serviceItem.querySelector(
                     ".selected-service-time"
                 );
 
 
-            if (selectedTimeBox) {
+            if (
+                selectedTimeBox
+            ) {
 
                 selectedTimeBox.style.display =
                     "flex";
 
 
-                const text =
+                var text =
                     selectedTimeBox.querySelector(
                         "span"
                     );
@@ -1574,16 +2018,21 @@ else {
             }
 
 
-            loadServiceTimes(
-                serviceItem,
-                selectedBarber.value,
-                hiddenDate.value
-            );
+            if (hiddenDate) {
+
+                loadServiceTimes(
+                    serviceItem,
+                    selectedBarber.value,
+                    hiddenDate.value
+                );
+
+            }
 
         }
     );
 
 }
+
                                 calendar.appendChild(
                                     dayBox
                                 );
@@ -1592,6 +2041,10 @@ else {
 
                         }
 
+
+                        // =================================================
+                        // ماه قبل
+                        // =================================================
 
                         prev.addEventListener(
                             "click",
@@ -1615,6 +2068,10 @@ else {
                         );
 
 
+                        // =================================================
+                        // ماه بعد
+                        // =================================================
+
                         next.addEventListener(
                             "click",
                             function () {
@@ -1636,6 +2093,10 @@ else {
                             }
                         );
 
+
+                        // =================================================
+                        // بستن
+                        // =================================================
 
                         close.addEventListener(
                             "click",
@@ -1677,19 +2138,19 @@ else {
     // انتخاب خودکار خدمت از URL
     // =====================================================
 
-    const params =
+    var params =
         new URLSearchParams(
             window.location.search
         );
 
 
-    const serviceId =
+    var serviceId =
         params.get("service");
 
 
     if (serviceId) {
 
-        const selectedService =
+        var selectedService =
             document.querySelector(
                 'input[name="services"][value="' +
                 serviceId +
@@ -1703,7 +2164,7 @@ else {
                 true;
 
 
-            const content =
+            var content =
                 selectedService.closest(
                     ".accordion-content"
                 );
@@ -1717,10 +2178,12 @@ else {
             }
 
 
-            const schedule =
-                content?.querySelector(
-                    ".service-schedule"
-                );
+            var schedule =
+                content
+                    ? content.querySelector(
+                        ".service-schedule"
+                    )
+                    : null;
 
 
             if (schedule) {
@@ -1733,6 +2196,5 @@ else {
         }
 
     }
-
 
 });

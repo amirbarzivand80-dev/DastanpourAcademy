@@ -95,10 +95,12 @@ class Reservation(models.Model):
     ]
 
     PAYMENT_STATUS_CHOICES = [
-        ("pending", "در انتظار پرداخت"),
-        ("paid", "پرداخت شده"),
-        ("failed", "ناموفق"),
-    ]
+    ("pending", "پرداخت نشده"),
+    ("deposit_paid", "بیعانه پرداخت شده"),
+    ("paid", "کامل پرداخت شده"),
+    ("failed", "پرداخت ناموفق"),
+    ("refunded", "مبلغ برگشت داده شده"),
+]
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -146,7 +148,20 @@ class Reservation(models.Model):
         default=0,
         help_text="مبلغ بیعانه"
     )
+    paid_amount = models.PositiveBigIntegerField(
+    default=0,
+    help_text="مبلغ پرداخت شده"
+)
+    selected_details = models.JSONField(
+    default=list,
+    blank=True,
+    help_text="جزئیات انتخاب شده هنگام رزرو"
+)
 
+    total_duration = models.PositiveIntegerField(
+    default=0,
+    help_text="مدت کل خدمت به دقیقه"
+)
     # -----------------------------
     # وضعیت رزرو
     # -----------------------------
@@ -191,7 +206,13 @@ class Reservation(models.Model):
             "date",
             "time",
         )
-
+    @property
+    def remaining_amount(self):
+        return max(self.service_price - self.paid_amount, 0)
+    @property
+    def is_fully_paid(self):    
+        return self.paid_amount >= self.service_price
+    
     def __str__(self):
 
         if self.user:

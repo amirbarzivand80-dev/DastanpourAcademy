@@ -1,0 +1,650 @@
+{% extends "superadmin_panel/base.html" %}
+
+{% load static %}
+
+{% block title %}
+    {% if form.instance.pk %}
+        ویرایش کد تخفیف
+    {% else %}
+        ایجاد کد تخفیف
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="discount-page">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>
+                {% if form.instance.pk %}
+                    ویرایش کد تخفیف
+                {% else %}
+                    ایجاد کد تخفیف
+                {% endif %}
+            </h1>
+
+            <p>
+                مدیریت اطلاعات و شرایط استفاده از کد تخفیف
+            </p>
+
+        </div>
+
+        <a
+            href="{% url 'superadmin_discounts' %}"
+            class="btn-secondary"
+        >
+            <i class="fa-solid fa-arrow-right"></i>
+            بازگشت
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         FORM
+    ====================================================== -->
+
+    <div class="discount-form-card">
+
+        <form
+            method="POST"
+            id="discount-form"
+        >
+
+            {% csrf_token %}
+
+
+            {% if form.non_field_errors %}
+
+                <div class="form-errors">
+                    {{ form.non_field_errors }}
+                </div>
+
+            {% endif %}
+
+
+            <!-- =================================================
+                 اطلاعات اصلی
+            ================================================== -->
+
+            <div class="form-section">
+
+                <div class="section-title">
+
+                    <i class="fa-solid fa-ticket"></i>
+
+                    <div>
+
+                        <h3>
+                            اطلاعات کد تخفیف
+                        </h3>
+
+                        <span>
+                            اطلاعات اصلی تخفیف را وارد کنید
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-grid">
+
+
+                    <!-- کد -->
+
+                    <div class="form-group">
+
+                        <label for="{{ form.code.id_for_label }}">
+                            کد تخفیف
+                        </label>
+
+                        {{ form.code }}
+
+                        {% if form.code.errors %}
+
+                            <div class="field-error">
+                                {{ form.code.errors }}
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- نوع -->
+
+                    <div class="form-group">
+
+                        <label for="{{ form.discount_type.id_for_label }}">
+                            نوع تخفیف
+                        </label>
+
+                        {{ form.discount_type }}
+
+                        {% if form.discount_type.errors %}
+
+                            <div class="field-error">
+                                {{ form.discount_type.errors }}
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- مقدار -->
+
+                    <div class="form-group">
+
+                        <label for="{{ form.value.id_for_label }}">
+                            مقدار تخفیف
+                        </label>
+
+                        {{ form.value }}
+
+                        {% if form.value.errors %}
+
+                            <div class="field-error">
+                                {{ form.value.errors }}
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- حداقل خرید -->
+
+                    <div class="form-group">
+
+                        <label for="{{ form.minimum_purchase.id_for_label }}">
+                            حداقل مبلغ خرید
+                        </label>
+
+                        {{ form.minimum_purchase }}
+
+                        {% if form.minimum_purchase.errors %}
+
+                            <div class="field-error">
+                                {{ form.minimum_purchase.errors }}
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 محدوده تخفیف
+            ================================================== -->
+
+            <div class="form-section">
+
+                <div class="section-title">
+
+                    <i class="fa-solid fa-bullseye"></i>
+
+                    <div>
+
+                        <h3>
+                            محدوده تخفیف
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     محصولات
+                ================================================== -->
+
+                <div class="discount-target-box">
+
+                    <div class="target-header">
+
+                        <div>
+
+                            <i class="fa-solid fa-box"></i>
+
+                            <strong>
+                                محصولات
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- گزینه‌ها -->
+
+                    <div class="target-options">
+
+                        {{ form.product_target }}
+
+                    </div>
+
+
+                    <!-- انتخاب محصولات خاص -->
+
+                    <div
+                        id="products-selection"
+                        class="specific-target"
+                        style="display:none;"
+                    >
+
+                        <label for="{{ form.products.id_for_label }}">
+                            انتخاب محصولات
+                        </label>
+
+                        {{ form.products }}
+
+                        {% if form.products.errors %}
+
+                            <div class="field-error">
+                                {{ form.products.errors }}
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     دوره‌ها
+                ================================================== -->
+
+                <div class="discount-target-box">
+
+                    <div class="target-header">
+
+                        <div>
+
+                            <i class="fa-solid fa-graduation-cap"></i>
+
+                            <strong>
+                                دوره‌ها
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- گزینه‌ها -->
+
+                    <div class="target-options">
+
+                        {{ form.course_target }}
+
+                    </div>
+
+
+                    <!-- انتخاب دوره‌های خاص -->
+
+                    <div
+                        id="courses-selection"
+                        class="specific-target"
+                        style="display:none;"
+                    >
+
+                        <label for="{{ form.courses.id_for_label }}">
+                            انتخاب دوره‌ها
+                        </label>
+
+                        {{ form.courses }}
+
+                        {% if form.courses.errors %}
+
+                            <div class="field-error">
+                                {{ form.courses.errors }}
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     خدمات
+                ================================================== -->
+
+                <div class="discount-target-box">
+
+                    <div class="target-header">
+
+                        <div>
+
+                            <i class="fa-solid fa-scissors"></i>
+
+                            <strong>
+                                خدمات
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- گزینه‌ها -->
+
+                    <div class="target-options">
+
+                        {{ form.service_target }}
+
+                    </div>
+
+
+                    <!-- انتخاب خدمات خاص -->
+
+                    <div
+                        id="services-selection"
+                        class="specific-target"
+                        style="display:none;"
+                    >
+
+                        <label for="{{ form.services.id_for_label }}">
+                            انتخاب خدمات
+                        </label>
+
+                        {{ form.services }}
+
+                        {% if form.services.errors %}
+
+                            <div class="field-error">
+                                {{ form.services.errors }}
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 کاربران
+            ================================================== -->
+
+            <div class="form-section">
+
+                <div class="section-title">
+
+                    <i class="fa-solid fa-users"></i>
+
+                    <div>
+
+                        <h3>
+                            کاربران مجاز
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+                <!-- گزینه‌ها -->
+
+                <div class="target-options">
+
+                    {{ form.user_target }}
+
+                </div>
+
+
+                <!-- انتخاب کاربران خاص -->
+
+                <div
+                    id="users-selection"
+                    class="specific-target"
+                    style="display:none;"
+                >
+
+                    <label for="{{ form.users.id_for_label }}">
+                        انتخاب کاربران
+                    </label>
+
+                    {{ form.users }}
+
+                    {% if form.users.errors %}
+
+                        <div class="field-error">
+                            {{ form.users.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 محدودیت استفاده
+            ================================================== -->
+
+            <div class="form-section">
+
+                <div class="section-title">
+
+                    <i class="fa-solid fa-chart-simple"></i>
+
+                    <div>
+
+                        <h3>
+                            محدودیت استفاده
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-grid">
+
+
+                    <div class="form-group">
+
+                        <label for="{{ form.usage_limit.id_for_label }}">
+                            حداکثر تعداد استفاده
+                        </label>
+
+                        {{ form.usage_limit }}
+
+                        {% if form.usage_limit.errors %}
+
+                            <div class="field-error">
+                                {{ form.usage_limit.errors }}
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="{{ form.per_user_limit.id_for_label }}">
+                            محدودیت برای هر کاربر
+                        </label>
+
+                        {{ form.per_user_limit }}
+
+                        {% if form.per_user_limit.errors %}
+
+                            <div class="field-error">
+                                {{ form.per_user_limit.errors }}
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 تاریخ اعتبار
+            ================================================== -->
+
+            <div class="form-section">
+
+                <div class="section-title">
+
+                    <i class="fa-solid fa-calendar-days"></i>
+
+                    <div>
+
+                        <h3>
+                            مدت اعتبار
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-grid">
+
+
+                    <div class="form-group">
+
+                        <label for="{{ form.start_date.id_for_label }}">
+                            شروع اعتبار
+                        </label>
+
+                        {{ form.start_date }}
+
+                        {% if form.start_date.errors %}
+
+                            <div class="field-error">
+                                {{ form.start_date.errors }}
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="{{ form.end_date.id_for_label }}">
+                            پایان اعتبار
+                        </label>
+
+                        {{ form.end_date }}
+
+                        {% if form.end_date.errors %}
+
+                            <div class="field-error">
+                                {{ form.end_date.errors }}
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 وضعیت
+            ================================================== -->
+
+            <div class="form-section">
+
+                <div class="section-title">
+
+                    <i class="fa-solid fa-power-off"></i>
+
+                    <div>
+
+                        <h3>
+                            وضعیت کد
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-checkbox">
+
+                    {{ form.is_active }}
+
+                    <label for="{{ form.is_active.id_for_label }}">
+                        کد تخفیف فعال باشد
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 BUTTONS
+            ================================================== -->
+
+            <div class="form-actions">
+
+                <button
+                    type="submit"
+                    class="btn-primary"
+                >
+
+                    <i class="fa-solid fa-check"></i>
+
+                    {% if form.instance.pk %}
+                        ذخیره تغییرات
+                    {% else %}
+                        ایجاد کد تخفیف
+                    {% endif %}
+
+                </button>
+
+
+                <a
+                    href="{% url 'superadmin_discounts' %}"
+                    class="btn-secondary"
+                >
+                    انصراف
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     JAVASCRIPT
+====================================================== -->
+
+<script src="{% static 'js/discount_form.js' %}"></script>
+
+{% endblock %}

@@ -213,7 +213,87 @@
                                 </div>
 
                             </div>
+<!-- ================================= -->
+<!-- جزئیات خدمت -->
+<!-- ================================= -->
 
+<div class="service-details">
+
+    <h4>
+        جزئیات خدمت
+    </h4>
+
+    <div class="service-details-list">
+
+        {% for detail in service.details.all %}
+
+        {% if detail.is_active %}
+
+        <label
+            class="service-detail-item"
+            data-detail-id="{{ detail.id }}"
+        >
+
+            <input
+                type="checkbox"
+                name="details_{{ service.id }}"
+                value="{{ detail.id }}"
+                class="service-detail-checkbox"
+            >
+
+            <div class="service-detail-info">
+
+                <strong>
+                    {{ detail.name }}
+                </strong>
+
+                {% if detail.description %}
+
+                <small>
+                    {{ detail.description }}
+                </small>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="service-detail-price">
+
+                {% for detail_price in detail.barber_prices.all %}
+
+                    <span
+                        class="detail-barber-data"
+                        data-barber="{{ detail_price.barber_id }}"
+                        data-price="{{ detail_price.price }}"
+                        data-duration="{{ detail_price.duration }}"
+                        style="display:none;"
+                    >
+                    </span>
+
+                {% endfor %}
+
+                <span class="detail-price-value">
+                    انتخاب نشده
+                </span>
+
+            </div>
+
+        </label>
+
+        {% endif %}
+
+        {% empty %}
+
+        <p class="no-details">
+            برای این خدمت جزئیاتی ثبت نشده است.
+        </p>
+
+        {% endfor %}
+
+    </div>
+
+</div>
 
                             <!-- ================================= -->
                             <!-- تاریخ و ساعت همین خدمت -->

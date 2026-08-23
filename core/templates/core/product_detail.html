@@ -105,17 +105,9 @@
 </h2>
 <div class="product-price">
 
-{% if product.discount_price %}
+    {{ final_price|price_format }}
 
-{{ product.discount_price|price_format }}
-
-{% else %}
-
-{{ product.price|price_format }}
-
-{% endif %}
-
-تومان
+    تومان
 
 </div>
 

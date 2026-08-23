@@ -1,4 +1,4 @@
-```html
+
 {% extends 'core/base.html' %}
 {% load static %}
 {% load price_filters %}
@@ -241,6 +241,8 @@
                         {% endfor %}
 
 
+                        <!-- مبلغ نهایی -->
+
                         <div class="total-price">
 
                             <span>
@@ -248,8 +250,26 @@
                             </span>
 
                             <span>
-                                {{ total_price|price_format }}
-                                تومان
+
+                                {% if discount_amount > 0 %}
+
+                                    <del>
+                                        {{ total_price|price_format }}
+                                        تومان
+                                    </del>
+
+                                    <strong>
+                                        {{ final_price|price_format }}
+                                        تومان
+                                    </strong>
+
+                                {% else %}
+
+                                    {{ final_price|price_format }}
+                                    تومان
+
+                                {% endif %}
+
                             </span>
 
                         </div>
@@ -330,4 +350,3 @@
 </script>
 
 {% endblock %}
-```

@@ -167,40 +167,24 @@ function getCookie(name) {
 
 
 
-
-
 function updateTotal() {
-
 
     let total = 0;
 
-
     document.querySelectorAll(".item-price").forEach(item => {
 
-
         total += Number(item.dataset.price);
-
 
     });
 
 
-
-    const subtotal = document.querySelector(".subtotal-price");
-
-
-    if (subtotal) {
-
-        subtotal.innerText =
-            total.toLocaleString("fa-IR") + " تومان";
-
-    }
-
-
+    // =========================================
+    // جمع کالاها
+    // =========================================
 
     const goodsRow = document.querySelector(
         ".summary-row:first-of-type span:last-child"
     );
-
 
     if (goodsRow) {
 
@@ -210,8 +194,39 @@ function updateTotal() {
     }
 
 
-}
+    // =========================================
+    // قیمت نهایی
+    // =========================================
+    // اگر کد تخفیف روی صفحه اعمال شده،
+    // Django قیمت نهایی را داخل HTML قرار داده
+    // و JS نباید آن را تغییر دهد.
+    // =========================================
 
+    const subtotal = document.querySelector(
+        ".subtotal-price"
+    );
+
+    if (subtotal) {
+
+        const hasDiscount =
+            subtotal.querySelector("del") ||
+            subtotal.querySelector("strong");
+
+        // اگر تخفیف وجود دارد، به HTML دست نمی‌زنیم
+        if (hasDiscount) {
+
+            return;
+
+        }
+
+        // اگر تخفیف وجود ندارد،
+        // قیمت نهایی همان جمع کالاهاست
+        subtotal.innerText =
+            total.toLocaleString("fa-IR") + " تومان";
+
+    }
+
+}
 
 
 
