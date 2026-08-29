@@ -34,5 +34,9 @@ urlpatterns = [
     views.reservation_payment,
     name="reservation_payment",
 ),
-
+path(
+    "survey/<uuid:token>/",
+    views.reservation_survey,
+    name="reservation_survey",
+),
 ]

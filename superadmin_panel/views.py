@@ -30,6 +30,7 @@ from reservation.forms import WalkInReservationForm
 from users.models import CustomUser
 from academy.models import Course
 from academy.forms import CourseForm
+from users.sms import send_survey_sms
 from academy.models import CourseStudent
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render, get_object_or_404
@@ -770,8 +771,8 @@ def reservations_live(request):
     return JsonResponse({
         "reservations": data
     })
-
 @login_required
+
 def reservation_status(request, id):
 
     reservation = get_object_or_404(
@@ -783,11 +784,40 @@ def reservation_status(request, id):
 
         status = request.POST.get("status")
 
-        reservation.status = status
+        old_status = reservation.status
 
+        reservation.status = status
         reservation.save()
 
+        # =====================================================
+        # ارسال پیامک نظرسنجی بعد از انجام شدن نوبت
+        # =====================================================
+
+        if (
+            status == "done"
+            and old_status != "done"
+            and not reservation.survey_sms_sent
+        ):
+
+            # لینک اختصاصی نظرسنجی
+            link = request.build_absolute_uri(
+                f"/reservation/survey/{reservation.survey_token}/"
+            )
+
+            send_survey_sms(
+                reservation.customer_phone,
+                reservation.customer_name,
+                link
+            )
+
+            reservation.survey_sms_sent = True
+
+            reservation.save(
+                update_fields=["survey_sms_sent"]
+            )
+
     return redirect("superadmin_reservations")
+
 
 @login_required
 def reservation_delete(request, id):

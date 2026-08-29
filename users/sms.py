@@ -12,7 +12,7 @@ REMINDER_PATTERN = "7ltuf"
 ORDER_PATTERN = "gvl7z"
 APPOINTMENT_CONFIRMATION_PATTERN = "v78dj"
 COURSE_PATTERN = "91i04"
-
+SURVEY_PATTERN = "czpjr"
 
 def send_otp_sms(phone, code):
 
@@ -410,6 +410,60 @@ def send_course_confirmation_sms(
 
         print(
             "COURSE CONFIRMATION SMS EXCEPTION:",
+            repr(e)
+        )
+
+        return None
+    
+
+def send_survey_sms(phone, name, link):
+
+    if phone.startswith("09"):
+        phone = "+98" + phone[1:]
+
+    elif phone.startswith("9"):
+        phone = "+98" + phone
+
+    headers = {
+        "Accept": "application/json",
+        "Authorization": f"Bearer {IPPANEL_API_KEY}",
+        "Content-Type": "application/json",
+    }
+
+    payload = {
+       "pattern": SURVEY_PATTERN,
+        "variables": {
+            "NAME": str(name),
+            "LINK": str(link),
+        },
+        "recipient": phone,
+        "sourceNumber": IPPANEL_SOURCE_NUMBER,
+    }
+
+    print("========== SURVEY SMS ==========")
+    print("PHONE:", phone)
+    print("NAME:", name)
+    print("LINK:", link)
+
+    try:
+
+        response = requests.post(
+            IPPANEL_API_URL,
+            headers=headers,
+            json=payload,
+            timeout=15,
+        )
+
+        print("STATUS:", response.status_code)
+        print("RESPONSE:", response.text)
+        print("================================")
+
+        return response
+
+    except Exception as e:
+
+        print(
+            "SURVEY SMS EXCEPTION:",
             repr(e)
         )
 

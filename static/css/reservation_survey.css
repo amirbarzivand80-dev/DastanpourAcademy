@@ -1,90 +1,53 @@
+
 /* =====================================
         Reservation Survey
 ===================================== */
 
-.reservation-survey-page{
-
-    padding:140px 0 80px;
-
+.survey-page {
+    min-height: 100vh;
+    padding: 140px 20px 80px;
+    box-sizing: border-box;
 }
 
-.survey-container{
-
-    max-width:800px;
-
-    margin:0 auto;
-
-    padding:0 20px;
-
-}
-
-.survey-card{
-
-    background:#1b1b1b;
-
-    padding:45px;
-
-    border-radius:20px;
-
-    box-shadow:0 10px 30px rgba(0,0,0,.18);
-
+.survey-container {
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 
 /* =====================================
-        Header
+        Main Box
 ===================================== */
 
-.survey-header{
-
-    text-align:center;
-
-    margin-bottom:40px;
-
+.survey-box,
+.survey-success {
+    background: #1b1b1b;
+    padding: 45px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .18);
+    box-sizing: border-box;
 }
 
-.survey-icon{
 
-    width:65px;
+/* =====================================
+        Titles
+===================================== */
 
-    height:65px;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    margin:0 auto 20px;
-
-    border-radius:50%;
-
-    background:#2b2b2b;
-
-    color:#d4b06a;
-
-    font-size:32px;
-
+.survey-box h1,
+.survey-success h1 {
+    color: #fff;
+    text-align: center;
+    font-size: 30px;
+    margin: 0 0 15px;
+    line-height: 1.8;
 }
 
-.survey-header h1{
-
-    color:#fff;
-
-    font-size:30px;
-
-    margin-bottom:12px;
-
-}
-
-.survey-header p{
-
-    color:#ccc;
-
-    font-size:16px;
-
-    line-height:2;
-
+.survey-subtitle {
+    color: #d4b06a;
+    text-align: center;
+    font-size: 16px;
+    margin: 0 0 35px;
+    line-height: 2;
 }
 
 
@@ -92,198 +55,100 @@
         Reservation Info
 ===================================== */
 
-.reservation-info{
-
-    display:grid;
-
-    grid-template-columns:repeat(2,1fr);
-
-    gap:15px;
-
-    margin-bottom:40px;
-
+.reservation-info {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 40px;
 }
 
-.info-item{
-
-    background:#2b2b2b;
-
-    border-radius:12px;
-
-    padding:18px;
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:8px;
-
+.reservation-info > div {
+    background: #2b2b2b;
+    border-radius: 12px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-sizing: border-box;
 }
 
-.info-item span{
-
-    color:#999;
-
-    font-size:14px;
-
+.reservation-info span {
+    color: #999;
+    font-size: 14px;
 }
 
-.info-item strong{
-
-    color:#fff;
-
-    font-size:16px;
-
+.reservation-info strong {
+    color: #fff;
+    font-size: 16px;
 }
 
 
 /* =====================================
-        Rating
+        Form
 ===================================== */
 
-.rating-section{
-
-    text-align:center;
-
-    margin-bottom:35px;
-
+.form-group {
+    margin-bottom: 25px;
 }
 
-.rating-section h2{
-
-    color:#fff;
-
-    font-size:22px;
-
-    margin-bottom:8px;
-
-}
-
-.rating-section p{
-
-    color:#999;
-
-    font-size:14px;
-
+.form-group label {
+    display: block;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 12px;
 }
 
 
 /* =====================================
-        Stars
+        Select
 ===================================== */
 
-.star-rating{
-
-    direction:rtl;
-
-    display:flex;
-
-    justify-content:center;
-
-    gap:8px;
-
-    margin-top:20px;
-
+.form-group select {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: #2b2b2b;
+    color: #fff;
+    font-family: inherit;
+    font-size: 15px;
+    box-sizing: border-box;
+    cursor: pointer;
 }
 
-.star-rating input{
-
-    display:none;
-
-}
-
-.star-rating label{
-
-    font-size:45px;
-
-    color:#555;
-
-    cursor:pointer;
-
-    transition:.25s;
-
-}
-
-.star-rating label:hover,
-.star-rating label:hover ~ label{
-
-    color:#d4b06a;
-
-    transform:scale(1.08);
-
-}
-
-.star-rating input:checked ~ label{
-
-    color:#d4b06a;
-
+.form-group select:focus {
+    outline: none;
+    border-color: #d4b06a;
 }
 
 
 /* =====================================
-        Message
+        Textarea
 ===================================== */
 
-.survey-message{
-
-    margin-bottom:25px;
-
+.form-group textarea {
+    width: 100%;
+    min-height: 150px;
+    resize: vertical;
+    padding: 15px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: #2b2b2b;
+    color: #fff;
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 2;
+    box-sizing: border-box;
 }
 
-.survey-message label{
-
-    display:block;
-
-    color:#fff;
-
-    font-size:16px;
-
-    font-weight:bold;
-
-    margin-bottom:12px;
-
+.form-group textarea::placeholder {
+    color: #999;
 }
 
-.survey-message textarea{
-
-    width:100%;
-
-    min-height:150px;
-
-    resize:vertical;
-
-    padding:15px;
-
-    border:none;
-
-    border-radius:12px;
-
-    background:#2b2b2b;
-
-    color:#fff;
-
-    font-family:inherit;
-
-    font-size:15px;
-
-    line-height:2;
-
-    box-sizing:border-box;
-
-}
-
-.survey-message textarea::placeholder{
-
-    color:#999;
-
-}
-
-.survey-message textarea:focus{
-
-    outline:none;
-
-    border:1px solid #d4b06a;
-
+.form-group textarea:focus {
+    outline: none;
+    border-color: #d4b06a;
 }
 
 
@@ -291,40 +156,77 @@
         Submit Button
 ===================================== */
 
-.survey-submit-btn{
-
-    width:100%;
-
-    padding:16px;
-
-    border:none;
-
-    border-radius:12px;
-
-    background:#d4b06a;
-
-    color:#111;
-
-    font-size:17px;
-
-    font-weight:bold;
-
-    font-family:inherit;
-
-    cursor:pointer;
-
-    transition:.3s;
-
+.submit-btn {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
+    background: #d4b06a;
+    color: #111;
+    font-size: 17px;
+    font-weight: bold;
+    font-family: inherit;
+    cursor: pointer;
+    transition: .3s;
 }
 
-.survey-submit-btn:hover{
+.submit-btn:hover {
+    background: #c39a48;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .2);
+}
 
-    background:#c39a48;
 
-    transform:translateY(-2px);
+/* =====================================
+        Success
+===================================== */
 
-    box-shadow:0 8px 20px rgba(0,0,0,.2);
+.survey-success {
+    text-align: center;
+}
 
+.success-icon {
+    width: 65px;
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background: #2b2b2b;
+    color: #d4b06a;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.survey-success p {
+    color: #ccc;
+    font-size: 16px;
+    line-height: 2;
+    margin: 8px 0;
+}
+
+
+/* =====================================
+        Home Button
+===================================== */
+
+.home-btn {
+    display: inline-block;
+    margin-top: 25px;
+    padding: 14px 30px;
+    border-radius: 12px;
+    background: #d4b06a;
+    color: #111;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    transition: .3s;
+}
+
+.home-btn:hover {
+    background: #c39a48;
+    transform: translateY(-2px);
 }
 
 
@@ -332,42 +234,57 @@
         Mobile
 ===================================== */
 
-@media(max-width:600px){
+@media (max-width: 600px) {
 
-    .reservation-survey-page{
-
-        padding:110px 0 50px;
-
+    .survey-page {
+        padding: 110px 15px 50px;
     }
 
-    .survey-card{
-
-        padding:25px 20px;
-
+    .survey-box,
+    .survey-success {
+        padding: 25px 20px;
+        border-radius: 16px;
     }
 
-    .survey-header h1{
-
-        font-size:25px;
-
+    .survey-box h1,
+    .survey-success h1 {
+        font-size: 24px;
     }
 
-    .reservation-info{
-
-        grid-template-columns:1fr;
-
+    .survey-subtitle {
+        font-size: 15px;
+        margin-bottom: 25px;
     }
 
-    .star-rating{
-
-        gap:3px;
-
+    .reservation-info {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-bottom: 30px;
     }
 
-    .star-rating label{
-
-        font-size:38px;
-
+    .reservation-info > div {
+        padding: 15px;
     }
 
+    .reservation-info strong {
+        font-size: 15px;
+    }
+
+    .form-group label {
+        font-size: 15px;
+    }
+
+    .submit-btn {
+        font-size: 16px;
+        padding: 15px;
+    }
+
+    .survey-success p {
+        font-size: 14px;
+    }
+
+    .home-btn {
+        width: 100%;
+        box-sizing: border-box;
+    }
 }

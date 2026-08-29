@@ -3,7 +3,7 @@ from django.conf import settings
 
 from services.models import Service
 from users.models import CustomUser
-
+import uuid
 
 class Barber(models.Model):
 
@@ -198,6 +198,15 @@ class Reservation(models.Model):
     reminder_sent = models.BooleanField(
     default=False
 )
+    survey_token = models.UUIDField(
+    default=uuid.uuid4,
+    unique=True,
+    editable=False
+)
+
+    survey_sms_sent = models.BooleanField(
+    default=False
+)
 
     class Meta:
 
@@ -221,6 +230,28 @@ class Reservation(models.Model):
             name = self.customer_name
 
         return f"{name} - {self.service.name}"
+    
+
+class ReservationReview(models.Model):
+
+    reservation = models.OneToOneField(
+        Reservation,
+        on_delete=models.CASCADE,
+        related_name="review"
+    )
+
+    rating = models.PositiveSmallIntegerField()
+
+    text = models.TextField(
+        blank=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return f"{self.reservation.customer_name} - {self.rating}"
     
 class BarberBlockedTime(models.Model):
 

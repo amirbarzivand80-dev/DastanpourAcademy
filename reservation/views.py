@@ -8,7 +8,7 @@ from django.http import JsonResponse
 from discounts.models import DiscountCode, DiscountUsage
 
 from services.models import Service, BarberServicePrice
-from .models import Barber, Reservation
+from .models import Barber, Reservation, ReservationReview
 from reservation.models import BarberBlockedTime
 from users.sms import send_appointment_confirmation_sms
 
@@ -1163,36 +1163,6 @@ def reservation_payment(request):
             # جلوگیری از دوباره ساخته شدن رزرو
             # =================================================
 
-            existing_ids = request.session.get(
-                "created_reservation_ids"
-            )
-
-            if existing_ids:
-
-                existing_count = (
-                    Reservation.objects
-                    .filter(
-                        id__in=existing_ids,
-                        user=request.user
-                    )
-                    .count()
-                )
-
-                if existing_count == len(existing_ids):
-
-                    request.session[
-                        "selected_payment_type"
-                    ] = payment_type
-
-                    request.session[
-                        "selected_payment_amount"
-                    ] = payable_amount
-
-                    request.session.modified = True
-
-                    return redirect(
-                        "reservation_payment"
-                    )
 
             # =================================================
             # ساخت واقعی رزروها
@@ -1481,5 +1451,63 @@ def reservation_payment(request):
 
             "selected_payment_amount":
                 selected_payment_amount,
+        }
+    )
+
+def reservation_survey(request, token):
+
+    reservation = get_object_or_404(
+        Reservation,
+        survey_token=token
+    )
+
+    already_reviewed = hasattr(
+        reservation,
+        "review"
+    )
+
+    success = False
+
+    if request.method == "POST":
+
+        if already_reviewed:
+
+            already_reviewed = True
+
+        else:
+
+            rating = request.POST.get("rating")
+            text = request.POST.get("text", "").strip()
+
+            if not rating:
+                messages.error(
+                    request,
+                    "لطفاً امتیاز خود را انتخاب کنید."
+                )
+
+            elif rating not in ["1", "2", "3", "4", "5"]:
+
+                messages.error(
+                    request,
+                    "امتیاز وارد شده معتبر نیست."
+                )
+
+            else:
+
+                ReservationReview.objects.create(
+                    reservation=reservation,
+                    rating=int(rating),
+                    text=text
+                )
+
+                success = True
+
+    return render(
+        request,
+        "core/reservation_survey.html",
+        {
+            "reservation": reservation,
+            "success": success,
+            "already_reviewed": already_reviewed,
         }
     )
