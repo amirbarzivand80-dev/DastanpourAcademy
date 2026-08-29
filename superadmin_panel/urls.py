@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import delete_order
 
 urlpatterns = [
 
@@ -517,6 +518,12 @@ path(
     "sms/search-users/",
     views.sms_search_users,
     name="sms_search_users"
+),
+
+path(
+    "orders/<int:order_id>/delete/",
+    delete_order,
+    name="delete_order"
 ),
 ]
 

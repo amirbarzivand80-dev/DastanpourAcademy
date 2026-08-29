@@ -1,0 +1,193 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}
+نظرسنجی
+{% endblock %}
+
+{% block content %}
+
+<section class="survey-page">
+
+    <div class="survey-container">
+
+        {% if success %}
+
+            <!-- =========================
+                 ثبت موفق نظر
+            ========================== -->
+
+            <div class="survey-success">
+
+                <div class="success-icon">
+                    ✓
+                </div>
+
+                <h1>
+                    با تشکر از شما ❤️
+                </h1>
+
+                <p>
+                    نظر و امتیاز شما با موفقیت ثبت شد.
+                </p>
+
+                <p>
+                    از اینکه تجربه خودتون رو با ما به اشتراک گذاشتید ممنونیم.
+                </p>
+
+                <a href="/" class="home-btn">
+    بازگشت به صفحه اصلی
+</a>
+
+            </div>
+
+
+        {% elif already_reviewed %}
+
+            <!-- =========================
+                 قبلاً نظر ثبت شده
+            ========================== -->
+
+            <div class="survey-success">
+
+                <div class="success-icon">
+                    ✓
+                </div>
+
+                <h1>
+                    نظر شما قبلاً ثبت شده است
+                </h1>
+
+                <p>
+                    از اینکه نظر خودتون رو با ما به اشتراک گذاشتید ممنونیم.
+                </p>
+
+                <a href="/" class="home-btn">
+    بازگشت به صفحه اصلی
+</a>
+
+            </div>
+
+
+        {% else %}
+
+            <!-- =========================
+                 فرم نظرسنجی
+            ========================== -->
+
+            <div class="survey-box">
+
+                <h1>
+                    نظرتان درباره خدمات ما چیست؟
+                </h1>
+
+                <p class="survey-subtitle">
+                    {{ reservation.barber.user.full_name }}
+                </p>
+
+                <div class="reservation-info">
+
+                    <div>
+                        <span>آرایشگر</span>
+                        <strong>
+                            {{ reservation.barber.user.full_name }}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>خدمت</span>
+                        <strong>
+                            {{ reservation.service.name }}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>تاریخ نوبت</span>
+                        <strong>
+                            {{ reservation.date }}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>ساعت</span>
+                        <strong>
+                            {{ reservation.time }}
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <form method="POST">
+
+                    {% csrf_token %}
+
+                    <div class="form-group">
+
+                        <label>
+                            امتیاز شما به آرایشگر
+                        </label>
+
+                        <select name="rating" required>
+
+                            <option value="">
+                                انتخاب امتیاز
+                            </option>
+
+                            <option value="5">
+                                ⭐⭐⭐⭐⭐ عالی
+                            </option>
+
+                            <option value="4">
+                                ⭐⭐⭐⭐ خیلی خوب
+                            </option>
+
+                            <option value="3">
+                                ⭐⭐⭐ خوب
+                            </option>
+
+                            <option value="2">
+                                ⭐⭐ متوسط
+                            </option>
+
+                            <option value="1">
+                                ⭐ ضعیف
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            نظر شما
+                        </label>
+
+                        <textarea
+                            name="text"
+                            rows="5"
+                            placeholder="نظر خود را درباره تجربه‌تان بنویسید..."
+                        ></textarea>
+
+                    </div>
+
+
+                    <button type="submit" class="submit-btn">
+                        ثبت نظر
+                    </button>
+
+                </form>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+<link rel="stylesheet" href="{% static 'css/reservation_survey.css' %}">
+
+{% endblock %}

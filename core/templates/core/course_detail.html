@@ -11,12 +11,16 @@
    <div class="gallery">
 
     {% if course.image %}
-        <img src="{{ course.image.url }}" alt="{{ course.title }}">
+        <img src="{{ course.image.url }}"
+             alt="{{ course.title }}"
+             class="course-gallery-image">
     {% endif %}
 
     {% for image in course.gallery.all %}
 
-        <img src="{{ image.image.url }}" alt="{{ course.title }}">
+        <img src="{{ image.image.url }}"
+             alt="{{ course.title }}"
+             class="course-gallery-image">
 
     {% endfor %}
 
@@ -154,5 +158,16 @@
     </div>
 
 </section>
+<!-- تصویر بزرگ -->
+<div class="image-lightbox" id="imageLightbox">
 
+    <span class="lightbox-close">&times;</span>
+
+    <img id="lightboxImage" src="" alt="">
+
+</div>
+
+
+
+<script src="{% static 'js/course_detail.js' %}"></script>
 {% endblock %}

@@ -129,7 +129,7 @@
 
                 <p class="product-short-description">
 
-                  {{ product.description }}
+                  {{ product.short_description }}
 
                 </p>
 
@@ -370,8 +370,56 @@
 
     </div>
 
+{% if related_products %}
+
+<section class="related-products-section">
+
+
+<div class="container">
+
+    <div class="related-box">
+
+        <h2>محصولات پیشنهادی</h2>
+
+        <div class="description-line"></div>
+
+        <div class="related-grid">
+
+            {% for related in related_products %}
+
+            <a href="{% url 'product_detail' related.slug %}"
+               class="related-card">
+
+                {% if related.image %}
+
+                    <img src="{{ related.image.url }}"
+                         alt="{{ related.name }}">
+
+                {% endif %}
+
+                <h3>
+                    {{ related.name }}
+                </h3>
+
+                <span>
+                    {{ related.price|price_format }} تومان
+                </span>
+
+            </a>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+
 
 </section>
+
+{% endif %}
+
 
 <link rel="stylesheet"
 href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">

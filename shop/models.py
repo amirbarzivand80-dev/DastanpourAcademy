@@ -48,7 +48,13 @@ class Product(models.Model):
 
     slug = models.SlugField(unique=True)
 
-    description = models.TextField()
+    short_description = models.TextField(
+    blank=True
+)
+
+    description = models.TextField(
+    blank=True
+)
 
     price = models.PositiveIntegerField()
 

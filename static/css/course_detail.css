@@ -239,3 +239,104 @@
     display:block;
 
 }
+
+
+
+/* =====================================
+        Course Image Lightbox
+===================================== */
+
+.course-gallery-image {
+
+    cursor: zoom-in;
+
+    transition: .3s;
+
+}
+
+.course-gallery-image:hover {
+
+    transform: scale(1.03);
+
+}
+
+
+/* Lightbox */
+
+.image-lightbox {
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0, 0, 0, .88);
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    z-index: 99999;
+
+    padding: 30px;
+
+}
+
+
+.image-lightbox.active {
+
+    display: flex;
+
+}
+
+
+.image-lightbox img {
+
+    max-width: 90vw;
+
+    max-height: 90vh;
+
+    width: auto;
+
+    height: auto;
+
+    object-fit: contain;
+
+    border-radius: 15px;
+
+    box-shadow: 0 10px 50px rgba(0,0,0,.5);
+
+}
+
+
+.lightbox-close {
+
+    position: absolute;
+
+    top: 25px;
+
+    right: 35px;
+
+    color: #fff;
+
+    font-size: 45px;
+
+    font-weight: 300;
+
+    cursor: pointer;
+
+    line-height: 1;
+
+    transition: .3s;
+
+}
+
+
+.lightbox-close:hover {
+
+    color: #d4af37;
+
+    transform: scale(1.1);
+
+}

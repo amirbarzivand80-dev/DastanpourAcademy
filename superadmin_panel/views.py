@@ -2970,6 +2970,18 @@ def orders(request):
             "search": search,
         }
     )
+
+from django.shortcuts import get_object_or_404, redirect
+
+def delete_order(request, order_id):
+
+    order = get_object_or_404(Order, id=order_id)
+
+    if request.method == "POST":
+        order.delete()
+        return redirect("orders")
+
+    return redirect("orders")
 def order_detail(request, id):
 
     order = get_object_or_404(

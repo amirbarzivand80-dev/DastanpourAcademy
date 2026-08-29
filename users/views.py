@@ -151,6 +151,7 @@ def register_view(request):
                 "full_name": full_name,
                 "password": password,
             }
+          
 
             return redirect("verify_phone")
 
@@ -171,14 +172,50 @@ def register_view(request):
     )
 def verify_phone(request):
 
+    # =====================================================
+    # ثبت نام جدید
+    # =====================================================
+
     pending_registration = request.session.get(
         "pending_registration"
     )
 
-    if not pending_registration:
+    # =====================================================
+    # کاربر قدیمی که هنگام ورود نیاز به تأیید دارد
+    # =====================================================
+
+    pending_verification_user_id = request.session.get(
+        "pending_verification_user_id"
+    )
+
+    # =====================================================
+    # اگر هیچ‌کدام وجود نداشت
+    # =====================================================
+
+    if not pending_registration and not pending_verification_user_id:
+
         return redirect("register")
 
-    phone = pending_registration["phone"]
+    # =====================================================
+    # مشخص کردن شماره تلفن
+    # =====================================================
+
+    if pending_registration:
+
+        phone = pending_registration["phone"]
+
+    else:
+
+        user = get_object_or_404(
+            CustomUser,
+            id=pending_verification_user_id
+        )
+
+        phone = user.phone
+
+    # =====================================================
+    # بررسی کد
+    # =====================================================
 
     if request.method == "POST":
 
@@ -233,43 +270,76 @@ def verify_phone(request):
 
         else:
 
+            # =================================================
             # کد صحیح است
+            # =================================================
+
             verification.is_used = True
 
             verification.save(
                 update_fields=["is_used"]
             )
 
-            # حالااااا کاربر ساخته می‌شود
-            user = CustomUser(
-                phone=pending_registration["phone"],
-                full_name=pending_registration["full_name"],
-                phone_verified=True,
-            )
+            # =================================================
+            # اگر ثبت نام جدید بوده
+            # =================================================
 
-            user.set_password(
-                pending_registration["password"]
-            )
+            if pending_registration:
 
-            user.save()
+                user = CustomUser(
+                    phone=pending_registration["phone"],
+                    full_name=pending_registration["full_name"],
+                    phone_verified=True,
+                )
 
-            # پاک کردن اطلاعات موقت ثبت نام
-            request.session.pop(
-                "pending_registration",
-                None
-            )
+                user.set_password(
+                    pending_registration["password"]
+                )
 
-            ActivityLog.objects.create(
-                user=user,
-                action=f"{user.full_name} شماره موبایل خود را تأیید کرد"
-            )
+                user.save()
 
-            # ورود خودکار
-            login(
-                request,
-                user,
-                backend="users.backends.PhoneBackend"
-            )
+                request.session.pop(
+                    "pending_registration",
+                    None
+                )
+
+                ActivityLog.objects.create(
+                    user=user,
+                    action=f"{user.full_name} شماره موبایل خود را تأیید کرد"
+                )
+
+                login(
+                    request,
+                    user,
+                    backend="users.backends.PhoneBackend"
+                )
+
+            # =================================================
+            # اگر کاربر قدیمی بوده
+            # =================================================
+
+            else:
+
+                user.phone_verified = True
+
+                user.save(
+                    update_fields=["phone_verified"]
+                )
+
+                request.session.pop(
+                    "pending_verification_user_id",
+                    None
+                )
+
+                login(
+                    request,
+                    user,
+                    backend="users.backends.PhoneBackend"
+                )
+
+            # =================================================
+            # مقصد بعد از ورود
+            # =================================================
 
             next_url = request.session.pop(
                 "login_next",
@@ -279,6 +349,10 @@ def verify_phone(request):
             return redirect(
                 next_url or "/"
             )
+
+    # =====================================================
+    # صفحه تأیید
+    # =====================================================
 
     return render(
         request,

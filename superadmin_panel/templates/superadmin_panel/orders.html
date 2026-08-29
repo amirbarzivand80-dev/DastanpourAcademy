@@ -147,12 +147,29 @@
 
                     <td>
 
-                        <a
-                            href="{% url 'order_detail' order.id %}"
-                            class="btn-edit"
-                        >
-                            مشاهده
-                        </a>
+                       <a
+    href="{% url 'order_detail' order.id %}"
+    class="btn-edit"
+>
+    مشاهده
+</a>
+
+<form
+    method="POST"
+    action="{% url 'delete_order' order.id %}"
+    style="display:inline;"
+    onsubmit="return confirm('آیا از حذف این سفارش مطمئن هستید؟');"
+>
+    {% csrf_token %}
+
+    <button
+        type="submit"
+        class="btn-delete"
+    >
+        حذف
+    </button>
+
+</form>
 
                     </td>
 

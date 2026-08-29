@@ -13,6 +13,7 @@ class ProductForm(forms.ModelForm):
             "brand",
             "name",
             "slug",
+            "short_description",
             "description",
             "price",
             "discount_price",
@@ -30,6 +31,11 @@ class ProductForm(forms.ModelForm):
 
             "slug": forms.TextInput(attrs={
                 "class": "form-control"
+            }),
+
+            "short_description": forms.Textarea(attrs={
+                "class": "form-control",
+                   "rows": 3
             }),
 
             "description": forms.Textarea(attrs={
